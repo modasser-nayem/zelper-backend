@@ -1,0 +1,427 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== OTP ====================
+enum OtpType {
+  ACCOUNT_VERIFY
+  FORGOT_PASSWORD
+}
+
+model Otp {
+  id          String    @id @default(uuid())
+  email       String
+  code        Int
+  type        OtpType
+  is_used     Boolean   @default(false)
+  is_verified Boolean   @default(false)
+  verified_at DateTime?
+  attempts    Int       @default(0)
+  expires_at  DateTime
+  created_at  DateTime  @default(now())
+  update_at   DateTime  @updatedAt
+
+  @@index([email])
+  @@map("otps")
+}
+
+// ============================= User model =========================
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BLOCKED
+  DELETED
+}
+
+enum ServiceHelperStatus {
+  NOT_SUBMITTED
+  IN_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+model User {
+  id            String       @id @default(uuid())
+  name          String
+  email         String       @unique
+  password      String
+  avatar        String?
+  role          UserRole     @default(USER)
+  status        UserStatus   @default(ACTIVE)
+  auth_provider AuthProvider @default(EMAIL)
+
+  // Helper Profile
+  phone               String?
+  bio                 String?
+  latitude            Float?
+  longitude           Float?
+  service_radius      Int                 @default(0)
+  rating_average      Float               @default(0)
+  total_reviews       Int                 @default(0)
+  completed_jobs      Int                 @default(0)
+  verification_status ServiceHelperStatus @default(NOT_SUBMITTED)
+  rejection_reason    String?
+  expertise           String[]            @default([])
+
+  // relations
+  notifications             Notification[]
+  job_posts                 JobPost[]              @relation("CustomerJobs")
+  job_applications          JobApplication[]       @relation("HelperApplications")
+  conversations_as_customer Conversation[]         @relation("CustomerConversations")
+  conversations_as_helper   Conversation[]         @relation("HelperConversations")
+  messages_sent             Message[]              @relation("MessageSender")
+  payments_as_customer      Payment[]              @relation("CustomerPayments")
+  payments_as_helper        Payment[]              @relation("HelperPayments")
+  wallet                    Wallet?
+  reviews_given             Review[]               @relation("CustomerReviews")
+  reviews_received          Review[]               @relation("HelperReviews")
+  verification_document     VerificationDocument[]
+  negotiation_offers        NegotiationOffer[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("users")
+}
+
+// verification documents
+model VerificationDocument {
+  id            String   @id @default(uuid())
+  user_id       String
+  document_type String
+  document_url  String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("verification_documents")
+}
+
+// ==================== Job Post =====================
+
+// Job Status Enum
+enum JobPostStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  WAITING_FOR_APPROVAL
+  COMPLETED
+  DISPUTED
+}
+
+model JobPost {
+  id                      String        @id @default(uuid())
+  customer_id             String
+  title                   String
+  description             String
+  budget                  Float
+  is_negotiable           Boolean       @default(false)
+  is_urgent               Boolean       @default(false)
+  scheduled_at            DateTime
+  latitude                Float
+  longitude               Float
+  address                 String
+  status                  JobPostStatus @default(OPEN)
+  selected_application_id String?       @unique
+
+  // relations
+  job_images       JobImage[]
+  job_applications JobApplication[] @relation("JobApplications")
+  conversations    Conversation[]   @relation("JobConversations")
+  payments         Payment[]        @relation("JobPayments")
+  reviews          Review[]         @relation("JobReviews")
+
+  // relations
+  customer             User            @relation("CustomerJobs", fields: [customer_id], references: [id], onDelete: Cascade)
+  selected_application JobApplication? @relation("SelectedJob", fields: [selected_application_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([customer_id])
+  @@map("job_posts")
+}
+
+// ==================== Job Images ====================
+model JobImage {
+  id         String   @id @default(uuid())
+  job_id     String
+  image_url  String
+  created_at DateTime @default(now())
+
+  job JobPost @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@index([job_id])
+  @@map("job_images")
+}
+
+// ==================== Job Interested ====================
+enum JobApplicationStatus {
+  PENDING
+  SELECTED
+  REJECTED
+  WITHDRAWN
+}
+
+model JobApplication {
+  id         String               @id @default(uuid())
+  job_id     String
+  helper_id  String
+  status     JobApplicationStatus @default(PENDING)
+  created_at DateTime             @default(now())
+  updated_at DateTime             @updatedAt
+
+  job              JobPost       @relation("JobApplications", fields: [job_id], references: [id], onDelete: Cascade)
+  helper           User          @relation("HelperApplications", fields: [helper_id], references: [id], onDelete: Cascade)
+  negotiations     Negotiation[]
+  selected_for_job JobPost?      @relation("SelectedJob")
+
+  @@unique([job_id, helper_id])
+  @@index([helper_id])
+  @@map("job_applications")
+}
+
+// ==================== Negotiation ====================
+enum NegotiationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+model Negotiation {
+  id                String            @id @default(uuid())
+  application_id    String
+  status            NegotiationStatus @default(PENDING)
+  final_amount      Float
+  accepted_offer_id String?           @unique
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+
+  application        JobApplication     @relation(fields: [application_id], references: [id], onDelete: Cascade)
+  negotiation_offers NegotiationOffer[]
+  accepted_offer     NegotiationOffer?  @relation("NegotiationAcceptedOffer", fields: [accepted_offer_id], references: [id], onDelete: Cascade)
+
+  @@index([application_id])
+  @@map("negotiations")
+}
+
+// ==================== Negotiation Offer ====================
+model NegotiationOffer {
+  id             String   @id @default(uuid())
+  negotiation_id String
+  sender_id      String
+  amount         Float    @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  negotiation             Negotiation  @relation(fields: [negotiation_id], references: [id], onDelete: Cascade)
+  sender                  User         @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+  accepted_in_negotiation Negotiation? @relation("NegotiationAcceptedOffer")
+
+  @@index([negotiation_id])
+  @@index([sender_id])
+  @@map("negotiation_offers")
+}
+
+// ==================== Payments ====================
+enum PaymentStatus {
+  PENDING
+  FUNDED
+  RELEASED
+  REFUNDED
+  FAILED
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  job_id                String
+  customer_id           String
+  helper_id             String
+  amount                Float
+  platform_fee          Float
+  helper_amount         Float
+  status                PaymentStatus @default(PENDING)
+  released_at           DateTime?
+  stripe_payment_intent String?
+  stripe_customer_id    String?
+  created_at            DateTime      @default(now())
+  updated_at            DateTime      @updatedAt
+
+  job      JobPost @relation("JobPayments", fields: [job_id], references: [id], onDelete: Cascade)
+  customer User    @relation("CustomerPayments", fields: [customer_id], references: [id], onDelete: Cascade)
+  helper   User    @relation("HelperPayments", fields: [helper_id], references: [id], onDelete: Cascade)
+
+  @@index([job_id])
+  @@index([customer_id])
+  @@index([helper_id])
+  @@map("payments")
+}
+
+// ==================== Wallets ====================
+model Wallet {
+  id                String   @id @default(uuid())
+  helper_id         String   @unique
+  available_balance Decimal  @default(0)
+  pending_balance   Decimal  @default(0)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  helper       User                @relation(fields: [helper_id], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+  withdrawals  Withdrawal[]
+
+  @@map("wallets")
+}
+
+// ==================== Wallet Transactions ====================
+enum WalletTransactionType {
+  JOB_EARNING
+  COMMISSION
+  WITHDRAWAL
+  REFUND
+}
+
+model WalletTransaction {
+  id           String                @id @default(uuid())
+  wallet_id    String
+  type         WalletTransactionType
+  amount       Decimal
+  reference_id String
+  note         String?
+  created_at   DateTime              @default(now())
+
+  wallet Wallet @relation(fields: [wallet_id], references: [id], onDelete: Cascade)
+
+  @@index([wallet_id])
+  @@map("wallet_transactions")
+}
+
+// ==================== Withdrawals ====================
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REJECTED
+}
+
+model Withdrawal {
+  id           String           @id @default(uuid())
+  wallet_id    String
+  amount       Decimal
+  bank_details Json?
+  status       WithdrawalStatus @default(PENDING)
+  note         String?
+  created_at   DateTime         @default(now())
+  updated_at   DateTime         @updatedAt
+
+  wallet Wallet @relation(fields: [wallet_id], references: [id], onDelete: Cascade)
+
+  @@index([wallet_id])
+  @@map("withdrawals")
+}
+
+// ==================== Conversations ====================
+enum ConversationStatus {
+  ACTIVE
+  CLOSED
+}
+
+model Conversation {
+  id          String             @id @default(uuid())
+  job_id      String
+  customer_id String
+  helper_id   String
+  status      ConversationStatus @default(ACTIVE)
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+
+  job      JobPost   @relation("JobConversations", fields: [job_id], references: [id], onDelete: Cascade)
+  customer User      @relation("CustomerConversations", fields: [customer_id], references: [id], onDelete: Cascade)
+  helper   User      @relation("HelperConversations", fields: [helper_id], references: [id], onDelete: Cascade)
+  messages Message[] @relation("ConversationMessages")
+
+  @@index([job_id])
+  @@index([customer_id])
+  @@index([helper_id])
+  @@map("conversations")
+}
+
+// ==================== Messages ====================
+enum MessageType {
+  TEXT
+  IMAGE
+}
+
+model Message {
+  id              String      @id @default(uuid())
+  conversation_id String
+  sender_id       String
+  type            MessageType @default(TEXT)
+  content         String
+  is_read         Boolean     @default(false)
+  created_at      DateTime    @default(now())
+
+  conversation Conversation @relation("ConversationMessages", fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@index([conversation_id])
+  @@index([sender_id])
+  @@map("messages")
+}
+
+// ==================== Reviews ====================
+model Review {
+  id          String   @id @default(uuid())
+  job_id      String   @unique
+  customer_id String
+  helper_id   String
+  rating      Int
+  comment     String
+  created_at  DateTime @default(now())
+
+  job      JobPost @relation("JobReviews", fields: [job_id], references: [id], onDelete: Cascade)
+  customer User    @relation("CustomerReviews", fields: [customer_id], references: [id], onDelete: Cascade)
+  helper   User    @relation("HelperReviews", fields: [helper_id], references: [id], onDelete: Cascade)
+
+  @@index([customer_id])
+  @@index([helper_id])
+  @@map("reviews")
+}
+
+// ==================== NOTIFICATIONS ====================
+model Notification {
+  id          String  @id @default(uuid())
+  receiver_id String
+  title       String
+  content     String
+  data        Json?
+  is_read     Boolean @default(false)
+
+  receiver User @relation(fields: [receiver_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([receiver_id])
+  @@map("notifications")
+}

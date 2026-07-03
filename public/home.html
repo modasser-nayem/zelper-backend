@@ -1,0 +1,1952 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXUS CORE — Global Network Infrastructure</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --c: #00e5cc;
+        --c2: rgba(0, 229, 204, 0.25);
+        --c3: rgba(0, 229, 204, 0.08);
+        --amber: #ff9500;
+        --pink: #ff44cc;
+        --blue: #44aaff;
+        --green: #39ff14;
+        --bg: #000810;
+      }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: "Share Tech Mono", monospace;
+      }
+
+      canvas {
+        display: block;
+      }
+      #cv-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+      }
+      #cv-world {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      /* ── UI OVERLAY ─────────────────────────────────────────── */
+      .ui {
+        position: fixed;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      /* ── HEADER ──────────────────────────────────────────────── */
+      .hdr {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 18px 26px;
+      }
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .brand-name {
+        font-family: "Orbitron", monospace;
+        font-weight: 900;
+        font-size: 22px;
+        letter-spacing: 6px;
+        color: var(--c);
+        text-shadow:
+          0 0 24px rgba(0, 229, 204, 0.75),
+          0 0 60px rgba(0, 229, 204, 0.25);
+      }
+      .brand-sub {
+        font-size: 8px;
+        letter-spacing: 6px;
+        color: rgba(0, 229, 204, 0.38);
+        text-transform: uppercase;
+      }
+      .hdr-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+      }
+      .hdr-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 8px;
+        letter-spacing: 2px;
+        color: rgba(0, 229, 204, 0.5);
+      }
+      .dot-live {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+        animation: blink 2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+
+      /* ── GLOBE ORB — top center, standalone ─────────────────── */
+      .orb-wrap {
+        position: absolute;
+        top: 54px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: floatY 7s ease-in-out infinite;
+        filter: drop-shadow(0 30px 60px rgba(0, 229, 204, 0.18))
+          drop-shadow(0 0 2px rgba(0, 229, 204, 0.3));
+        z-index: 4;
+      }
+
+      .core-orb {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .orb-center {
+        position: relative;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 30% 30%,
+          #00ffee,
+          #003b44 60%,
+          #001015 100%
+        );
+        box-shadow:
+          0 0 25px rgba(0, 255, 220, 0.8),
+          0 0 60px rgba(0, 255, 220, 0.35),
+          inset 0 0 25px rgba(255, 255, 255, 0.15);
+        overflow: hidden;
+        animation: orbFloat 6s ease-in-out infinite;
+      }
+
+      .core-glow {
+        position: absolute;
+        inset: -25px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 255, 220, 0.22),
+          transparent 70%
+        );
+        animation: glowPulse 4s ease-in-out infinite;
+      }
+
+      .orb-ring {
+        position: absolute;
+        border: 1px solid rgba(0, 255, 220, 0.25);
+        border-radius: 50%;
+      }
+
+      .ring1 {
+        width: 150px;
+        height: 150px;
+        animation: rotateRing 18s linear infinite;
+      }
+
+      .ring2 {
+        width: 190px;
+        height: 190px;
+        border-style: dashed;
+        animation: rotateRingReverse 28s linear infinite;
+      }
+
+      .ring3 {
+        width: 230px;
+        height: 230px;
+        opacity: 0.35;
+        animation: rotateRing 35s linear infinite;
+      }
+
+      .core-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 10px;
+        line-height: 1.6;
+        letter-spacing: 3px;
+        color: #dfffff;
+        text-shadow: 0 0 10px rgba(0, 255, 220, 0.9);
+        font-family: "Orbitron", monospace;
+      }
+
+      .pulse {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 255, 220, 0.4);
+        animation: pulseWave 4s infinite;
+      }
+
+      .pulse2 {
+        animation-delay: 1.3s;
+      }
+
+      .pulse3 {
+        animation-delay: 2.6s;
+      }
+
+      @keyframes pulseWave {
+        0% {
+          transform: scale(0.7);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+
+      @keyframes rotateRing {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes rotateRingReverse {
+        from {
+          transform: rotate(360deg);
+        }
+        to {
+          transform: rotate(0deg);
+        }
+      }
+
+      @keyframes orbFloat {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes glowPulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1.15);
+          opacity: 1;
+        }
+      }
+
+      @keyframes floatY {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0) rotateX(2deg);
+        }
+        50% {
+          transform: translateX(-50%) translateY(-14px) rotateX(2deg);
+        }
+      }
+
+      /* ── SERVER UNIT — floats to right side ─────────────────── */
+      .srv-wrap {
+        position: absolute;
+        top: 80px;
+        right: 24px;
+        animation: srvFloat 8s ease-in-out infinite;
+        filter: drop-shadow(0 10px 30px rgba(0, 229, 204, 0.12));
+        z-index: 4;
+      }
+
+      @keyframes srvFloat {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .srv {
+        width: 220px;
+        background: linear-gradient(
+          165deg,
+          rgba(0, 22, 44, 0.97) 0%,
+          rgba(0, 6, 18, 0.99) 100%
+        );
+        border: 1px solid rgba(0, 229, 204, 0.28);
+        border-radius: 10px;
+        padding: 14px;
+        position: relative;
+        overflow: hidden;
+      }
+      .srv::before,
+      .srv::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-color: var(--c);
+        border-style: solid;
+      }
+      .srv::before {
+        top: -1px;
+        left: -1px;
+        border-width: 2px 0 0 2px;
+        border-radius: 10px 0 0 0;
+      }
+      .srv::after {
+        bottom: -1px;
+        right: -1px;
+        border-width: 0 2px 2px 0;
+        border-radius: 0 0 10px 0;
+      }
+
+      /* Animated scan line */
+      .srv-scan {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        top: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 229, 204, 0.65) 50%,
+          transparent 100%
+        );
+        animation: scanDown 5s linear infinite;
+      }
+      @keyframes scanDown {
+        0% {
+          top: 0;
+          opacity: 0.8;
+        }
+        100% {
+          top: 100%;
+          opacity: 0;
+        }
+      }
+
+      /* Corner glow patches */
+      .srv-glow-tl,
+      .srv-glow-br {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        pointer-events: none;
+      }
+      .srv-glow-tl {
+        top: -20px;
+        left: -20px;
+        background: radial-gradient(
+          circle,
+          rgba(0, 229, 204, 0.12) 0%,
+          transparent 70%
+        );
+      }
+      .srv-glow-br {
+        bottom: -20px;
+        right: -20px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 149, 0, 0.1) 0%,
+          transparent 70%
+        );
+      }
+
+      /* Topbar */
+      .srv-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 11px;
+        padding-bottom: 9px;
+        border-bottom: 1px solid rgba(0, 229, 204, 0.1);
+      }
+      .srv-id {
+        font-family: "Orbitron", monospace;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--c);
+      }
+      .srv-online {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 7px;
+        letter-spacing: 2px;
+        color: var(--green);
+      }
+
+      /* Bay rows */
+      .bays {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-bottom: 11px;
+      }
+      .bay {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        height: 10px;
+      }
+      .bay-leds {
+        display: flex;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+      .led {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+      }
+      .led.g {
+        background: var(--green);
+        box-shadow: 0 0 5px var(--green);
+      }
+      .led.a {
+        background: var(--amber);
+        box-shadow: 0 0 5px var(--amber);
+      }
+      .led.off {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .bay-track {
+        flex: 1;
+        height: 5px;
+        background: rgba(0, 229, 204, 0.05);
+        border: 1px solid rgba(0, 229, 204, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .bay-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 1s;
+      }
+      .bay-val {
+        font-size: 7px;
+        color: rgba(0, 229, 204, 0.4);
+        width: 30px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+
+      /* Core area */
+      .core-area {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 11px;
+      }
+      .core-screen-wrap {
+        flex: 1;
+        height: 62px;
+        background: rgba(0, 8, 20, 0.9);
+        border: 1px solid rgba(0, 229, 204, 0.18);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+      }
+      #cv-core {
+        width: 100%;
+        height: 100%;
+      }
+      .stats-col {
+        width: 82px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+      }
+      .stat {
+      }
+      .stat-lbl {
+        font-size: 6px;
+        letter-spacing: 2px;
+        color: rgba(0, 229, 204, 0.38);
+        margin-bottom: 1px;
+      }
+      .stat-val {
+        font-family: "Orbitron", monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--c);
+      }
+      .stat-val.warn {
+        color: var(--amber);
+      }
+
+      /* Port section */
+      .srv-bot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 9px;
+        border-top: 1px solid rgba(0, 229, 204, 0.09);
+      }
+      .ports {
+        display: flex;
+        gap: 3px;
+      }
+      .port {
+        width: 10px;
+        height: 7px;
+        border-radius: 1px;
+        background: rgba(0, 229, 204, 0.07);
+        border: 1px solid rgba(0, 229, 204, 0.18);
+      }
+      .port.on {
+        background: rgba(0, 229, 204, 0.28);
+        box-shadow: 0 0 5px rgba(0, 229, 204, 0.35);
+      }
+      .port.on.blink {
+        animation: blink 1s ease-in-out infinite;
+      }
+      .srv-meta {
+        font-size: 7px;
+        letter-spacing: 1px;
+        color: rgba(0, 229, 204, 0.32);
+      }
+      .srv-meta span {
+        color: var(--amber);
+      }
+
+      /* ── BOTTOM PANELS ────────────────────────────────────────── */
+      .panels {
+        position: absolute;
+        bottom: 16px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        padding: 0 22px;
+      }
+      .panel {
+        background: rgba(0, 8, 22, 0.78);
+        border: 1px solid rgba(0, 229, 204, 0.16);
+        border-radius: 6px;
+        padding: 7px 16px;
+        backdrop-filter: blur(10px);
+        min-width: 100px;
+      }
+      .p-lbl {
+        font-size: 6px;
+        letter-spacing: 3px;
+        color: rgba(0, 229, 204, 0.38);
+        margin-bottom: 3px;
+      }
+      .p-val {
+        font-family: "Orbitron", monospace;
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--c);
+      }
+      .p-val.am {
+        color: var(--amber);
+      }
+      .p-val.gr {
+        color: var(--green);
+      }
+      .p-val.pk {
+        color: var(--pink);
+      }
+
+      /* ── CONNECTION SIDEBAR ───────────────────────────────────── */
+      .conn-sidebar {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .ci {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 8px;
+        letter-spacing: 1px;
+        opacity: 0;
+        transition: opacity 0.6s;
+        white-space: nowrap;
+      }
+      .ci.show {
+        opacity: 1;
+      }
+      .cled {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        animation: blink 1.8s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- CANVASES -->
+    <canvas id="cv-bg"></canvas>
+    <canvas id="cv-world"></canvas>
+
+    <!-- UI -->
+    <div class="ui">
+      <!-- HEADER -->
+      <div class="hdr">
+        <div class="brand">
+          <div class="brand-name">NEXUS CORE</div>
+          <div class="brand-sub">
+            Global Network Infrastructure &nbsp;·&nbsp; Node-01 &nbsp;·&nbsp;
+            Sector Ω
+          </div>
+        </div>
+        <div class="hdr-right">
+          <div class="hdr-row">
+            <div class="dot-live"></div>
+            SYSTEM ONLINE
+          </div>
+          <div class="hdr-row" id="utc-time">--:--:-- UTC</div>
+          <div class="hdr-row" id="active-links">0 ACTIVE LINKS</div>
+        </div>
+      </div>
+
+      <!-- GLOBE ORB — top center -->
+      <div class="orb-wrap" id="orb-wrap">
+        <div class="core-orb">
+          <div class="orb-ring ring1"></div>
+          <div class="orb-ring ring2"></div>
+          <div class="orb-ring ring3"></div>
+
+          <div class="orb-center">
+            <div class="pulse pulse1"></div>
+            <div class="pulse pulse2"></div>
+            <div class="pulse pulse3"></div>
+
+            <div class="core-glow"></div>
+
+            <div class="core-text">GLOBAL<br />NETWORK<br />CORE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVER UNIT — right side -->
+      <div class="srv-wrap" id="srv-wrap">
+        <div class="srv">
+          <div class="srv-scan"></div>
+          <div class="srv-glow-tl"></div>
+          <div class="srv-glow-br"></div>
+
+          <div class="srv-top">
+            <div class="srv-id">
+              ◈ SERVER CORE ENGINE &nbsp;·&nbsp; v4.2.1-stable
+            </div>
+            <div class="srv-online">
+              <div class="led g"></div>
+              ONLINE
+            </div>
+          </div>
+
+          <div class="bays" id="bays"></div>
+
+          <div class="core-area">
+            <div class="core-screen-wrap">
+              <canvas id="cv-core"></canvas>
+            </div>
+            <div class="stats-col">
+              <div class="stat">
+                <div class="stat-lbl">CPU LOAD</div>
+                <div class="stat-val" id="s-cpu">—</div>
+              </div>
+              <div class="stat">
+                <div class="stat-lbl">BANDWIDTH</div>
+                <div class="stat-val" id="s-bw">—</div>
+              </div>
+              <div class="stat">
+                <div class="stat-lbl">THREADS</div>
+                <div class="stat-val" id="s-th">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="srv-bot">
+            <div class="ports" id="ports"></div>
+            <div class="srv-meta">
+              TEMP&nbsp;<span id="s-temp">—</span> &nbsp;·&nbsp; MEM&nbsp;<span
+                id="s-mem"
+                >—</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM PANELS -->
+      <div class="panels">
+        <div class="panel">
+          <div class="p-lbl">GLOBAL NODES</div>
+          <div class="p-val">147</div>
+        </div>
+        <div class="panel">
+          <div class="p-lbl">DATA TX TODAY</div>
+          <div class="p-val am" id="data-tx">—</div>
+        </div>
+        <div class="panel">
+          <div class="p-lbl">AVG LATENCY</div>
+          <div class="p-val gr" id="latency">—</div>
+        </div>
+        <div class="panel">
+          <div class="p-lbl">UPTIME SLA</div>
+          <div class="p-val">99.97%</div>
+        </div>
+        <div class="panel">
+          <div class="p-lbl">PACKET LOSS</div>
+          <div class="p-val pk">0.01%</div>
+        </div>
+      </div>
+
+      <!-- CONNECTION SIDEBAR -->
+      <div class="conn-sidebar" id="conn-sidebar"></div>
+    </div>
+    <!-- /ui -->
+
+    <script>
+      "use strict";
+
+      // ─────────────────────────────────────────────────────────────
+      //  CANVAS CONTEXTS
+      // ─────────────────────────────────────────────────────────────
+      const cvBg = document.getElementById("cv-bg");
+      const ctxBg = cvBg.getContext("2d");
+      const cvWorld = document.getElementById("cv-world");
+      const ctxW = cvWorld.getContext("2d");
+      const cvCore = document.getElementById("cv-core");
+      const ctxC = cvCore.getContext("2d");
+
+      let W = 0,
+        H = 0;
+
+      // ─────────────────────────────────────────────────────────────
+      //  CONTINENT DATA  [lat, lon]
+      // ─────────────────────────────────────────────────────────────
+      const LAND = [
+        {
+          n: "North America",
+          p: [
+            [72, -141],
+            [71, -157],
+            [64, -167],
+            [62, -164],
+            [60, -145],
+            [58, -136],
+            [55, -132],
+            [50, -127],
+            [48, -125],
+            [40, -124],
+            [32, -117],
+            [29, -111],
+            [22, -90],
+            [16, -88],
+            [14, -83],
+            [9, -79],
+            [9, -78],
+            [10, -69],
+            [20, -87],
+            [22, -88],
+            [22, -90],
+            [25, -92],
+            [30, -84],
+            [25, -77],
+            [24, -81],
+            [28, -80],
+            [32, -80],
+            [35, -76],
+            [40, -74],
+            [42, -70],
+            [44, -66],
+            [47, -53],
+            [52, -55],
+            [56, -61],
+            [60, -64],
+            [62, -64],
+            [68, -62],
+            [72, -68],
+            [75, -73],
+            [78, -82],
+            [82, -65],
+            [83, -52],
+            [74, -52],
+            [70, -58],
+            [68, -52],
+            [63, -52],
+            [72, -141],
+          ],
+        },
+        {
+          n: "Greenland",
+          p: [
+            [76, -65],
+            [77, -62],
+            [80, -65],
+            [83, -38],
+            [83, -55],
+            [82, -60],
+            [80, -68],
+            [76, -73],
+            [76, -65],
+          ],
+        },
+        {
+          n: "South America",
+          p: [
+            [11, -73],
+            [12, -74],
+            [12, -72],
+            [10, -62],
+            [8, -60],
+            [5, -53],
+            [2, -52],
+            [0, -51],
+            [-5, -35],
+            [-8, -35],
+            [-14, -39],
+            [-20, -40],
+            [-23, -43],
+            [-28, -49],
+            [-33, -52],
+            [-38, -57],
+            [-41, -62],
+            [-46, -65],
+            [-50, -68],
+            [-55, -65],
+            [-55, -64],
+            [-55, -68],
+            [-52, -70],
+            [-45, -65],
+            [-36, -71],
+            [-30, -71],
+            [-25, -70],
+            [-18, -70],
+            [-10, -76],
+            [-5, -80],
+            [2, -77],
+            [5, -77],
+            [8, -77],
+            [11, -73],
+          ],
+        },
+        {
+          n: "Europe",
+          p: [
+            [71, 28],
+            [70, 31],
+            [70, 27],
+            [68, 28],
+            [66, 25],
+            [60, 22],
+            [56, 21],
+            [55, 14],
+            [57, 10],
+            [56, 5],
+            [50, 2],
+            [48, -5],
+            [43, -9],
+            [36, -9],
+            [36, -5],
+            [36, 0],
+            [37, 3],
+            [40, 0],
+            [40, 3],
+            [43, 3],
+            [43, 7],
+            [44, 15],
+            [40, 18],
+            [38, 16],
+            [38, 22],
+            [35, 24],
+            [35, 28],
+            [37, 36],
+            [41, 36],
+            [41, 28],
+            [42, 45],
+            [45, 41],
+            [48, 40],
+            [55, 38],
+            [60, 50],
+            [63, 54],
+            [65, 58],
+            [68, 56],
+            [71, 28],
+          ],
+        },
+        {
+          n: "Africa",
+          p: [
+            [37, -6],
+            [37, 10],
+            [30, 32],
+            [25, 37],
+            [22, 37],
+            [12, 44],
+            [5, 41],
+            [0, 42],
+            [-2, 41],
+            [-11, 40],
+            [-11, 35],
+            [-14, 38],
+            [-26, 34],
+            [-34, 27],
+            [-35, 19],
+            [-30, 17],
+            [-25, 15],
+            [-18, 12],
+            [-5, 10],
+            [0, 8],
+            [4, -2],
+            [5, 2],
+            [6, 1],
+            [5, -8],
+            [4, -7],
+            [8, -15],
+            [14, -17],
+            [15, -16],
+            [20, -17],
+            [25, -15],
+            [30, -10],
+            [32, -9],
+            [34, -7],
+            [37, -6],
+          ],
+        },
+        {
+          n: "Asia main",
+          p: [
+            [70, 30],
+            [72, 80],
+            [73, 140],
+            [70, 162],
+            [60, 163],
+            [56, 162],
+            [50, 142],
+            [42, 143],
+            [36, 137],
+            [33, 130],
+            [30, 122],
+            [25, 121],
+            [18, 110],
+            [10, 104],
+            [5, 103],
+            [1, 104],
+            [5, 100],
+            [10, 98],
+            [16, 100],
+            [18, 100],
+            [20, 93],
+            [22, 91],
+            [22, 90],
+            [20, 87],
+            [15, 80],
+            [10, 79],
+            [8, 78],
+            [10, 80],
+            [20, 73],
+            [23, 68],
+            [25, 57],
+            [22, 59],
+            [22, 56],
+            [24, 55],
+            [28, 57],
+            [30, 48],
+            [32, 46],
+            [35, 44],
+            [35, 36],
+            [37, 36],
+            [41, 36],
+            [42, 45],
+            [47, 40],
+            [56, 60],
+            [60, 60],
+            [65, 60],
+            [68, 56],
+            [70, 30],
+          ],
+        },
+        {
+          n: "Japan",
+          p: [
+            [31, 130],
+            [33, 131],
+            [34, 133],
+            [35, 137],
+            [37, 138],
+            [38, 141],
+            [40, 141],
+            [41, 141],
+            [43, 145],
+            [44, 144],
+            [42, 143],
+            [39, 141],
+            [36, 136],
+            [34, 133],
+            [31, 130],
+          ],
+        },
+        {
+          n: "Australia",
+          p: [
+            [-15, 128],
+            [-12, 130],
+            [-12, 136],
+            [-13, 136],
+            [-13, 141],
+            [-16, 146],
+            [-20, 149],
+            [-25, 153],
+            [-30, 153],
+            [-35, 150],
+            [-38, 147],
+            [-38, 141],
+            [-37, 141],
+            [-35, 136],
+            [-32, 134],
+            [-32, 118],
+            [-22, 114],
+            [-18, 122],
+            [-15, 128],
+          ],
+        },
+        {
+          n: "UK",
+          p: [
+            [51, -5],
+            [58, -5],
+            [58, 2],
+            [53, 2],
+            [51, -5],
+          ],
+        },
+        {
+          n: "Iceland",
+          p: [
+            [64, -24],
+            [65, -14],
+            [64, -13],
+            [63, -18],
+            [64, -24],
+          ],
+        },
+        {
+          n: "Madagascar",
+          p: [
+            [-12, 49],
+            [-18, 44],
+            [-25, 44],
+            [-25, 47],
+            [-12, 49],
+          ],
+        },
+        {
+          n: "Sri Lanka",
+          p: [
+            [10, 80],
+            [7, 80],
+            [6, 81],
+            [9, 81],
+            [10, 80],
+          ],
+        },
+      ];
+
+      // ─────────────────────────────────────────────────────────────
+      //  CITIES
+      // ─────────────────────────────────────────────────────────────
+      const CITIES = [
+        { name: "New York", lat: 40.7, lon: -74.0, col: "#00e5cc" },
+        { name: "London", lat: 51.5, lon: -0.1, col: "#00e5cc" },
+        { name: "Tokyo", lat: 35.7, lon: 139.7, col: "#ff9500" },
+        { name: "Sydney", lat: -33.9, lon: 151.2, col: "#ff9500" },
+        { name: "São Paulo", lat: -23.5, lon: -46.6, col: "#44aaff" },
+        { name: "Mumbai", lat: 19.1, lon: 72.9, col: "#ff44cc" },
+        { name: "Cairo", lat: 30.0, lon: 31.2, col: "#ff9500" },
+        { name: "Moscow", lat: 55.8, lon: 37.6, col: "#00e5cc" },
+        { name: "Dubai", lat: 25.2, lon: 55.3, col: "#ff9500" },
+        { name: "Singapore", lat: 1.3, lon: 103.8, col: "#ff44cc" },
+        { name: "Lagos", lat: 6.5, lon: 3.4, col: "#44aaff" },
+        { name: "Toronto", lat: 43.7, lon: -79.4, col: "#00e5cc" },
+        { name: "Frankfurt", lat: 50.1, lon: 8.7, col: "#00e5cc" },
+        { name: "Beijing", lat: 39.9, lon: 116.4, col: "#ff44cc" },
+        { name: "Cape Town", lat: -33.9, lon: 18.4, col: "#44aaff" },
+        { name: "Los Angeles", lat: 34.0, lon: -118.2, col: "#00e5cc" },
+        { name: "Seoul", lat: 37.6, lon: 127.0, col: "#ff44cc" },
+        { name: "Amsterdam", lat: 52.4, lon: 4.9, col: "#00e5cc" },
+        { name: "Chicago", lat: 41.9, lon: -87.6, col: "#44aaff" },
+        { name: "Johannesburg", lat: -26.2, lon: 28.0, col: "#44aaff" },
+      ];
+
+      // Map layout (computed from DOM)
+      let MAP = { x: 0, y: 0, w: 0, h: 0 };
+      let cityXY = [];
+
+      function buildMapLayout() {
+        // Use orb bottom edge as the top of the map
+        const orbEl = document.getElementById("orb-wrap");
+        let orbBottom = H * 0.38;
+        if (orbEl) {
+          const r = orbEl.getBoundingClientRect();
+          orbBottom = r.bottom + 18;
+        }
+        const usableH = H - orbBottom - 70;
+        const usableW = W - 60;
+        const aspect = 2.05;
+        let mW = Math.min(usableW, usableH * aspect);
+        let mH = mW / aspect;
+        MAP = { x: (W - mW) / 2, y: orbBottom, w: mW, h: mH };
+        cityXY = CITIES.map((c) => project(c.lat, c.lon));
+      }
+
+      function project(lat, lon) {
+        return {
+          x: MAP.x + ((lon + 180) * MAP.w) / 360,
+          y: MAP.y + ((90 - lat) * MAP.h) / 180,
+        };
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  STARS  &  SPACE BG
+      // ─────────────────────────────────────────────────────────────
+      const STAR_COUNT = 520;
+      let stars = [];
+      let shoots = [];
+      let lastShoot = 0;
+
+      function initStars() {
+        stars = [];
+        for (let i = 0; i < STAR_COUNT; i++) {
+          const r = Math.pow(Math.random(), 2.5) * 2.2 + 0.15;
+          stars.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r,
+            base: Math.random() * 0.75 + 0.1,
+            phase: Math.random() * Math.PI * 2,
+            spd: Math.random() * 0.018 + 0.004,
+            spark: Math.random() < 0.025,
+          });
+        }
+      }
+
+      function drawSpace(t) {
+        ctxBg.clearRect(0, 0, W, H);
+
+        // Deep space gradient
+        const bg = ctxBg.createRadialGradient(
+          W * 0.45,
+          H * 0.35,
+          0,
+          W * 0.45,
+          H * 0.5,
+          W * 0.85,
+        );
+        bg.addColorStop(0, "#021320");
+        bg.addColorStop(0.45, "#010c18");
+        bg.addColorStop(1, "#000508");
+        ctxBg.fillStyle = bg;
+        ctxBg.fillRect(0, 0, W, H);
+
+        // Nebulae
+        const NEB = [
+          { x: W * 0.12, y: H * 0.28, r: W * 0.28, c: [0, 38, 80], a: 0.52 },
+          { x: W * 0.82, y: H * 0.18, r: W * 0.24, c: [10, 0, 60], a: 0.38 },
+          { x: W * 0.52, y: H * 0.68, r: W * 0.32, c: [0, 30, 50], a: 0.35 },
+          { x: W * 0.88, y: H * 0.72, r: W * 0.2, c: [0, 50, 40], a: 0.28 },
+          { x: W * 0.35, y: H * 0.5, r: W * 0.18, c: [20, 0, 40], a: 0.22 },
+        ];
+        for (const n of NEB) {
+          const p = 0.88 + Math.sin(t * 0.00028 + n.x * 0.001) * 0.12;
+          const g = ctxBg.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * p);
+          g.addColorStop(0, `rgba(${n.c[0]},${n.c[1]},${n.c[2]},${n.a})`);
+          g.addColorStop(1, `rgba(${n.c[0]},${n.c[1]},${n.c[2]},0)`);
+          ctxBg.fillStyle = g;
+          ctxBg.fillRect(0, 0, W, H);
+        }
+
+        // Stars
+        for (const s of stars) {
+          const a = Math.max(
+            0.03,
+            s.base + Math.sin(t * s.spd + s.phase) * 0.22,
+          );
+          ctxBg.beginPath();
+          ctxBg.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctxBg.fillStyle = `rgba(210,230,255,${a})`;
+          ctxBg.fill();
+          if (s.spark && a > 0.55) {
+            const len = s.r * 5.5 * (a / s.base);
+            ctxBg.globalAlpha = a * 0.35;
+            ctxBg.strokeStyle = "#d0e8ff";
+            ctxBg.lineWidth = 0.5;
+            for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
+              ctxBg.beginPath();
+              ctxBg.moveTo(s.x, s.y);
+              ctxBg.lineTo(
+                s.x + Math.cos(angle) * len,
+                s.y + Math.sin(angle) * len,
+              );
+              ctxBg.stroke();
+            }
+            ctxBg.globalAlpha = 1;
+          }
+        }
+
+        // Shooting stars
+        if (t - lastShoot > 5500 + Math.random() * 9000) {
+          lastShoot = t;
+          shoots.push({
+            x: Math.random() * W * 0.65,
+            y: Math.random() * H * 0.35,
+            vx: 4 + Math.random() * 4,
+            vy: 1 + Math.random() * 2.5,
+            len: 90 + Math.random() * 130,
+            born: t,
+          });
+        }
+        shoots = shoots.filter((s) => {
+          const age = (t - s.born) / 900;
+          if (age > 1) return false;
+          const alpha = age < 0.1 ? age / 0.1 : 1 - (age - 0.1) / 0.9;
+          const ex = s.x + s.vx * age * 110,
+            ey = s.y + s.vy * age * 110;
+          const g = ctxBg.createLinearGradient(
+            ex - s.len,
+            ey - s.len * 0.45,
+            ex,
+            ey,
+          );
+          g.addColorStop(0, "rgba(255,255,255,0)");
+          g.addColorStop(1, `rgba(255,255,255,${alpha * 0.85})`);
+          ctxBg.beginPath();
+          ctxBg.moveTo(ex - s.len, ey - s.len * 0.45);
+          ctxBg.lineTo(ex, ey);
+          ctxBg.strokeStyle = g;
+          ctxBg.lineWidth = 1.8;
+          ctxBg.stroke();
+          return true;
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  WORLD MAP DRAWING
+      // ─────────────────────────────────────────────────────────────
+      function drawMap(t) {
+        ctxW.clearRect(0, 0, W, H);
+
+        const { x: mx, y: my, w: mw, h: mh } = MAP;
+        if (!mw || !mh) return;
+
+        // Map ambient glow
+        const mglow = ctxW.createRadialGradient(
+          mx + mw * 0.5,
+          my + mh * 0.5,
+          0,
+          mx + mw * 0.5,
+          my + mh * 0.5,
+          mw * 0.58,
+        );
+        mglow.addColorStop(0, "rgba(0,110,130,.07)");
+        mglow.addColorStop(1, "rgba(0,110,130,0)");
+        ctxW.fillStyle = mglow;
+        ctxW.fillRect(0, 0, W, H);
+
+        // Grid lines
+        ctxW.strokeStyle = "rgba(0,180,160,.055)";
+        ctxW.lineWidth = 0.5;
+        for (let lon = -180; lon <= 180; lon += 30) {
+          const { x: gx } = project(0, lon);
+          ctxW.beginPath();
+          ctxW.moveTo(gx, my);
+          ctxW.lineTo(gx, my + mh);
+          ctxW.stroke();
+        }
+        for (let lat = -90; lat <= 90; lat += 30) {
+          const { y: gy } = project(lat, 0);
+          ctxW.beginPath();
+          ctxW.moveTo(mx, gy);
+          ctxW.lineTo(mx + mw, gy);
+          ctxW.stroke();
+        }
+
+        // Map border
+        ctxW.strokeStyle = "rgba(0,180,160,.18)";
+        ctxW.lineWidth = 1;
+        ctxW.strokeRect(mx, my, mw, mh);
+
+        // Corner brackets
+        const bk = 18,
+          bkW = 1.5;
+        const corners = [
+          [mx, my],
+          [mx + mw, my],
+          [mx, my + mh],
+          [mx + mw, my + mh],
+        ];
+        ctxW.strokeStyle = "rgba(0,229,204,.55)";
+        ctxW.lineWidth = bkW;
+        corners.forEach(([cx, cy], i) => {
+          const sx = i % 2 === 0 ? 1 : -1,
+            sy = i < 2 ? 1 : -1;
+          ctxW.beginPath();
+          ctxW.moveTo(cx + sx * bk, cy);
+          ctxW.lineTo(cx, cy);
+          ctxW.lineTo(cx, cy + sy * bk);
+          ctxW.stroke();
+        });
+
+        // Continents
+        const pulse = 0.12 + Math.sin(t * 0.0007) * 0.04;
+        ctxW.save();
+        ctxW.beginPath();
+        ctxW.rect(mx, my, mw, mh);
+        ctxW.clip();
+        for (const land of LAND) {
+          if (!land.p || land.p.length < 3) continue;
+          ctxW.beginPath();
+          const first = project(land.p[0][0], land.p[0][1]);
+          ctxW.moveTo(first.x, first.y);
+          for (let i = 1; i < land.p.length; i++) {
+            const { x, y } = project(land.p[i][0], land.p[i][1]);
+            ctxW.lineTo(x, y);
+          }
+          ctxW.closePath();
+          ctxW.fillStyle = `rgba(0,65,85,${pulse})`;
+          ctxW.fill();
+          ctxW.strokeStyle = "rgba(0,185,165,.38)";
+          ctxW.lineWidth = 0.8;
+          ctxW.stroke();
+        }
+        ctxW.restore();
+
+        // Map label
+        ctxW.font = "8px Share Tech Mono, monospace";
+        ctxW.fillStyle = "rgba(0,229,204,.22)";
+        ctxW.fillText(
+          "GLOBAL NETWORK MAP  ·  EQUIRECTANGULAR PROJECTION  ·  REAL-TIME",
+          mx + 8,
+          my + mh + 14,
+        );
+
+        // Lat/lon corner labels
+        [
+          [-90, -180],
+          [-90, 180],
+          [90, -180],
+          [90, 180],
+        ].forEach(([lat, lon]) => {
+          const { x, y } = project(lat, lon);
+          ctxW.fillStyle = "rgba(0,229,204,.2)";
+          ctxW.font = "7px Share Tech Mono";
+          const txt = `${Math.abs(lat)}°${lat < 0 ? "S" : "N"} ${Math.abs(lon)}°${lon < 0 ? "W" : "E"}`;
+          const off = lat < 0 ? -4 : 10,
+            offx = lon < 0 ? 3 : -52;
+          ctxW.fillText(txt, x + offx, y + off);
+        });
+
+        // City base dots
+        for (let i = 0; i < CITIES.length; i++) {
+          const p = cityXY[i];
+          if (!p) continue;
+          ctxW.beginPath();
+          ctxW.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+          ctxW.fillStyle = "rgba(0,229,204,.35)";
+          ctxW.fill();
+        }
+
+        // Server beam from orb center down to map
+        drawBeam(t);
+
+        // Connection arcs
+        drawConnections(t);
+      }
+
+      // Get orb center position
+      function getOrbCenter() {
+        const orbEl = document.getElementById("orb-wrap");
+        if (orbEl) {
+          const r = orbEl.getBoundingClientRect();
+          return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        }
+        return { x: W / 2, y: H * 0.18 };
+      }
+
+      function drawBeam(t) {
+        const orb = getOrbCenter();
+        const sx = orb.x;
+        const sy = orb.y + 55; // bottom of orb sphere
+        const ey = MAP.y;
+        if (ey <= sy) return;
+        const alpha = 0.35 + Math.sin(t * 0.002) * 0.12;
+        const g = ctxW.createLinearGradient(sx, sy, sx, ey);
+        g.addColorStop(0, `rgba(0,229,204,${alpha})`);
+        g.addColorStop(1, "rgba(0,229,204,0)");
+        ctxW.beginPath();
+        ctxW.moveTo(sx, sy);
+        ctxW.lineTo(sx, ey);
+        ctxW.strokeStyle = g;
+        ctxW.lineWidth = 1.5;
+        ctxW.shadowBlur = 10;
+        ctxW.shadowColor = "#00e5cc";
+        ctxW.stroke();
+        ctxW.shadowBlur = 0;
+
+        // Wide faint cone
+        ctxW.save();
+        ctxW.globalAlpha = 0.04 + Math.sin(t * 0.002) * 0.015;
+        const cone = ctxW.createLinearGradient(
+          sx,
+          sy,
+          sx,
+          MAP.y + MAP.h * 0.25,
+        );
+        cone.addColorStop(0, "rgba(0,229,204,1)");
+        cone.addColorStop(1, "rgba(0,229,204,0)");
+        ctxW.beginPath();
+        ctxW.moveTo(sx, sy);
+        ctxW.lineTo(
+          sx - (MAP.y + MAP.h * 0.25 - sy) * 0.35,
+          MAP.y + MAP.h * 0.25,
+        );
+        ctxW.lineTo(
+          sx + (MAP.y + MAP.h * 0.25 - sy) * 0.35,
+          MAP.y + MAP.h * 0.25,
+        );
+        ctxW.closePath();
+        ctxW.fillStyle = cone;
+        ctxW.fill();
+        ctxW.restore();
+
+        // Draw connection line from orb to server box
+        drawOrbToServerLine(t, sx, orb.y);
+      }
+
+      // Glowing line connecting orb to server box
+      function drawOrbToServerLine(t, orbX, orbY) {
+        const srvEl = document.getElementById("srv-wrap");
+        if (!srvEl) return;
+        const r = srvEl.getBoundingClientRect();
+        const srvX = r.left + 20; // left edge of server box
+        const srvY = r.top + r.height * 0.3; // upper portion of server
+
+        const alpha = 0.28 + Math.sin(t * 0.0018) * 0.1;
+        const g = ctxW.createLinearGradient(orbX, orbY, srvX, srvY);
+        g.addColorStop(0, `rgba(0,229,204,${alpha})`);
+        g.addColorStop(1, `rgba(0,229,204,${alpha * 0.4})`);
+
+        // Dashed connection line
+        ctxW.setLineDash([4, 6]);
+        ctxW.beginPath();
+        ctxW.moveTo(orbX + 55, orbY);
+        ctxW.lineTo(srvX, srvY);
+        ctxW.strokeStyle = g;
+        ctxW.lineWidth = 1;
+        ctxW.shadowBlur = 6;
+        ctxW.shadowColor = "#00e5cc";
+        ctxW.stroke();
+        ctxW.setLineDash([]);
+        ctxW.shadowBlur = 0;
+
+        // Animated packet on this line
+        const pkt = (t * 0.0008) % 1;
+        const px = orbX + 55 + (srvX - orbX - 55) * pkt;
+        const py = orbY + (srvY - orbY) * pkt;
+        ctxW.beginPath();
+        ctxW.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctxW.fillStyle = "rgba(0,229,204,0.85)";
+        ctxW.shadowBlur = 8;
+        ctxW.shadowColor = "#00e5cc";
+        ctxW.fill();
+        ctxW.shadowBlur = 0;
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  CONNECTIONS — all originate from orb center
+      // ─────────────────────────────────────────────────────────────
+      let connections = [];
+      let connLastSpawn = -9999;
+      const MAX_CONN = 18;
+
+      function hexToRgb(hex) {
+        const h = hex.replace("#", "");
+        return [
+          parseInt(h.slice(0, 2), 16),
+          parseInt(h.slice(2, 4), 16),
+          parseInt(h.slice(4, 6), 16),
+        ];
+      }
+
+      class Connection {
+        constructor(idx) {
+          this.idx = idx;
+          this.col = CITIES[idx].col;
+          this.rgb = hexToRgb(this.col);
+          this.alpha = 0;
+          this.pkt = 0;
+          this.phase = "in";
+          this.born = performance.now();
+          this.life = 9000 + Math.random() * 6000;
+          this.pktSpd = 0.0007 + Math.random() * 0.0006;
+          this.active = true;
+          this.latency = (12 + Math.random() * 90).toFixed(0);
+          this.bw = (50 + Math.random() * 950).toFixed(0);
+        }
+
+        update(now) {
+          const age = now - this.born;
+          const fade = 900;
+          if (this.phase === "in") {
+            this.alpha = Math.min(1, age / fade);
+            if (this.alpha >= 0.98) this.phase = "active";
+          } else if (this.phase === "active") {
+            this.alpha = 1;
+            if (age > this.life) this.phase = "out";
+          } else {
+            this.alpha = Math.max(0, 1 - (age - this.life) / fade);
+            if (this.alpha <= 0) this.active = false;
+          }
+          this.pkt += this.pktSpd;
+          if (this.pkt > 1) this.pkt -= 1;
+        }
+
+        draw(ctx, sx, sy, t) {
+          const dst = cityXY[this.idx];
+          if (!dst) return;
+          const [r, g, b] = this.rgb;
+          const a = this.alpha;
+
+          const mx2 = (sx + dst.x) / 2;
+          const my2 = (sy + dst.y) / 2;
+          const dist = Math.hypot(dst.x - sx, dst.y - sy);
+          const dir = dst.x >= sx ? 1 : -1;
+          const cpX = mx2 + dir * dist * 0.22;
+          const cpY = sy + (dst.y - sy) * 0.3 - 35;
+
+          // Faint full arc
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.quadraticCurveTo(cpX, cpY, dst.x, dst.y);
+          ctx.strokeStyle = `rgba(${r},${g},${b},${a * 0.15})`;
+          ctx.lineWidth = 4;
+          ctx.stroke();
+          ctx.strokeStyle = `rgba(${r},${g},${b},${a * 0.25})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.strokeStyle = `rgba(${r},${g},${b},${a * 0.45})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+
+          // Moving packet head + tail
+          const head = bezierPt(sx, sy, cpX, cpY, dst.x, dst.y, this.pkt);
+          const TAIL = 25;
+          ctx.beginPath();
+          let first = true;
+          for (let i = 0; i <= TAIL; i++) {
+            const tt = Math.max(0, this.pkt - i * 0.028);
+            const pt = bezierPt(sx, sy, cpX, cpY, dst.x, dst.y, tt);
+            first ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y);
+            first = false;
+          }
+          ctx.strokeStyle = `rgba(${r},${g},${b},${a * 0.7})`;
+          ctx.lineWidth = 2;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = this.col;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+
+          // Packet dot
+          ctx.beginPath();
+          ctx.arc(head.x, head.y, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${a * 0.9})`;
+          ctx.shadowBlur = 14;
+          ctx.shadowColor = this.col;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // City pulse rings
+          const ring1 = (t * 0.0025 + this.idx) % 1;
+          ctx.beginPath();
+          ctx.arc(dst.x, dst.y, 4 + ring1 * 14, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(${r},${g},${b},${a * (1 - ring1) * 0.55})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          const ring2 = (t * 0.0025 + this.idx + 0.5) % 1;
+          ctx.beginPath();
+          ctx.arc(dst.x, dst.y, 4 + ring2 * 14, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(${r},${g},${b},${a * (1 - ring2) * 0.35})`;
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+
+          // City dot (bright)
+          ctx.beginPath();
+          ctx.arc(dst.x, dst.y, 3.2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${a * 0.95})`;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = this.col;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // City label
+          if (a > 0.45) {
+            ctx.font = "9px Share Tech Mono, monospace";
+            const lx = dst.x + (dst.x > W * 0.6 ? -60 : 7);
+            ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.75})`;
+            ctx.fillText(CITIES[this.idx].name.toUpperCase(), lx, dst.y - 5);
+            ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.45})`;
+            ctx.fillText(this.latency + " ms", lx, dst.y + 5);
+          }
+        }
+      }
+
+      function bezierPt(x0, y0, cx, cy, x1, y1, t) {
+        const m = 1 - t;
+        return {
+          x: m * m * x0 + 2 * m * t * cx + t * t * x1,
+          y: m * m * y0 + 2 * m * t * cy + t * t * y1,
+        };
+      }
+
+      function drawConnections(t) {
+        // All connections originate from the orb center
+        const orb = getOrbCenter();
+        const sx = orb.x;
+        const sy = orb.y + 55; // bottom of orb
+
+        const now = performance.now();
+        if (
+          now - connLastSpawn > 900 + Math.random() * 700 &&
+          connections.length < MAX_CONN
+        ) {
+          const used = new Set(connections.map((c) => c.idx));
+          const avail = CITIES.map((_, i) => i).filter((i) => !used.has(i));
+          if (avail.length) {
+            connections.push(
+              new Connection(avail[Math.floor(Math.random() * avail.length)]),
+            );
+            connLastSpawn = now;
+          }
+        }
+
+        connections = connections.filter((c) => c.active);
+        for (const c of connections) {
+          c.update(now);
+          c.draw(ctxW, sx, sy, t);
+        }
+
+        // Update sidebar
+        const sb = document.getElementById("conn-sidebar");
+        if (sb) {
+          sb.innerHTML = connections
+            .map((c) => {
+              const [r, g, b] = c.rgb;
+              return `<div class="ci show">
+        <div class="cled" style="background:${c.col};box-shadow:0 0 6px ${c.col}"></div>
+        <span style="color:rgba(${r},${g},${b},.72)">${CITIES[c.idx].name.toUpperCase()}</span>
+        <span style="color:rgba(0,229,204,.3)">${c.latency}ms</span>
+      </div>`;
+            })
+            .join("");
+        }
+        const al = document.getElementById("active-links");
+        if (al) al.textContent = `${connections.length} ACTIVE LINKS`;
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  CORE SCREEN  (oscilloscope waveform)
+      // ─────────────────────────────────────────────────────────────
+      const WAVE_LEN = 240;
+      let waveData = new Float32Array(WAVE_LEN);
+
+      function drawCoreScreen(t) {
+        const cw = cvCore.width,
+          ch = cvCore.height;
+        if (!cw || !ch) return;
+
+        ctxC.fillStyle = "rgba(0,8,20,.55)";
+        ctxC.fillRect(0, 0, cw, ch);
+
+        waveData.copyWithin(0, 1);
+        const noise = (Math.random() - 0.5) * 0.25;
+        const sig =
+          Math.sin(t * 0.0045) * 0.28 +
+          Math.sin(t * 0.012) * 0.18 +
+          Math.sin(t * 0.031) * 0.1 +
+          noise;
+        waveData[WAVE_LEN - 1] = sig;
+
+        const mid = ch / 2;
+        const step = cw / WAVE_LEN;
+
+        ctxC.beginPath();
+        ctxC.moveTo(0, mid + waveData[0] * mid * 0.55);
+        for (let i = 1; i < WAVE_LEN; i++) {
+          const phase = Math.sin(t * 0.0021 + i * 0.08) * 0.2;
+          ctxC.lineTo(i * step, mid + (waveData[i] + phase) * mid * 0.55);
+        }
+        ctxC.strokeStyle = "rgba(0,229,204,.2)";
+        ctxC.lineWidth = 0.8;
+        ctxC.stroke();
+
+        ctxC.beginPath();
+        ctxC.moveTo(0, mid + waveData[0] * mid * 0.75);
+        for (let i = 1; i < WAVE_LEN; i++) {
+          ctxC.lineTo(i * step, mid + waveData[i] * mid * 0.75);
+        }
+        ctxC.strokeStyle = "rgba(0,229,204,.85)";
+        ctxC.lineWidth = 1.2;
+        ctxC.shadowBlur = 5;
+        ctxC.shadowColor = "#00e5cc";
+        ctxC.stroke();
+        ctxC.shadowBlur = 0;
+
+        ctxC.beginPath();
+        ctxC.moveTo(0, mid);
+        ctxC.lineTo(cw, mid);
+        ctxC.strokeStyle = "rgba(0,229,204,.09)";
+        ctxC.lineWidth = 0.5;
+        ctxC.stroke();
+
+        ctxC.font = "7px Share Tech Mono";
+        ctxC.fillStyle = "rgba(0,229,204,.3)";
+        ctxC.fillText("CORE.SIG", 3, 10);
+        ctxC.fillText(((sig + 1) * 50).toFixed(1) + "%", cw - 40, 10);
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  SERVER UI SETUP
+      // ─────────────────────────────────────────────────────────────
+      function buildServerUI() {
+        const baysEl = document.getElementById("bays");
+        if (baysEl) {
+          baysEl.innerHTML = Array.from({ length: 8 }, (_, i) => {
+            const pct = 25 + Math.random() * 65;
+            const r = Math.random();
+            const lc = r < 0.72 ? "g" : r < 0.88 ? "a" : "off";
+            const col =
+              lc === "g" ? "#00e5cc" : lc === "a" ? "#ff9500" : "#223";
+            return `<div class="bay">
+        <div class="bay-leds"><div class="led ${lc}"></div></div>
+        <div class="bay-track">
+          <div class="bay-fill" style="width:${pct.toFixed(0)}%;background:${col};opacity:.6;
+            animation:bayPulse ${(1 + Math.random()).toFixed(1)}s ease-in-out infinite ${Math.random().toFixed(1)}s">
+          </div>
+        </div>
+        <div class="bay-val">${pct.toFixed(0)}%</div>
+      </div>`;
+          }).join("");
+        }
+
+        const portsEl = document.getElementById("ports");
+        if (portsEl) {
+          portsEl.innerHTML = Array.from({ length: 12 }, (_, i) => {
+            const on = Math.random() < 0.65;
+            return `<div class="port ${on ? "on blink" : ""}" style="${on ? `animation-delay:${(Math.random() * 2).toFixed(1)}s` : ""}"></div>`;
+          }).join("");
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  LIVE STATS
+      // ─────────────────────────────────────────────────────────────
+      let dataTx = 0.31 + Math.random() * 0.5;
+      let lastStat = 0;
+
+      function updateStats(t) {
+        if (t - lastStat < 320) return;
+        lastStat = t;
+
+        const cpu = (
+          38 +
+          Math.sin(t * 0.0018) * 22 +
+          Math.random() * 5
+        ).toFixed(1);
+        const bw = (760 + Math.random() * 240).toFixed(0);
+        const th = Math.floor(
+          48 + Math.sin(t * 0.001) * 16 + Math.random() * 8,
+        );
+        const temp = (41 + Math.sin(t * 0.001) * 5 + Math.random() * 2).toFixed(
+          0,
+        );
+        const mem = (72 + Math.sin(t * 0.0009) * 8 + Math.random() * 3).toFixed(
+          0,
+        );
+        dataTx += 0.0012 + Math.random() * 0.0018;
+        const lat = (11 + Math.random() * 9).toFixed(0);
+
+        const $$ = (id, v) => {
+          const e = document.getElementById(id);
+          if (e) e.textContent = v;
+        };
+        $$("s-cpu", cpu + "%");
+        $$("s-bw", bw + " M");
+        $$("s-th", th + "T");
+        $$("s-temp", temp + "°C");
+        $$("s-mem", mem + "%");
+        $$("data-tx", dataTx.toFixed(2) + " TB");
+        $$("latency", lat + " ms");
+
+        const now = new Date();
+        const hh = String(now.getUTCHours()).padStart(2, "0");
+        const mm = String(now.getUTCMinutes()).padStart(2, "0");
+        const ss = String(now.getUTCSeconds()).padStart(2, "0");
+        $$("utc-time", `${hh}:${mm}:${ss} UTC`);
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  RESIZE
+      // ─────────────────────────────────────────────────────────────
+      function resize() {
+        W = window.innerWidth;
+        H = window.innerHeight;
+        cvBg.width = cvWorld.width = W;
+        cvBg.height = cvWorld.height = H;
+        cvCore.width = cvCore.parentElement
+          ? cvCore.parentElement.offsetWidth || 200
+          : 200;
+        cvCore.height = cvCore.parentElement
+          ? cvCore.parentElement.offsetHeight || 62
+          : 62;
+        buildMapLayout();
+        initStars();
+      }
+
+      window.addEventListener("resize", () => {
+        resize();
+        buildMapLayout();
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      //  MAIN LOOP
+      // ─────────────────────────────────────────────────────────────
+      let layoutTick = 0;
+
+      function loop(ts) {
+        requestAnimationFrame(loop);
+
+        layoutTick++;
+        if (layoutTick % 120 === 0) buildMapLayout();
+
+        drawSpace(ts);
+        drawMap(ts);
+        drawCoreScreen(ts);
+        updateStats(ts);
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      //  INIT
+      // ─────────────────────────────────────────────────────────────
+      const style = document.createElement("style");
+      style.textContent = `@keyframes bayPulse{0%,100%{opacity:.7}50%{opacity:.32}}`;
+      document.head.appendChild(style);
+
+      document.fonts.ready.then(() => {
+        resize();
+        buildMapLayout();
+        buildServerUI();
+
+        [0, 700, 1400, 2100].forEach((delay, i) => {
+          setTimeout(() => {
+            const used = new Set(connections.map((c) => c.idx));
+            const avail = CITIES.map((_, i) => i).filter((i) => !used.has(i));
+            if (avail.length)
+              connections.push(
+                new Connection(avail[Math.floor(Math.random() * avail.length)]),
+              );
+            connLastSpawn = performance.now();
+          }, delay);
+        });
+
+        requestAnimationFrame(loop);
+      });
+
+      // 1. Block more DevTools shortcuts
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && e.key === "I") ||
+          (e.ctrlKey && e.shiftKey && e.key === "J") ||
+          (e.ctrlKey && e.key === "U")
+        ) {
+          e.preventDefault();
+          return false;
+        }
+      });
+
+      // 2. Blur page when DevTools is opened (hacky)
+      setInterval(() => {
+        const before = new Date().getTime();
+        debugger;
+        const after = new Date().getTime();
+
+        if (after - before > 100) {
+          document.body.style.filter = "blur(10px)";
+        }
+      }, 1000);
+
+      // 3. Disable text selection
+      document.addEventListener("selectstart", (e) => e.preventDefault());
+
+      // 4. Disable drag
+      document.addEventListener("dragstart", (e) => e.preventDefault());
+
+      // 5. Disable context menu
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      // 6. Disable right-click menu
+      document.addEventListener("oncontextmenu", (e) => e.preventDefault());
+    </script>
+  </body>
+</html>

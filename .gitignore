@@ -1,0 +1,27 @@
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+
+*.local
+
+# Build
+output/
+dist-ssr/
+coverage/
+dist/
+
+# Dependencies
+node_modules/
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Vercel
+.vercel/
+
+

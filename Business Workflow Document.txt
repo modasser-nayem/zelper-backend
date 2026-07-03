@@ -1,0 +1,393 @@
+Project Overview
+Goal
+Someone Help is a location-based platform that connects people who need immediate or scheduled assistance with nearby people willing to help.
+Unlike traditional marketplaces, users do not have permanent customer or provider roles. Every account is a standard user account that can request help or provide help at any time.
+The platform prioritizes:
+Privacy
+Trust
+Simple negotiation
+Secure escrow payment
+Easy onboarding
+
+Core Principles
+1. Single User Account
+Every registered account is simply a User.
+A user can
+Request help
+Provide help
+Do both simultaneously
+No separate registration is required.
+
+2. Optional Verification
+Verification is optional.
+Users may request identity verification whenever they choose.
+Verification increases trust but never blocks platform usage.
+Verified users receive a badge that is visible during provider selection.
+
+3. Privacy First
+Before payment, both users remain anonymous.
+The platform hides
+Name
+Photo
+Phone Number
+Email
+Exact Address
+Exact GPS Location
+Customers evaluate helpers only using trust-related information.
+
+Complete Workflow
+
+Phase 1 — User Registration
+User opens the application.
+User provides
+Email or Phone
+Password
+Basic profile information
+System creates
+User
+Default status
+ACTIVE
+No role is assigned.
+
+Phase 2 — Optional Verification
+Whenever the user chooses,
+they may submit
+National ID
+Passport
+Driving License
+Selfie
+Additional documents
+System creates
+Verification Request
+Possible statuses
+PENDING
+
+VERIFIED
+
+REJECTED
+Even while
+UNVERIFIED
+the user can
+create jobs
+accept jobs
+earn money
+withdraw earnings
+
+Phase 3 — Choosing Mode
+After login
+the user chooses
+Help Others
+or
+Need Help
+This only changes the dashboard.
+It never changes the user account.
+
+Phase 4 — Customer Creates Help Request
+Customer selects
+Create Help Request
+Required information
+Category
+Title
+Description
+Images
+Budget
+Negotiable (Yes/No)
+Urgency
+Scheduled Date (optional)
+Scheduled Time (optional)
+Approximate Location
+System creates
+Job
+
+Status = OPEN
+Nearby helpers are notified.
+
+Phase 5 — Nearby Helpers Discover Jobs
+Helpers browse
+Nearby Jobs
+The platform filters jobs using
+Distance
+Category
+Availability
+Service Radius
+Helpers can view
+Job title
+Description
+Distance
+Budget
+Urgency
+Schedule
+Approximate location
+Exact customer information remains hidden.
+
+Phase 6 — Helper Sends Interest
+If interested,
+Helper selects
+Apply
+System creates
+Job Application
+Status
+PENDING
+No conversation is created.
+
+Phase 7 — Customer Reviews Applicants
+Customer receives
+12 Helpers Applied
+Customer reviews each helper.
+Visible information
+Verification Badge
+Rating
+Completed Jobs
+Reviews
+Distance
+Response Rate
+Completion Rate
+Hidden information
+Name
+Photo
+Phone
+Email
+Address
+Customer selects one helper.
+Other applications remain pending until payment succeeds.
+
+Phase 8 — Price Negotiation
+If negotiation is disabled
+The posted budget becomes the agreed price.
+Proceed directly to payment.
+If negotiation is enabled
+The selected helper and customer enter a negotiation room.
+Communication is limited to price offers only.
+No text messaging.
+Example
+Customer
+
+1000
+
+↓
+
+Helper
+
+1200
+
+↓
+
+Customer
+
+1100
+
+↓
+
+Helper
+
+Accepted
+
+↓
+
+Final Price
+
+1100
+Only one active offer exists at any moment.
+Each new offer replaces the previous one.
+Possible negotiation statuses
+ACTIVE
+
+ACCEPTED
+
+REJECTED
+
+EXPIRED
+Once accepted
+Price becomes locked.
+
+Phase 9 — Payment
+Customer proceeds to payment.
+Payment includes
+Job Amount
+Platform Fee (optional)
+Example
+Customer Pays
+
+1000
+Platform immediately deducts commission.
+Remaining balance enters escrow.
+Example
+Customer Paid
+
+1000
+
+Platform Commission
+
+100
+
+Escrow
+
+900
+System
+assigns helper
+closes all other applications
+locks negotiated amount
+Job status
+ASSIGNED
+
+Phase 10 — Private Conversation Opens
+Only after successful payment
+the platform creates
+Conversation
+Both users now can access
+Chat
+Images
+Phone number
+Profile Photo
+Name
+Navigation
+Exact Location
+Privacy restrictions are removed.
+
+Phase 11 — Work Starts
+Helper selects
+Start Job
+Job status
+IN_PROGRESS
+
+Phase 12 — Work Completion
+After finishing onsite work
+Helper selects
+Complete Job
+Job status
+WAITING_FOR_APPROVAL
+Customer receives notification.
+
+Phase 13 — Customer Approval
+Customer reviews completed work.
+If satisfied
+Approve
+Job
+COMPLETED
+Otherwise
+Request Revision
+Job returns
+IN_PROGRESS
+Conversation remains open.
+
+Phase 14 — Escrow Release
+After approval
+Escrow releases funds.
+Example
+Escrow
+
+900
+
+↓
+
+Helper Wallet
+
+900
+Wallet transaction created
+JOB_EARNING
+
+Phase 15 — Withdrawal
+Helper opens
+Wallet
+Selects
+Withdraw
+Supported methods
+Bank
+bKash
+Nagad
+System creates
+Withdrawal
+
+Status = PENDING
+Admin approval or automatic payout
+SUCCESS
+Wallet updated.
+
+Phase 16 — Review
+After job completion
+Customer may submit
+Rating (1–5)
+Review
+Only one review is allowed per completed job.
+The helper's rating is recalculated.
+Job becomes
+CLOSED
+
+System Lifecycle
+User Registration
+
+↓
+
+Optional Verification
+
+↓
+
+Choose Dashboard
+
+↓
+
+Create Help Request
+
+↓
+
+Nearby Helpers Apply
+
+↓
+
+Customer Reviews Applicants
+
+↓
+
+Select Helper
+
+↓
+
+Price Negotiation (Optional)
+
+↓
+
+Price Accepted
+
+↓
+
+Customer Payment
+
+↓
+
+Escrow Created
+
+↓
+
+Private Chat Opens
+
+↓
+
+Helper Starts Work
+
+↓
+
+Helper Completes Work
+
+↓
+
+Customer Approves
+
+↓
+
+Escrow Released
+
+↓
+
+Wallet Updated
+
+↓
+
+Withdrawal
+
+↓
+
+Review
+
+↓
+
+Job Closed

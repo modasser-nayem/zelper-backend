@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: someone-help-api
+    image: someone-help-api:latest
+    ports:
+      - "5021:5021"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/usr/src/app/logs
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: mongo:6-jammy
+    container_name: someone-help-db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+    driver: local

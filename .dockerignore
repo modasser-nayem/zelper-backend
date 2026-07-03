@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+.env.test
+.git
+.gitignore
+README.md
+logs
+coverage
+docker-compose.yml
+Dockerfile
+postman_collection.json
