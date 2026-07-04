@@ -8,9 +8,9 @@ async function main() {
   const seedEmails = [
     "customer1@gmail.com",
     "customer2@gmail.com",
-    "provider_rev@gmail.com",
-    "provider_ver@gmail.com",
-    "provider_rej@gmail.com",
+    "helper_rev@gmail.com",
+    "helper_ver@gmail.com",
+    "helper_rej@gmail.com",
   ];
 
   await prisma.user.deleteMany({
@@ -26,7 +26,7 @@ async function main() {
       name: "Customer One",
       email: "customer1@gmail.com",
       password: hashed,
-      role: UserRole.CUSTOMER,
+      role: UserRole.USER,
       avatar: `${avatarBase}CustomerOne`,
     },
   });
@@ -36,81 +36,81 @@ async function main() {
       name: "Customer Two",
       email: "customer2@gmail.com",
       password: hashed,
-      role: UserRole.CUSTOMER,
+      role: UserRole.USER,
       avatar: `${avatarBase}CustomerTwo`,
     },
   });
 
-  // Create Provider - In Review (with ProviderProfile)
-  const providerInReview = await prisma.user.create({
+  // Create Helper - In Review (directly on User)
+  const helperInReview = await prisma.user.create({
     data: {
-      name: "Provider In Review",
-      email: "provider_rev@gmail.com",
+      name: "Helper In Review",
+      email: "helper_rev@gmail.com",
       password: hashed,
-      role: UserRole.CUSTOMER,
-      avatar: `${avatarBase}ProviderRev`,
-    },
-  });
-  await prisma.providerProfile.create({
-    data: {
-      user_id: providerInReview.id,
+      role: UserRole.USER,
+      avatar: `${avatarBase}HelperRev`,
       verification_status: "IN_REVIEW",
-      documents: [
-        "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-        "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-      ],
-      expertise: "Plumbing Services",
+      expertise: ["Plumbing Services"],
       phone: "+1-305-555-0101",
       bio: "Experienced plumber with 5+ years of service.",
-      experience_years: 5,
     },
   });
 
-  // Create Provider - Verified
-  const providerVerified = await prisma.user.create({
+  await prisma.verificationDocument.create({
     data: {
-      name: "Provider Verified",
-      email: "provider_ver@gmail.com",
-      password: hashed,
-      role: UserRole.PROVIDER,
-      avatar: `${avatarBase}ProviderVer`,
+      user_id: helperInReview.id,
+      document_type: "JPG",
+      document_url: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
     },
   });
-  await prisma.providerProfile.create({
+
+  // Create Helper - Verified (directly on User)
+  const helperVerified = await prisma.user.create({
     data: {
-      user_id: providerVerified.id,
+      name: "Helper Verified",
+      email: "helper_ver@gmail.com",
+      password: hashed,
+      role: UserRole.USER,
+      avatar: `${avatarBase}HelperVer`,
       verification_status: "VERIFIED",
-      documents: ["https://res.cloudinary.com/demo/image/upload/sample.jpg"],
-      expertise: "Electrical Maintenance",
+      expertise: ["Electrical Maintenance"],
       phone: "+1-713-555-0202",
       bio: "Licensed electrician. 10+ years experience.",
-      experience_years: 10,
       rating_average: 4.5,
       total_reviews: 12,
     },
   });
 
-  // Create Provider - Rejected
-  const providerRejected = await prisma.user.create({
+  await prisma.verificationDocument.create({
     data: {
-      name: "Provider Rejected",
-      email: "provider_rej@gmail.com",
-      password: hashed,
-      role: UserRole.CUSTOMER,
-      avatar: `${avatarBase}ProviderRej`,
+      user_id: helperVerified.id,
+      document_type: "JPG",
+      document_url: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
     },
   });
-  await prisma.providerProfile.create({
+
+  // Create Helper - Rejected (directly on User)
+  const helperRejected = await prisma.user.create({
     data: {
-      user_id: providerRejected.id,
+      name: "Helper Rejected",
+      email: "helper_rej@gmail.com",
+      password: hashed,
+      role: UserRole.USER,
+      avatar: `${avatarBase}HelperRej`,
       verification_status: "REJECTED",
       rejection_reason:
         "The uploaded identity documents are blurred and unreadable. Please upload clear scans.",
-      documents: ["https://res.cloudinary.com/demo/image/upload/sample.jpg"],
-      expertise: "Carpentry & Woodwork",
+      expertise: ["Carpentry & Woodwork"],
       phone: "+1-214-555-0303",
       bio: "Woodwork specialist.",
-      experience_years: 3,
+    },
+  });
+
+  await prisma.verificationDocument.create({
+    data: {
+      user_id: helperRejected.id,
+      document_type: "JPG",
+      document_url: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
     },
   });
 

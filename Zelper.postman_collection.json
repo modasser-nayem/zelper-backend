@@ -1,0 +1,1039 @@
+{
+  "info": {
+    "_postman_id": "b8456961-9b8a-4f0a-b221-7dc06005afee",
+    "name": "Zelper",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50868842",
+    "_collection_link": "https://go.postman.co/collection/50868842-b8456961-9b8a-4f0a-b221-7dc06005afee?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Forgot Password",
+          "item": [
+            {
+              "name": "1. Forgot Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"modassernayem@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/forgot-password",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["auth", "forgot-password"]
+                }
+              },
+              "response": [
+                {
+                  "name": "1. Forgot Password",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "",
+                        "value": "",
+                        "type": "text",
+                        "disabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"modassernayem@gmail.com\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/auth/forgot-password",
+                      "host": ["{{BASE_URL}}"],
+                      "path": ["auth", "forgot-password"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "description": "",
+                      "type": "text"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "104"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"68-aGEafpxZMvyJ8qj17K2Oibdnr8E\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 03 Dec 2025 08:05:40 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [
+                    {
+                      "expires": "Invalid Date",
+                      "domain": "",
+                      "path": ""
+                    }
+                  ],
+                  "body": "{\n    \"success\": true,\n    \"message\": \"We have sent a 6-digit OTP to your email address, Please check!\",\n    \"data\": null\n}"
+                }
+              ]
+            },
+            {
+              "name": "2. Verify Reset OTP",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"modassernayem@gmail.com\",\r\n    \"otp\": 722613\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/verify-otp",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["auth", "verify-otp"]
+                }
+              },
+              "response": [
+                {
+                  "name": "2. Verify Reset OTP",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"modassernayem@gmail.com\",\r\n    \"otp\": 6480\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/auth/verify-otp",
+                      "host": ["{{BASE_URL}}"],
+                      "path": ["auth", "verify-otp"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "description": "",
+                      "type": "text"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "153"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"99-Y1MK4iaAX0SGpVbeTjKpbAEesVo\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 03 Dec 2025 08:09:31 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [
+                    {
+                      "expires": "Invalid Date",
+                      "domain": "",
+                      "path": ""
+                    }
+                  ],
+                  "body": "{\n    \"success\": true,\n    \"message\": \"OTP successfully verified\",\n    \"data\": {\n        \"isVerified\": true,\n        \"message\": \"OTP successfully verified\",\n        \"email\": \"modassernayem@gmail.com\"\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "3. Reset Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"modassernayem@gmail.com\",\r\n    \"newPassword\": \"123456\"\r\n} ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/reset-password",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["auth", "reset-password"]
+                }
+              },
+              "response": [
+                {
+                  "name": "3. Reset Password",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"modassernayem@gmail.com\",\r\n    \"newPassword\": \"111111\",\r\n    \"confirmPassword\": \"111111\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/auth/reset-password",
+                      "host": ["{{BASE_URL}}"],
+                      "path": ["auth", "reset-password"]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "description": "",
+                      "type": "text"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "69"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"45-w97Qz/9uveUotPwI5pbpARWocqY\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 03 Dec 2025 08:09:55 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"message\": \"Password Successfully Reset!\",\n    \"data\": null\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1. Create Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const result = pm.response.json();\r",
+                  "console.log(result);\r",
+                  "\r",
+                  "if(pm.response.code === 201 || pm.response.code === 200) {\r",
+                  "    pm.collectionVariables.set(\"ACCESS_TOKEN\", result.data.accessToken);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Test User One\",\r\n    \"email\": \"testuser1@gmail.com\",\r\n    \"password\": \"password123\",\r\n    \"phone\": \"+123456789\",\r\n    \"bio\": \"General handyman\",\r\n    \"latitude\": 23.8103,\r\n    \"longitude\": 90.4125,\r\n    \"service_radius\": 15,\r\n    \"expertise\": [\"Plumbing\", \"Electrical\"],\r\n    \"fcmToken\": \"fcm_token_123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/signup",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "signup"]
+            }
+          },
+          "response": [
+            {
+              "name": "1. Create Account",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Test User\",\r\n    \"email\": \"testuser@gmail.com\",\r\n    \"password\": \"password123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/signup",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["auth", "signup"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "76"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"4c-er1OpX1NUu6T9aaHnWIrcaDcjWo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 08 Jun 2026 04:56:47 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 201,\n    \"message\": \"Successfully registered account!\",\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOi...\",\n        \"refreshToken\": \"eyJhbGciOi...\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const result = pm.response.json();\r",
+                  "console.log(result);\r",
+                  "\r",
+                  "if(pm.response.code === 200) {\r",
+                  "    pm.collectionVariables.set(\"ACCESS_TOKEN\", result.data.accessToken);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// // super admin\r\n// {\r\n//     \"email\": \"admin@gmail.com\",\r\n//     \"password\": \"123456\"\r\n// }\r\n\r\n{\r\n    \"email\": \"testuser1@gmail.com\",\r\n    \"password\": \"123456\"\r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// // super admin\r\n// {\r\n//     \"email\": \"admin@gmail.com\",\r\n//     \"password\": \"123456\"\r\n// }\r\n\r\n{\r\n    \"email\": \"modassernayem@gmail.com\",\r\n    \"password\": \"111111\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/login",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "refreshToken=; Max-Age=864000; Path=/; Expires=Sat, 13 Dec 2025 08:11:15 GMT; HttpOnly; SameSite=Lax"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "443"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1bb-Ra3hC6w4JiFpxM0fo67QhBTI2CA\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 03 Dec 2025 08:11:15 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"success\": true,\n    \"message\": \"User logged in successfully!\",\n    \"data\": {\n        \"accessToken\": \"\",\n        \"refreshToken\": \"\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Social Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"token\": \"Z9HCN_JDrF6rah4SoZxVxbI36rMKO_2w5H2ev7UDFPTUUNk0l7I5kZju7lEMltySXvc1apdiXuIdGsp6nHhW9zXhwIw1TDzKAkvf9NLX5bRIZtj6VCrB6OsdvNFI7lHqUKicbau9msBgXF2teQM7Y5GS3zjliG4ew\",\r\n    \"provider\": \"GOOGLE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/social-login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "social-login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "change password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"currentPassword\": \"password123\",\r\n    \"newPassword\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/change-password",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "change-password"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users/profile",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "data",
+                  "value": "{\n    \"name\": \"Ali Modasser\",\n    \"phone\": \"+987654321\",\n    \"bio\": \"Experienced builder and plumber\",\n    \"latitude\": 23.7771,\n    \"longitude\": 90.3994,\n    \"service_radius\": 20,\n    \"expertise\": [\"Plumbing\", \"Electrical\", \"Carpentry\"]\n}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/users/profile",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": [
+            {
+              "name": "Update Profile",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": ""
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"name\": \"Ali Modasser\",\n    \"phone\": \"+987654321\",\n    \"bio\": \"Experienced builder and plumber\"\n}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/users/profile",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["users", "profile"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "360"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"168-WUCy4x+kP/IitLL3LtRemX0wUo0\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 08 Jun 2026 05:22:55 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 200,\n    \"message\": \"Profile updated successfully!\",\n    \"data\": {\n        \"id\": \"6a264b8b16ceb2d855dbaae7\",\n        \"name\": \"Ali Modasser\",\n        \"email\": \"modassernayem@gmail.com\",\n        \"avatar\": null,\n        \"role\": \"USER\",\n        \"status\": \"ACTIVE\",\n        \"auth_provider\": \"EMAIL\",\n        \"phone\": \"+987654321\",\n        \"bio\": \"Experienced builder and plumber\",\n        \"latitude\": null,\n        \"longitude\": null,\n        \"service_radius\": 0,\n        \"rating_average\": 0,\n        \"total_reviews\": 0,\n        \"completed_jobs\": 0,\n        \"verification_status\": \"NOT_SUBMITTED\",\n        \"rejection_reason\": null,\n        \"expertise\": [],\n        \"verification_document\": [],\n        \"created_at\": \"2026-07-04T09:00:00.000Z\",\n        \"updated_at\": \"2026-07-04T09:30:00.000Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Own Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users/profile",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users - Admin",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "searchTerm",
+                  "value": "jani",
+                  "disabled": true
+                },
+                {
+                  "key": "role",
+                  "value": "ADMI",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get All Users - Admin",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/users",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["users"],
+                  "query": [
+                    {
+                      "key": "searchTerm",
+                      "value": "jani",
+                      "disabled": true
+                    },
+                    {
+                      "key": "role",
+                      "value": "ADMI",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "636"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"27c-IG/h59clNQJC4w4MQg7NZ59FEhs\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 08 Jun 2026 05:34:35 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 200,\n    \"message\": \"Users retrieve successfully!\",\n    \"data\": [\n        {\n            \"id\": \"6a264b8b16ceb2d855dbaae7\",\n            \"name\": \"Ali Modasser\",\n            \"email\": \"modassernayem@gmail.com\",\n            \"avatar\": null,\n            \"role\": \"USER\",\n            \"status\": \"ACTIVE\",\n            \"auth_provider\": \"EMAIL\",\n            \"phone\": null,\n            \"bio\": null,\n            \"latitude\": null,\n            \"longitude\": null,\n            \"service_radius\": 0,\n            \"rating_average\": 0,\n            \"total_reviews\": 0,\n            \"completed_jobs\": 0,\n            \"verification_status\": \"NOT_SUBMITTED\",\n            \"rejection_reason\": null,\n            \"expertise\": [],\n            \"verification_document\": [],\n            \"created_at\": \"2026-07-04T09:00:00.000Z\",\n            \"updated_at\": \"2026-07-04T09:30:00.000Z\"\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 1,\n        \"totalPages\": 1\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User Status - Admin",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users/:userId/status",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", ":userId", "status"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "6a264b8b16ceb2d855dbaae7"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users/:userId",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "6a264b8b16ceb2d855dbaae7"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Helper Verification",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "data",
+                  "value": "{\n    \"documentType\": \"ID Front\"\n}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/users/profile/helper-verification",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "profile", "helper-verification"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Helper Verification Status - Admin",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"VERIFIED\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/users/:userId/helper-status",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", ":userId", "helper-status"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/health",
+          "host": ["{{BASE_URL}}"],
+          "path": ["health"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://206.162.244.175:5014/api/v1",
+      "disabled": true
+    },
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:5014/api/v1",
+      "disabled": false
+    },
+    {
+      "key": "ACCESS_TOKEN",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM1MjdhOTNlLTc2OGItNGRjZS05NjdjLWU4ODRkZmUwMTc5NyIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzgzMTQzNTIwLCJleHAiOjE3ODM3NDgzMjB9.jRlbT8sCdHuWI1ce2VRdZW6aoAvvnESxYPCa9hALTeE"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import { resetPasswordHtml } from "../../../mail/template/resetPassword";
 import config from "../../../config";
 import { generateOtp } from "./auth.utils";
 import prisma from "../../../db/prisma";
+import { Prisma } from "@prisma/client";
 import {
   TChangePassword,
   TLogin,
@@ -41,9 +42,33 @@ export class AuthService {
 
     const { fcmToken, ...restData } = payload.data;
 
-    // Create user
+    // Format expertise
+    let dbExpertise: string[] = [];
+    if (restData.expertise) {
+      if (Array.isArray(restData.expertise)) {
+        dbExpertise = restData.expertise;
+      } else if (typeof restData.expertise === "string") {
+        dbExpertise = restData.expertise
+          .split(",")
+          .map((e) => e.trim())
+          .filter(Boolean);
+      }
+    }
+
+    // Create user with direct fields matching schema.prisma
     const result = await prisma.user.create({
-      data: { ...restData },
+      data: {
+        name: restData.name,
+        email: restData.email,
+        password: restData.password,
+        role: "USER",
+        phone: restData.phone || null,
+        bio: restData.bio || null,
+        latitude: restData.latitude || null,
+        longitude: restData.longitude || null,
+        service_radius: restData.service_radius || 0,
+        expertise: dbExpertise,
+      },
     });
 
     if (payload.data.fcmToken) {
@@ -66,11 +91,10 @@ export class AuthService {
       throw new AppError(status.NOT_FOUND, "User not found!");
     }
 
-    // Check user status
-    if (user.status === "BLOCKED") {
+    if (user.status !== "ACTIVE") {
       throw new AppError(
         status.FORBIDDEN,
-        "Your account has been blocked. Please contact support.",
+        `Your account status is ${user.status.toLowerCase()}. Please contact support.`,
       );
     }
 
@@ -185,10 +209,10 @@ export class AuthService {
       throw new AppError(status.NOT_FOUND, "User not found!");
     }
 
-    if (user.status === "BLOCKED") {
+    if (user.status !== "ACTIVE") {
       throw new AppError(
         status.FORBIDDEN,
-        "Account has been blocked! contact support.",
+        `Your account status is ${user.status.toLowerCase()}. Please contact support.`,
       );
     }
 
@@ -229,10 +253,10 @@ export class AuthService {
     }
 
     // Check user status
-    if (user.status === "BLOCKED") {
+    if (user.status !== "ACTIVE") {
       throw new AppError(
         status.FORBIDDEN,
-        "Your account has been blocked. Please contact support.",
+        `Your account status is ${user.status.toLowerCase()}. Please contact support.`,
       );
     }
 
@@ -323,10 +347,10 @@ export class AuthService {
       throw new AppError(status.NOT_FOUND, "User not found!");
     }
 
-    if (user.status === "BLOCKED") {
+    if (user.status !== "ACTIVE") {
       throw new AppError(
         status.FORBIDDEN,
-        "Account has been blocked! contact support session",
+        `Your account status is ${user.status.toLowerCase()}. Please contact support.`,
       );
     }
 
@@ -425,7 +449,7 @@ export class AuthService {
       );
     }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       return await tx.otp.update({
         where: { id: otpData.id },
         data: {

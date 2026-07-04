@@ -4,12 +4,15 @@ import { emailSchema, passwordSchema } from "../../validation/global";
 export const AuthValidation = {
   // sign up
   signup: z.object({
-    name: z.string({ required_error: "name is required" }).nonempty(),
+    name: z.string({ required_error: "name is required" }).min(1, "Name cannot be empty"),
     email: emailSchema,
     password: passwordSchema,
-    address: z.string().optional(),
-    role: z.enum(["CUSTOMER", "PROVIDER"]),
-    expertise: z.string().optional(),
+    phone: z.string().optional(),
+    bio: z.string().optional(),
+    latitude: z.number().min(-90).max(90).optional(),
+    longitude: z.number().min(-180).max(180).optional(),
+    service_radius: z.number().int().nonnegative().optional(),
+    expertise: z.union([z.string(), z.array(z.string())]).optional(),
     fcmToken: z.string().optional(),
   }),
 

@@ -4,45 +4,33 @@ import requestValidate from "../../middlewares/validateRequest";
 import { auth } from "../../middlewares/auth";
 import { uploadFile } from "../../../upload/fileUpload";
 import { UserController } from "./user.controller";
+import { parseFormData } from "../../middlewares/parseFormData";
 
 const router = express.Router();
 
 // Get my profile
 router.get("/profile", auth(), UserController.getMyProfile);
 
-// Update my profile
+// Update my profile (Accepts 'file' and JSON stringified 'data' under form-data)
 router.put(
   "/profile",
   auth(),
+  uploadFile.single("file"),
+  parseFormData,
   requestValidate(userValidationSchema.updateUser),
   UserController.updateProfile,
-);
-
-// Update Profile avatar
-router.put(
-  "/profile/avatar",
-  auth(),
-  uploadFile.single("file"),
-  UserController.updateProfilePicture,
 );
 
 // Delete My Account
 router.delete("/profile", auth(), UserController.deleteAccount);
 
-// Request provider verification
+// Request helper verification
 router.put(
-  "/profile/provider-verification",
+  "/profile/helper-verification",
   auth(),
-  uploadFile.array("files"),
-  UserController.requestProviderVerification,
-);
-
-// Switch role between CUSTOMER and PROVIDER
-router.patch(
-  "/switch-role",
-  auth(),
-  requestValidate(userValidationSchema.switchRole),
-  UserController.switchRole,
+  uploadFile.single("file"),
+  parseFormData,
+  UserController.requestHelperVerification,
 );
 
 // ========== Admin ===========
@@ -53,15 +41,15 @@ router.get("/", auth("ADMIN"), UserController.getAllUsers);
 // Get single user by id
 router.get("/:id", auth("ADMIN"), UserController.getSingleUser);
 
-// Block User
+// Update user status
 router.patch("/:id/status", auth("ADMIN"), UserController.updateUserStatus);
 
-// Update provider verification status
+// Update helper verification status
 router.patch(
-  "/:id/provider-status",
+  "/:id/helper-status",
   auth("ADMIN"),
-  requestValidate(userValidationSchema.updateProviderStatus),
-  UserController.updateProviderStatus,
+  requestValidate(userValidationSchema.updateHelperStatus),
+  UserController.updateHelperStatus,
 );
 
 export const userRoutes = router;

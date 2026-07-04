@@ -22,34 +22,18 @@ export const UserController = {
   // Update user profile
   updateProfile: catchAsync(async (req, res) => {
     const user = req.user;
+    const file = req.file as Express.Multer.File;
 
     const result = await UserService.updateProfile({
       userId: user.id,
       data: req.body,
-    });
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Profile updated successfully!",
-      data: result,
-    });
-  }),
-
-  // Update user profile
-  updateProfilePicture: catchAsync(async (req, res) => {
-    const userId = req.user.id;
-    const file = req.file as Express.Multer.File;
-
-    const result = await UserService.updateProfilePicture({
-      userId,
       file,
     });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Profile Picture Saved!",
+      message: "Profile updated successfully!",
       data: result,
     });
   }),
@@ -116,30 +100,32 @@ export const UserController = {
     });
   }),
 
-  // Request provider verification
-  requestProviderVerification: catchAsync(async (req, res) => {
+  // Request helper verification
+  requestHelperVerification: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const files = req.files as Express.Multer.File[];
+    const file = req.file as Express.Multer.File;
+    const { documentType } = req.body;
 
-    const result = await UserService.requestProviderVerification({
+    const result = await UserService.requestHelperVerification({
       userId,
-      files,
+      file,
+      documentType,
     });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Provider verification request submitted successfully!",
+      message: "Helper verification document uploaded successfully!",
       data: result,
     });
   }),
 
-  // Update provider status (Admin)
-  updateProviderStatus: catchAsync(async (req, res) => {
+  // Update helper verification status (Admin)
+  updateHelperStatus: catchAsync(async (req, res) => {
     const id = req.params.id;
     const { status, rejectionReason } = req.body;
 
-    const result = await UserService.updateProviderStatus({
+    const result = await UserService.updateHelperStatus({
       id,
       status,
       rejectionReason,
@@ -148,31 +134,7 @@ export const UserController = {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: `Provider status successfully updated to ${status}!`,
-      data: result,
-    });
-  }),
-
-  // Switch role between CUSTOMER and PROVIDER
-  switchRole: catchAsync(async (req, res) => {
-    const userId = req.user.id;
-    const { role } = req.body;
-
-    const result = await UserService.switchRole({
-      userId,
-      role,
-    });
-
-    setCookie({
-      res,
-      cookieName: COOKIE_NAME.REFRESH_TOKEN,
-      token: result.refreshToken,
-    });
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: `Role switched successfully to ${role}!`,
+      message: `Helper status successfully updated to ${status}!`,
       data: result,
     });
   }),
