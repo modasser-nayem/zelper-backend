@@ -29,8 +29,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/forgot-password",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "forgot-password"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "forgot-password"
+                  ]
                 }
               },
               "response": [
@@ -57,8 +62,13 @@
                     },
                     "url": {
                       "raw": "{{BASE_URL}}/auth/forgot-password",
-                      "host": ["{{BASE_URL}}"],
-                      "path": ["auth", "forgot-password"]
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "forgot-password"
+                      ]
                     }
                   },
                   "status": "OK",
@@ -131,8 +141,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/verify-otp",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "verify-otp"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "verify-otp"
+                  ]
                 }
               },
               "response": [
@@ -152,8 +167,13 @@
                     },
                     "url": {
                       "raw": "{{BASE_URL}}/auth/verify-otp",
-                      "host": ["{{BASE_URL}}"],
-                      "path": ["auth", "verify-otp"]
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "verify-otp"
+                      ]
                     }
                   },
                   "status": "OK",
@@ -226,8 +246,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/reset-password",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "reset-password"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "reset-password"
+                  ]
                 }
               },
               "response": [
@@ -247,8 +272,13 @@
                     },
                     "url": {
                       "raw": "{{BASE_URL}}/auth/reset-password",
-                      "host": ["{{BASE_URL}}"],
-                      "path": ["auth", "reset-password"]
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "reset-password"
+                      ]
                     }
                   },
                   "status": "OK",
@@ -335,8 +365,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/signup",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "signup"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
             }
           },
           "response": [
@@ -356,8 +391,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/signup",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "signup"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "signup"
+                  ]
                 }
               },
               "status": "Created",
@@ -440,8 +480,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/login",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
           "response": [
@@ -461,8 +506,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/login",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "login"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
                 }
               },
               "status": "OK",
@@ -539,8 +589,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/social-login",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "social-login"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "social-login"
+              ]
             }
           },
           "response": []
@@ -571,8 +626,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/change-password",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "change-password"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
             }
           },
           "response": []
@@ -599,8 +659,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           },
           "response": []
@@ -637,8 +702,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/users/profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           },
           "response": [
@@ -664,8 +734,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/users/profile",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", "profile"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile"
+                  ]
                 }
               },
               "status": "OK",
@@ -733,8 +808,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           },
           "response": []
@@ -756,8 +836,12 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users"
+              ],
               "query": [
                 {
                   "key": "searchTerm",
@@ -780,8 +864,12 @@
                 "header": [],
                 "url": {
                   "raw": "{{BASE_URL}}/users",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users"
+                  ],
                   "query": [
                     {
                       "key": "searchTerm",
@@ -867,8 +955,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/:userId/status",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", ":userId", "status"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                ":userId",
+                "status"
+              ],
               "variable": [
                 {
                   "key": "userId",
@@ -896,8 +990,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/:userId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", ":userId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                ":userId"
+              ],
               "variable": [
                 {
                   "key": "userId",
@@ -940,8 +1039,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/users/profile/helper-verification",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile", "helper-verification"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile",
+                "helper-verification"
+              ]
             }
           },
           "response": []
@@ -972,11 +1077,474 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/users/:userId/helper-status",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", ":userId", "helper-status"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                ":userId",
+                "helper-status"
+              ],
               "variable": [
                 {
                   "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "📋 Customer - Create Job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "data",
+                  "value": "{\n    \"title\": \"Plumbing Repair\",\n    \"description\": \"Kitchen sink pipe leaking, need help fixing it.\",\n    \"budget\": 100,\n    \"is_negotiable\": true,\n    \"is_urgent\": true,\n    \"scheduled_at\": \"2026-07-05T10:00:00.000Z\",\n    \"latitude\": 23.8103,\n    \"longitude\": 90.4125,\n    \"address\": \"Dhaka, Bangladesh\"\n}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/jobs",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Customer - Get My Job Posts",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/my/posts",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "my",
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Customer - Get Job Applications List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/applications",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "applications"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Customer - Select Helper",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"applicationId\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/select-helper",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "select-helper"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Customer - Reject Application",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"applicationId\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/reject-application",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "reject-application"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🙋 Helper - Browse Nearby Jobs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/browse?lat=23.8103&lng=90.4125&radius=15",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "browse"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "23.8103"
+                },
+                {
+                  "key": "lng",
+                  "value": "90.4125"
+                },
+                {
+                  "key": "radius",
+                  "value": "15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🙋 Helper - Get My Applications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/my/applications",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "my",
+                "applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🙋 Helper - Apply to Job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/apply",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "apply"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🙋 Helper - Withdraw Application",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/withdraw",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "withdraw"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🔗 Get Single Job Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🔗 Update Job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "data",
+                  "value": "{\n    \"title\": \"Updated Job Title\",\n    \"budget\": 150\n}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🔗 Delete Job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
                   "value": ""
                 }
               ]
@@ -993,8 +1561,12 @@
         "header": [],
         "url": {
           "raw": "{{BASE_URL}}/health",
-          "host": ["{{BASE_URL}}"],
-          "path": ["health"]
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "health"
+          ]
         }
       },
       "response": []
@@ -1007,7 +1579,9 @@
         "type": "text/javascript",
         "packages": {},
         "requests": {},
-        "exec": [""]
+        "exec": [
+          ""
+        ]
       }
     },
     {
@@ -1016,7 +1590,9 @@
         "type": "text/javascript",
         "packages": {},
         "requests": {},
-        "exec": [""]
+        "exec": [
+          ""
+        ]
       }
     }
   ],
