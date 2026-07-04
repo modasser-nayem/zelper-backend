@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
+import pickOptions from "../../../shared/pick";
 import { TBrowseJobsQuery, TJobListQuery } from "./job.interface";
 import { JobService } from "./job.services";
 
@@ -78,7 +79,8 @@ export const JobController = {
   // Helper: browse nearby open jobs
   browseJobs: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const result = await JobService.browseJobs({ userId, query: req.query as TBrowseJobsQuery });
+    const query = pickOptions(req.query, ["searchTerm", "lat", "lng", "radius", "page", "limit"]) as TBrowseJobsQuery;
+    const result = await JobService.browseJobs({ userId, query });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -92,7 +94,8 @@ export const JobController = {
   // Customer: get my job posts
   getMyPosts: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const result = await JobService.getMyPosts({ userId, query: req.query as TJobListQuery });
+    const query = pickOptions(req.query, ["searchTerm", "page", "limit", "sortBy", "sortOrder"]) as TJobListQuery;
+    const result = await JobService.getMyPosts({ userId, query });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -106,7 +109,8 @@ export const JobController = {
   // Helper: get my job applications
   getMyApplications: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const result = await JobService.getMyApplications({ userId, query: req.query as TJobListQuery });
+    const query = pickOptions(req.query, ["searchTerm", "page", "limit"]) as TJobListQuery;
+    const result = await JobService.getMyApplications({ userId, query });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

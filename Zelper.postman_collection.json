@@ -835,7 +835,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/users",
+              "raw": "{{BASE_URL}}/users?searchTerm=&role=&status=&page=1&limit=10&sortBy=created_at&sortOrder=desc",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -845,12 +845,37 @@
               "query": [
                 {
                   "key": "searchTerm",
-                  "value": "jani",
+                  "value": "",
                   "disabled": true
                 },
                 {
                   "key": "role",
-                  "value": "ADMI",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "sortBy",
+                  "value": "created_at",
+                  "disabled": true
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
                   "disabled": true
                 }
               ]
@@ -1158,7 +1183,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/jobs/my/posts",
+              "raw": "{{BASE_URL}}/jobs/my/posts?searchTerm=&page=1&limit=10&sortBy=created_at&sortOrder=desc",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -1166,6 +1191,33 @@
                 "jobs",
                 "my",
                 "posts"
+              ],
+              "query": [
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "sortBy",
+                  "value": "created_at",
+                  "disabled": true
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "disabled": true
+                }
               ]
             }
           },
@@ -1310,7 +1362,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/jobs/browse?lat=23.8103&lng=90.4125&radius=15",
+              "raw": "{{BASE_URL}}/jobs/browse?lat=23.8103&lng=90.4125&radius=15&searchTerm=&page=1&limit=10",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -1321,15 +1373,33 @@
               "query": [
                 {
                   "key": "lat",
-                  "value": "23.8103"
+                  "value": "23.8103",
+                  "disabled": false
                 },
                 {
                   "key": "lng",
-                  "value": "90.4125"
+                  "value": "90.4125",
+                  "disabled": false
                 },
                 {
                   "key": "radius",
-                  "value": "15"
+                  "value": "15",
+                  "disabled": false
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
                 }
               ]
             }
@@ -1352,7 +1422,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/jobs/my/applications",
+              "raw": "{{BASE_URL}}/jobs/my/applications?searchTerm=&page=1&limit=10",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -1360,6 +1430,23 @@
                 "jobs",
                 "my",
                 "applications"
+              ],
+              "query": [
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                }
               ]
             }
           },
@@ -1549,6 +1636,141 @@
                 }
               ]
             }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negotiations",
+      "item": [
+        {
+          "name": "Start Negotiation (REST - POST)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"applicationId\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/negotiations",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "negotiations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Negotiation Details (REST - GET)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/negotiations/:negotiationId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "negotiations",
+                ":negotiationId"
+              ],
+              "variable": [
+                {
+                  "key": "negotiationId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Socket: join_negotiation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "socket-event-only",
+              "host": [
+                "socket-event-only"
+              ]
+            },
+            "description": "Socket.io event\n\nEvent: join_negotiation\nPayload: { negotiationId: string }\nHandshake auth: { token: ACCESS_TOKEN }"
+          },
+          "response": []
+        },
+        {
+          "name": "Socket: send_offer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "socket-event-only",
+              "host": [
+                "socket-event-only"
+              ]
+            },
+            "description": "Socket.io event\n\nEvent: send_offer\nPayload: { negotiationId: string, amount: number }\n\nBroadcast: offer_received\n{ offer: { id, sender_id, sender, amount, created_at } }\n\nExample flow:\n  Job budget = $30\n  Helper sends_offer $50\n  Customer sends_offer $40\n  Helper sends_offer $45\n  Customer accept_offer -> locked at $45"
+          },
+          "response": []
+        },
+        {
+          "name": "Socket: accept_offer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "socket-event-only",
+              "host": [
+                "socket-event-only"
+              ]
+            },
+            "description": "Socket.io event\n\nEvent: accept_offer\nPayload: { negotiationId: string }\n\nAccepts the LATEST offer. Cannot accept your own last offer.\n\nBroadcast: negotiation_accepted\n{ negotiation: { id, status, final_amount, accepted_offer_id } }"
+          },
+          "response": []
+        },
+        {
+          "name": "Socket: reject_negotiation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "socket-event-only",
+              "host": [
+                "socket-event-only"
+              ]
+            },
+            "description": "Socket.io event\n\nEvent: reject_negotiation\nPayload: { negotiationId: string }\n\nCustomer ends -> status = REJECTED\nHelper ends -> status = CANCELLED\n\nBroadcast: negotiation_rejected\n{ negotiation: { id, status }, rejected_by: userId }"
           },
           "response": []
         }

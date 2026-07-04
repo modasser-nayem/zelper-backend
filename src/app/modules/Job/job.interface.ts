@@ -12,11 +12,25 @@ export type TCreateJob = {
 
 export type TUpdateJob = Partial<TCreateJob>;
 
-// Query param types — all values from req.query are strings
+// Filter params for job listing endpoints
+export type IJobFilterRequest = {
+  searchTerm?: string;
+};
+
+// Filter params for browse jobs (adds location filters)
+export type IBrowseJobsFilter = IJobFilterRequest & {
+  lat?: string;
+  lng?: string;
+  radius?: string;
+};
+
+// Query param types — all values from req.query are strings (page/limit/sort handled by PaginationHelper)
 export type TJobListQuery = {
   searchTerm?: string;
   page?: string;
   limit?: string;
+  sortBy?: string;
+  sortOrder?: string;
 };
 
 export type TBrowseJobsQuery = TJobListQuery & {

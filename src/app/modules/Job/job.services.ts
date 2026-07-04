@@ -4,6 +4,7 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import { FileUploadHelper } from "../../../upload/fileUpload";
 import { TBrowseJobsQuery, TCreateJob, TJobListQuery, TJobMaskInput, TRawCountRow, TRawJobRow, TUpdateJob, TUserPublicFields } from "./job.interface";
+import { PaginationHelper } from "../../../helpers/pagination";
 
 // Utility function to apply privacy mask to customer details
 const maskCustomerDetails = (customer: TUserPublicFields | null | undefined) => {
@@ -286,9 +287,12 @@ export const JobService = {
     query: TJobListQuery;
   }) => {
     const { userId, query } = payload;
-    const page = Number(query.page || 1);
-    const limit = Number(query.limit || 10);
-    const skip = (page - 1) * limit;
+    const { page, limit, skip, sortBy, sortOrder } = PaginationHelper.calculatePagination({
+      page: Number(query.page),
+      limit: Number(query.limit),
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
+    });
 
     const searchCondition = query.searchTerm
       ? {
@@ -311,7 +315,7 @@ export const JobService = {
             select: { id: true, helper_id: true, status: true },
           },
         },
-        orderBy: { created_at: "desc" },
+        orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
         take: limit,
         skip,
       }),
@@ -330,9 +334,10 @@ export const JobService = {
     query: TJobListQuery;
   }) => {
     const { userId, query } = payload;
-    const page = Number(query.page || 1);
-    const limit = Number(query.limit || 10);
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = PaginationHelper.calculatePagination({
+      page: Number(query.page),
+      limit: Number(query.limit),
+    });
 
     const whereConditions = { helper_id: userId };
 
@@ -386,9 +391,10 @@ export const JobService = {
     query: TBrowseJobsQuery;
   }) => {
     const { userId, query } = payload;
-    const page = Number(query.page || 1);
-    const limit = Number(query.limit || 10);
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = PaginationHelper.calculatePagination({
+      page: Number(query.page),
+      limit: Number(query.limit),
+    });
     const radius = Number(query.radius || 15);
 
     let userLat = query.lat ? Number(query.lat) : null;
