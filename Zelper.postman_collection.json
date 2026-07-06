@@ -598,7 +598,45 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"token\": \"Z9HCN_JDrF6rah4SoZxVxbI36rMKO_2w5H2ev7UDFPTUUNk0l7I5kZju7lEMltySXvc1apdiXuIdGsp6nHhW9zXhwIw1TDzKAkvf9NLX5bRIZtj6VCrB6OsdvNFI7lHqUKicbau9msBgXF2teQM7Y5GS3zjliG4ew\",\r\n    \"provider\": \"GOOGLE\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/social-login",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "social-login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "change password",
@@ -635,7 +673,45 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"currentPassword\": \"password123\",\r\n    \"newPassword\": \"123456\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/change-password",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "change-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -668,7 +744,37 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/users/profile",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Profile retrieved successfully\",\n    \"data\": {\n        \"id\": \"uuid-1234\",\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"role\": \"CUSTOMER\",\n        \"avatar\": \"https://...\",\n        \"completed_jobs\": 0\n    }\n}"
+            }
+          ]
         },
         {
           "name": "Update Profile",
@@ -817,7 +923,37 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/users/profile",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Get All Users - Admin",
@@ -846,27 +982,32 @@
                 {
                   "key": "searchTerm",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Search query for filtering records by name, title, or details"
                 },
                 {
                   "key": "role",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Filter by user role: CUSTOMER, HELPER, ADMIN"
                 },
                 {
                   "key": "status",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
                 },
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 },
                 {
                   "key": "sortBy",
@@ -996,7 +1137,44 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/users/:userId/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    ":userId",
+                    "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "6a264b8b16ceb2d855dbaae7"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Get Single User",
@@ -1030,7 +1208,43 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/users/:userId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    ":userId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "6a264b8b16ceb2d855dbaae7"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Profile retrieved successfully\",\n    \"data\": {\n        \"id\": \"uuid-1234\",\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"role\": \"CUSTOMER\",\n        \"avatar\": \"https://...\",\n        \"completed_jobs\": 0\n    }\n}"
+            }
+          ]
         },
         {
           "name": "Request Helper Verification",
@@ -1074,7 +1288,52 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": ""
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"documentType\": \"ID Front\"\n}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/users/profile/helper-verification",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile",
+                    "helper-verification"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Update Helper Verification Status - Admin",
@@ -1118,7 +1377,52 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"status\": \"VERIFIED\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/users/:userId/helper-status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    ":userId",
+                    "helper-status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -1165,7 +1469,50 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "files",
+                      "type": "file",
+                      "src": []
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"title\": \"Plumbing Repair\",\n    \"description\": \"Kitchen sink pipe leaking, need help fixing it.\",\n    \"budget\": 100,\n    \"is_negotiable\": true,\n    \"is_urgent\": true,\n    \"scheduled_at\": \"2026-07-05T10:00:00.000Z\",\n    \"latitude\": 23.8103,\n    \"longitude\": 90.4125,\n    \"address\": \"Dhaka, Bangladesh\"\n}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Job post created successfully\",\n    \"data\": {\n        \"id\": \"job-123\",\n        \"customer_id\": \"uuid-1234\",\n        \"title\": \"Need lawn moving helper\",\n        \"budget\": 120,\n        \"status\": \"OPEN\"\n    }\n}"
+            }
+          ]
         },
         {
           "name": "📋 Customer - Get My Job Posts",
@@ -1196,17 +1543,20 @@
                 {
                   "key": "searchTerm",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Search query for filtering records by name, title, or details"
                 },
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 },
                 {
                   "key": "sortBy",
@@ -1221,7 +1571,68 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/my/posts?searchTerm=&page=1&limit=10&sortBy=created_at&sortOrder=desc",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "my",
+                    "posts"
+                  ],
+                  "query": [
+                    {
+                      "key": "searchTerm",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Search query for filtering records by name, title, or details"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "created_at",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "desc",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📋 Customer - Get Job Applications List",
@@ -1251,12 +1662,51 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/applications",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "applications"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📋 Customer - Select Helper",
@@ -1295,12 +1745,59 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"applicationId\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/select-helper",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "select-helper"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📋 Customer - Reject Application",
@@ -1339,12 +1836,59 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"applicationId\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/reject-application",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "reject-application"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🙋 Helper - Browse Nearby Jobs",
@@ -1389,22 +1933,90 @@
                 {
                   "key": "searchTerm",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Search query for filtering records by name, title, or details"
                 },
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/browse?lat=23.8103&lng=90.4125&radius=15&searchTerm=&page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "browse"
+                  ],
+                  "query": [
+                    {
+                      "key": "lat",
+                      "value": "23.8103",
+                      "disabled": false
+                    },
+                    {
+                      "key": "lng",
+                      "value": "90.4125",
+                      "disabled": false
+                    },
+                    {
+                      "key": "radius",
+                      "value": "15",
+                      "disabled": false
+                    },
+                    {
+                      "key": "searchTerm",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Search query for filtering records by name, title, or details"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🙋 Helper - Get My Applications",
@@ -1435,22 +2047,76 @@
                 {
                   "key": "searchTerm",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Search query for filtering records by name, title, or details"
                 },
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/my/applications?searchTerm=&page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "my",
+                    "applications"
+                  ],
+                  "query": [
+                    {
+                      "key": "searchTerm",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Search query for filtering records by name, title, or details"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🙋 Helper - Apply to Job",
@@ -1480,12 +2146,51 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/apply",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "apply"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🙋 Helper - Withdraw Application",
@@ -1515,12 +2220,51 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/withdraw",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "withdraw"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔗 Get Single Job Details",
@@ -1549,12 +2293,50 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔗 Update Job",
@@ -1598,12 +2380,64 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "files",
+                      "type": "file",
+                      "src": []
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"title\": \"Updated Job Title\",\n    \"budget\": 150\n}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔗 Delete Job",
@@ -1632,12 +2466,50 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🙋 Helper - Start Job",
@@ -1667,13 +2539,52 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             },
             "description": "Helper starts the assigned job.\nStatus: ASSIGNED → IN_PROGRESS"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/start",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "start"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🙋 Helper - Complete Job",
@@ -1703,13 +2614,52 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             },
             "description": "Helper marks the job as done. Customer receives notification to review.\nStatus: IN_PROGRESS → WAITING_FOR_APPROVAL"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/complete",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "complete"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📋 Customer - Approve Job Completion",
@@ -1739,13 +2689,52 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             },
             "description": "Customer approves the completed work.\nStatus: WAITING_FOR_APPROVAL → COMPLETED\n\nTriggers escrow release automatically:\n- Payment.status = RELEASED\n- Wallet.pending_balance -= helper_amount\n- Wallet.available_balance += helper_amount\n- WalletTransaction type=JOB_EARNING created"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/jobs/:jobId/approve",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "approve"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -1786,7 +2775,44 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"applicationId\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/negotiations",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "negotiations"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Get Negotiation Details (REST - GET)",
@@ -1815,12 +2841,50 @@
               "variable": [
                 {
                   "key": "negotiationId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the negotiation thread"
                 }
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/negotiations/:negotiationId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "negotiations",
+                    ":negotiationId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "negotiationId",
+                      "value": "",
+                      "description": "The unique UUID of the negotiation thread"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Socket: join_negotiation",
@@ -1835,7 +2899,33 @@
             },
             "description": "Socket.io event\n\nEvent: join_negotiation\nPayload: { negotiationId: string }\nHandshake auth: { token: ACCESS_TOKEN }"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "socket-event-only",
+                  "host": [
+                    "socket-event-only"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Socket: send_offer",
@@ -1850,7 +2940,33 @@
             },
             "description": "Socket.io event\n\nEvent: send_offer\nPayload: { negotiationId: string, amount: number }\n\nBroadcast: offer_received\n{ offer: { id, sender_id, sender, amount, created_at } }\n\nExample flow:\n  Job budget = $30\n  Helper sends_offer $50\n  Customer sends_offer $40\n  Helper sends_offer $45\n  Customer accept_offer -> locked at $45"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "socket-event-only",
+                  "host": [
+                    "socket-event-only"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Socket: accept_offer",
@@ -1865,7 +2981,33 @@
             },
             "description": "Socket.io event\n\nEvent: accept_offer\nPayload: { negotiationId: string }\n\nAccepts the LATEST offer. Cannot accept your own last offer.\n\nBroadcast: negotiation_accepted\n{ negotiation: { id, status, final_amount, accepted_offer_id } }"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "socket-event-only",
+                  "host": [
+                    "socket-event-only"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "Socket: reject_negotiation",
@@ -1880,7 +3022,33 @@
             },
             "description": "Socket.io event\n\nEvent: reject_negotiation\nPayload: { negotiationId: string }\n\nCustomer ends -> status = REJECTED\nHelper ends -> status = CANCELLED\n\nBroadcast: negotiation_rejected\n{ negotiation: { id, status }, rejected_by: userId }"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "socket-event-only",
+                  "host": [
+                    "socket-event-only"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -1923,7 +3091,45 @@
             },
             "description": "Creates a Stripe PaymentIntent for the selected job.\n\nReturns:\n- clientSecret: use with Stripe.js SDK on the frontend to collect card details\n- amount: total customer pays\n- platformFee: commission deducted immediately\n- helperAmount: held in escrow until job approved\n\nPrice used:\n- is_negotiable = false → job.budget\n- is_negotiable = true  → Negotiation.final_amount (must be ACCEPTED)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"jobId\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/payments/create-intent",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "create-intent"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📦 Get Job Payment Details",
@@ -1953,13 +3159,52 @@
               "variable": [
                 {
                   "key": "jobId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the job post"
                 }
               ]
             },
             "description": "Get payment details for a job (accessible by both customer and helper).\n\nShows: amount, platformFee, helperAmount, status, stripe_payment_intent"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/payments/job/:jobId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "job",
+                    ":jobId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "jobId",
+                      "value": "",
+                      "description": "The unique UUID of the job post"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔔 Stripe Webhook (Stripe → Server)",
@@ -1992,7 +3237,50 @@
             },
             "description": "This endpoint is called by Stripe — NOT by the frontend.\n\nHandled events:\n- payment_intent.succeeded → Funds escrow, assigns job, rejects other apps, opens conversation, credits helper pending_balance\n- payment_intent.payment_failed → Marks payment FAILED\n\nRequires: stripe-signature header (set by Stripe automatically)\nDo NOT call this manually — test using Stripe CLI: stripe listen --forward-to localhost:5000/api/v1/payments/webhook"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "stripe-signature",
+                    "value": "t=...,v1=..."
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"type\": \"payment_intent.succeeded\", ... }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/payments/webhook",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -2026,7 +3314,37 @@
             },
             "description": "Returns wallet balances and Stripe Connect status:\n- available_balance: ready to withdraw\n- pending_balance: held in escrow\n- stripe_onboarding_done: true if Stripe account is connected and ready"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/me",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔗 Connect Stripe Account (Step 1)",
@@ -2059,7 +3377,40 @@
             },
             "description": "Creates a Stripe Connect Express account for the helper.\n\nReturns:\n- accountId: the Stripe Connect account ID\n- onboardingUrl: redirect the helper to this URL in the browser\n\nThe helper completes their Stripe onboarding (adds debit card or bank account).\nStripe then redirects back to FRONTEND_URL/wallet/connect/success"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "none"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/me/connect",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "connect"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "✅ Confirm Stripe Onboarding (Step 2)",
@@ -2090,7 +3441,39 @@
             },
             "description": "Call this endpoint after the helper returns from Stripe onboarding.\nChecks with Stripe whether onboarding is complete and updates wallet.stripe_onboarding_done.\n\nReturns:\n- onboardingComplete: boolean\n- chargesEnabled: boolean\n- payoutsEnabled: boolean"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/me/connect/confirm",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "connect",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Stripe Connect status retrieved\",\n    \"data\": {\n        \"accountId\": \"acct_123\",\n        \"onboardingComplete\": true,\n        \"chargesEnabled\": true,\n        \"payoutsEnabled\": true\n    }\n}"
+            }
+          ]
         },
         {
           "name": "📋 Get My Transactions",
@@ -2121,23 +3504,77 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 },
                 {
                   "key": "type",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Filter type. Enums: \n- Transactions: DEPOSIT, WITHDRAWAL, COMMISSION, REFUND"
                 }
               ]
             },
             "description": "Paginated transaction history.\ntype filter: JOB_EARNING | COMMISSION | WITHDRAWAL | REFUND"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/me/transactions?page=1&limit=10&type=",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    },
+                    {
+                      "key": "type",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Filter type. Enums: \n- Transactions: DEPOSIT, WITHDRAWAL, COMMISSION, REFUND"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📋 Get My Withdrawals",
@@ -2168,23 +3605,77 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 },
                 {
                   "key": "status",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
                 }
               ]
             },
             "description": "Helper's withdrawal history.\nstatus filter: PENDING | PROCESSING | COMPLETED | FAILED | REJECTED"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/me/withdrawals?page=1&limit=10&status=",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "withdrawals"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "💸 Request Withdrawal (Stripe)",
@@ -2223,7 +3714,46 @@
             },
             "description": "Request a Stripe Transfer to the helper's connected account.\n\nPre-requisite: helper must have completed Stripe Connect onboarding.\n\nFlow:\n1. Validates amount <= available_balance\n2. Creates stripe.transfers.create() → money moves to helper's Stripe account\n3. Deducts from available_balance\n4. Creates Withdrawal record (status=PENDING)\n5. Creates WITHDRAWAL wallet transaction\n\nStripe then pays out to the helper's linked debit card or bank account per their payout schedule (instant or next business day).\n\nOn REJECTED/FAILED: amount is refunded back to available_balance automatically."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"amount\": 500,\n    \"note\": \"Monthly earnings payout\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/me/withdrawals",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "withdrawals"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔐 Admin - Get All Withdrawals",
@@ -2254,23 +3784,77 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 },
                 {
                   "key": "status",
                   "value": "PENDING",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
                 }
               ]
             },
             "description": "Admin only: All withdrawal requests with helper details and Stripe transfer ID stored in bank_details JSON."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/admin/withdrawals?page=1&limit=10&status=PENDING",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "admin",
+                    "withdrawals"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    },
+                    {
+                      "key": "status",
+                      "value": "PENDING",
+                      "disabled": false,
+                      "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔐 Admin - Update Withdrawal Status",
@@ -2316,7 +3900,53 @@
             },
             "description": "Admin manually updates status (e.g., after verifying Stripe transfer).\n\nREJECTED or FAILED → automatically refunds available_balance + creates REFUND transaction."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"COMPLETED\",\n    \"note\": \"Stripe transfer confirmed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/wallet/admin/withdrawals/:withdrawalId",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "admin",
+                    "withdrawals",
+                    ":withdrawalId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "withdrawalId",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -2358,7 +3988,44 @@
             },
             "description": "Submit a review for a completed job.\n\nOnly the customer of the job can leave a review.\nRecalculates helper average rating and total reviews, and sets Job status to CLOSED."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"jobId\": \"\",\n    \"rating\": 5,\n    \"comment\": \"Excellent service! Very professional.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/reviews",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "reviews"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Review submitted successfully\",\n    \"data\": {\n        \"id\": \"rev-99\",\n        \"rating\": 5,\n        \"comment\": \"Excellent job!\",\n        \"job_id\": \"job-123\"\n    }\n}"
+            }
+          ]
         },
         {
           "name": "📋 Get My Reviews",
@@ -2388,18 +4055,64 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ]
             },
             "description": "Get all reviews received by the authenticated helper."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/reviews/me?page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "reviews",
+                    "me"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📋 Get Helper Reviews",
@@ -2420,24 +4133,79 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ],
               "variable": [
                 {
                   "key": "helperId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the helper user profile"
                 }
               ]
             },
             "description": "Get reviews received by a helper (publicly accessible)."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/reviews/helper/:helperId?page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "reviews",
+                    "helper",
+                    ":helperId"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "helperId",
+                      "value": "",
+                      "description": "The unique UUID of the helper user profile"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -2471,7 +4239,37 @@
             },
             "description": "Returns aggregated analytics and stats for the admin panel:\n- Users breakdown (active, suspended, helpers)\n- Jobs breakdown (open, completed, disputed, etc.)\n- Financials (volume, escrow held, platform fees)\n- Recent activities (new jobs, payments, verification requests, withdrawals)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/dashboard/admin-stats",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin-stats"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Admin statistics retrieved successfully\",\n    \"data\": {\n        \"users\": {\n            \"total\": 10,\n            \"helpers\": 5,\n            \"active\": 8,\n            \"suspended\": 2\n        },\n        \"jobs\": {\n            \"total\": 20,\n            \"open\": 5,\n            \"assigned\": 10,\n            \"completed\": 5\n        },\n        \"financials\": {\n            \"totalVolume\": 1200,\n            \"platformCommission\": 120,\n            \"currentEscrow\": 800\n        }\n    }\n}"
+            }
+          ]
         },
         {
           "name": "📊 Admin - Get Chart Stats (Last 6 Months)",
@@ -2500,7 +4298,37 @@
             },
             "description": "Returns monthly statistics for the last 6 months (revenue, volume, total jobs, completed jobs) formatted for frontend data charts."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/dashboard/admin-charts",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin-charts"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "💳 Admin - List All Payments",
@@ -2531,28 +4359,89 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 },
                 {
                   "key": "status",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
                 },
                 {
                   "key": "searchTerm",
                   "value": "",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Search query for filtering records by name, title, or details"
                 }
               ]
             },
             "description": "List all payments on the platform with search (customer, helper, job title) and status filters."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/dashboard/admin/payments?page=1&limit=10&status=&searchTerm=",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin",
+                    "payments"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                    },
+                    {
+                      "key": "searchTerm",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Search query for filtering records by name, title, or details"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "💰 Admin - List Helper Wallets",
@@ -2583,18 +4472,65 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ]
             },
             "description": "List helper wallets showing available/pending balances."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/dashboard/admin/wallets?page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin",
+                    "wallets"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -2629,18 +4565,64 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ]
             },
             "description": "Get list of conversations of the logged-in user with the companion user, including latest message and unread counts."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/chat/conversations?page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Conversations retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"conv-55\",\n            \"companion\": {\n                \"id\": \"user-77\",\n                \"name\": \"Jane Smith\",\n                \"avatar\": null\n            },\n            \"last_message\": \"Deal accepted\",\n            \"unread_count\": 0\n        }\n    ]\n}"
+            }
+          ]
         },
         {
           "name": "💬 Get Conversation Messages",
@@ -2672,24 +4654,80 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "20",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ],
               "variable": [
                 {
                   "key": "conversationId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the conversation thread"
                 }
               ]
             },
             "description": "Get list of messages in a conversation (paginated, ordered oldest to newest for instant rendering)."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/chat/conversations/:conversationId/messages?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations",
+                    ":conversationId",
+                    "messages"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "conversationId",
+                      "value": "",
+                      "description": "The unique UUID of the conversation thread"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "💬 Send Text Message (REST)",
@@ -2727,7 +4765,45 @@
             },
             "description": "Send a regular text message through the REST API."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"conversationId\": \"\",\n    \"content\": \"Hello! I am ready to start the job.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/chat/messages",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "messages"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📸 Send Media Message (Multipart)",
@@ -2768,13 +4844,62 @@
               "variable": [
                 {
                   "key": "conversationId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the conversation thread"
                 }
               ]
             },
             "description": "Upload an image/media file as a chat message. File size limit is 8MB."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/chat/conversations/:conversationId/media",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations",
+                    ":conversationId",
+                    "media"
+                  ],
+                  "variable": [
+                    {
+                      "key": "conversationId",
+                      "value": "",
+                      "description": "The unique UUID of the conversation thread"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "👁️ Mark Conversation as Seen",
@@ -2805,13 +4930,53 @@
               "variable": [
                 {
                   "key": "conversationId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the conversation thread"
                 }
               ]
             },
             "description": "Mark all unread incoming messages in the conversation as read."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/chat/conversations/:conversationId/seen",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations",
+                    ":conversationId",
+                    "seen"
+                  ],
+                  "variable": [
+                    {
+                      "key": "conversationId",
+                      "value": "",
+                      "description": "The unique UUID of the conversation thread"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -2845,18 +5010,63 @@
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Page number for pagination (optional, default: 1)"
                 },
                 {
                   "key": "limit",
                   "value": "10",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Number of records per page (optional, default: 10)"
                 }
               ]
             },
             "description": "Get paginated list of notifications for the authenticated user."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/notifications?page=1&limit=10",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false,
+                      "description": "Page number for pagination (optional, default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": false,
+                      "description": "Number of records per page (optional, default: 10)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Notifications retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"notif-1\",\n            \"title\": \"New Job Application\",\n            \"content\": \"Helper has applied\",\n            \"is_read\": false,\n            \"created_at\": \"2026-07-06T12:00:00Z\"\n        }\n    ]\n}"
+            }
+          ]
         },
         {
           "name": "🔔 Mark Notification as Read",
@@ -2886,13 +5096,52 @@
               "variable": [
                 {
                   "key": "notificationId",
-                  "value": ""
+                  "value": "",
+                  "description": "The unique UUID of the notification"
                 }
               ]
             },
             "description": "Mark a single notification as read."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/notifications/:notificationId/read",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    ":notificationId",
+                    "read"
+                  ],
+                  "variable": [
+                    {
+                      "key": "notificationId",
+                      "value": "",
+                      "description": "The unique UUID of the notification"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "🔔 Mark All Notifications as Read",
@@ -2921,7 +5170,37 @@
             },
             "description": "Mark all notifications of the authenticated user as read."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": null,
+                "url": {
+                  "raw": "{{BASE_URL}}/notifications/read-all",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "read-all"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         },
         {
           "name": "📱 Save FCM Token",
@@ -2959,7 +5238,45 @@
             },
             "description": "Register/Save the client FCM token for push notifications."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success Response Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"token\": \"fcm_token_value_here\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/notifications/fcm-token",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "fcm-token"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },
@@ -2978,7 +5295,36 @@
           ]
         }
       },
-      "response": []
+      "response": [
+        {
+          "name": "Success Response Example",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": null,
+            "url": {
+              "raw": "{{BASE_URL}}/health",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+        }
+      ]
     }
   ],
   "event": [
