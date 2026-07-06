@@ -66,4 +66,15 @@ router.post("/:id/apply", auth(), JobController.applyToJob);
 // Helper withdraws job application
 router.post("/:id/withdraw", auth(), JobController.withdrawApplication);
 
+// ==================== Job Lifecycle Routes ====================
+
+// Helper: start the job (ASSIGNED → IN_PROGRESS)
+router.patch("/:id/start", auth(), JobController.startJob);
+
+// Helper: mark job as completed (IN_PROGRESS → WAITING_FOR_APPROVAL)
+router.patch("/:id/complete", auth(), JobController.completeJob);
+
+// Customer: approve job completion → COMPLETED + escrow released
+router.patch("/:id/approve", auth(), JobController.approveJob);
+
 export const JobRoutes = router;

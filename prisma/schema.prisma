@@ -277,12 +277,14 @@ model Payment {
 
 // ==================== Wallets ====================
 model Wallet {
-  id                String   @id @default(uuid())
-  helper_id         String   @unique
-  available_balance Decimal  @default(0)
-  pending_balance   Decimal  @default(0)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  id                      String   @id @default(uuid())
+  helper_id               String   @unique
+  available_balance       Decimal  @default(0)
+  pending_balance         Decimal  @default(0)
+  stripe_account_id       String?  // Stripe Connect Express account ID
+  stripe_onboarding_done  Boolean  @default(false)
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
 
   helper       User                @relation(fields: [helper_id], references: [id], onDelete: Cascade)
   transactions WalletTransaction[]

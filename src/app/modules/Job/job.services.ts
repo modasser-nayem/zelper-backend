@@ -779,7 +779,7 @@ export const JobService = {
       throw new AppError(httpStatus.BAD_REQUEST, "Cannot reject a withdrawn application!");
     }
 
-    // If rejecting the currently selected application, clear the selected_application_id on the job
+    // clear selected application if matching
     const result = await prisma.$transaction(async (tx) => {
       if (job.selected_application_id === applicationId) {
         await tx.jobPost.update({
@@ -808,5 +808,100 @@ export const JobService = {
     });
 
     return result;
+  },
+
+  // start job
+  startJob: async (payload: { userId: string; jobId: string }) => {
+    const { userId, jobId } = payload;
+
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId },
+      include: {
+        selected_application: { select: { helper_id: true } },
+      },
+    });
+
+    if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
+
+    if (job.selected_application?.helper_id !== userId) {
+      throw new AppError(httpStatus.FORBIDDEN, "Only the assigned helper can start this job!");
+    }
+
+    if (job.status !== "ASSIGNED") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Cannot start a job with status '${job.status}'. Job must be ASSIGNED.`,
+      );
+    }
+
+    return prisma.jobPost.update({
+      where: { id: jobId },
+      data: { status: "IN_PROGRESS" },
+      select: { id: true, status: true, title: true },
+    });
+  },
+
+  // complete job
+  completeJob: async (payload: { userId: string; jobId: string }) => {
+    const { userId, jobId } = payload;
+
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId },
+      include: {
+        selected_application: { select: { helper_id: true } },
+      },
+    });
+
+    if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
+
+    if (job.selected_application?.helper_id !== userId) {
+      throw new AppError(httpStatus.FORBIDDEN, "Only the assigned helper can complete this job!");
+    }
+
+    if (job.status !== "IN_PROGRESS") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Cannot complete a job with status '${job.status}'. Job must be IN_PROGRESS.`,
+      );
+    }
+
+    return prisma.jobPost.update({
+      where: { id: jobId },
+      data: { status: "WAITING_FOR_APPROVAL" },
+      select: { id: true, status: true, title: true },
+    });
+  },
+
+  // approve job completion
+  approveJob: async (payload: { userId: string; jobId: string }) => {
+    const { userId, jobId } = payload;
+
+    const job = await prisma.jobPost.findUnique({ where: { id: jobId } });
+
+    if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
+
+    if (job.customer_id !== userId) {
+      throw new AppError(httpStatus.FORBIDDEN, "Only the customer can approve job completion!");
+    }
+
+    if (job.status !== "WAITING_FOR_APPROVAL") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Cannot approve a job with status '${job.status}'. Job must be WAITING_FOR_APPROVAL.`,
+      );
+    }
+
+    // set status to completed
+    const updatedJob = await prisma.jobPost.update({
+      where: { id: jobId },
+      data: { status: "COMPLETED" },
+      select: { id: true, status: true, title: true },
+    });
+
+    // release escrow
+    const { PaymentService } = await import("../Payment/payment.services");
+    await PaymentService.releaseEscrow({ jobId });
+
+    return updatedJob;
   },
 };

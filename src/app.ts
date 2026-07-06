@@ -29,6 +29,13 @@ class App {
       }),
     );
 
+    // Stripe webhook MUST receive the raw body for signature verification.
+    // This MUST be registered before express.json() to avoid body parsing.
+    this.app.use(
+      "/api/v1/payments/webhook",
+      express.raw({ type: "application/json" }),
+    );
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());

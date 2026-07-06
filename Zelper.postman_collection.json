@@ -1638,6 +1638,114 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "🙋 Helper - Start Job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/start",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "start"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Helper starts the assigned job.\nStatus: ASSIGNED → IN_PROGRESS"
+          },
+          "response": []
+        },
+        {
+          "name": "🙋 Helper - Complete Job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/complete",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "complete"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Helper marks the job as done. Customer receives notification to review.\nStatus: IN_PROGRESS → WAITING_FOR_APPROVAL"
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Customer - Approve Job Completion",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jobs/:jobId/approve",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "approve"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Customer approves the completed work.\nStatus: WAITING_FOR_APPROVAL → COMPLETED\n\nTriggers escrow release automatically:\n- Payment.status = RELEASED\n- Wallet.pending_balance -= helper_amount\n- Wallet.available_balance += helper_amount\n- WalletTransaction type=JOB_EARNING created"
+          },
+          "response": []
         }
       ]
     },
@@ -1771,6 +1879,442 @@
               ]
             },
             "description": "Socket.io event\n\nEvent: reject_negotiation\nPayload: { negotiationId: string }\n\nCustomer ends -> status = REJECTED\nHelper ends -> status = CANCELLED\n\nBroadcast: negotiation_rejected\n{ negotiation: { id, status }, rejected_by: userId }"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "💳 Customer - Create Payment Intent",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jobId\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/payments/create-intent",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "payments",
+                "create-intent"
+              ]
+            },
+            "description": "Creates a Stripe PaymentIntent for the selected job.\n\nReturns:\n- clientSecret: use with Stripe.js SDK on the frontend to collect card details\n- amount: total customer pays\n- platformFee: commission deducted immediately\n- helperAmount: held in escrow until job approved\n\nPrice used:\n- is_negotiable = false → job.budget\n- is_negotiable = true  → Negotiation.final_amount (must be ACCEPTED)"
+          },
+          "response": []
+        },
+        {
+          "name": "📦 Get Job Payment Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/payments/job/:jobId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "payments",
+                "job",
+                ":jobId"
+              ],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get payment details for a job (accessible by both customer and helper).\n\nShows: amount, platformFee, helperAmount, status, stripe_payment_intent"
+          },
+          "response": []
+        },
+        {
+          "name": "🔔 Stripe Webhook (Stripe → Server)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "stripe-signature",
+                "value": "t=...,v1=..."
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"type\": \"payment_intent.succeeded\", ... }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/payments/webhook",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "payments",
+                "webhook"
+              ]
+            },
+            "description": "This endpoint is called by Stripe — NOT by the frontend.\n\nHandled events:\n- payment_intent.succeeded → Funds escrow, assigns job, rejects other apps, opens conversation, credits helper pending_balance\n- payment_intent.payment_failed → Marks payment FAILED\n\nRequires: stripe-signature header (set by Stripe automatically)\nDo NOT call this manually — test using Stripe CLI: stripe listen --forward-to localhost:5000/api/v1/payments/webhook"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Wallet",
+      "item": [
+        {
+          "name": "💰 Get My Wallet",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/me",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me"
+              ]
+            },
+            "description": "Returns wallet balances and Stripe Connect status:\n- available_balance: ready to withdraw\n- pending_balance: held in escrow\n- stripe_onboarding_done: true if Stripe account is connected and ready"
+          },
+          "response": []
+        },
+        {
+          "name": "🔗 Connect Stripe Account (Step 1)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "none"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/me/connect",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "connect"
+              ]
+            },
+            "description": "Creates a Stripe Connect Express account for the helper.\n\nReturns:\n- accountId: the Stripe Connect account ID\n- onboardingUrl: redirect the helper to this URL in the browser\n\nThe helper completes their Stripe onboarding (adds debit card or bank account).\nStripe then redirects back to FRONTEND_URL/wallet/connect/success"
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Confirm Stripe Onboarding (Step 2)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/me/connect/confirm",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "connect",
+                "confirm"
+              ]
+            },
+            "description": "Call this endpoint after the helper returns from Stripe onboarding.\nChecks with Stripe whether onboarding is complete and updates wallet.stripe_onboarding_done.\n\nReturns:\n- onboardingComplete: boolean\n- chargesEnabled: boolean\n- payoutsEnabled: boolean"
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Get My Transactions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/me/transactions?page=1&limit=10&type=",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "type",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Paginated transaction history.\ntype filter: JOB_EARNING | COMMISSION | WITHDRAWAL | REFUND"
+          },
+          "response": []
+        },
+        {
+          "name": "📋 Get My Withdrawals",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/me/withdrawals?page=1&limit=10&status=",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "withdrawals"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Helper's withdrawal history.\nstatus filter: PENDING | PROCESSING | COMPLETED | FAILED | REJECTED"
+          },
+          "response": []
+        },
+        {
+          "name": "💸 Request Withdrawal (Stripe)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 500,\n    \"note\": \"Monthly earnings payout\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/me/withdrawals",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "withdrawals"
+              ]
+            },
+            "description": "Request a Stripe Transfer to the helper's connected account.\n\nPre-requisite: helper must have completed Stripe Connect onboarding.\n\nFlow:\n1. Validates amount <= available_balance\n2. Creates stripe.transfers.create() → money moves to helper's Stripe account\n3. Deducts from available_balance\n4. Creates Withdrawal record (status=PENDING)\n5. Creates WITHDRAWAL wallet transaction\n\nStripe then pays out to the helper's linked debit card or bank account per their payout schedule (instant or next business day).\n\nOn REJECTED/FAILED: amount is refunded back to available_balance automatically."
+          },
+          "response": []
+        },
+        {
+          "name": "🔐 Admin - Get All Withdrawals",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/admin/withdrawals?page=1&limit=10&status=PENDING",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "admin",
+                "withdrawals"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Admin only: All withdrawal requests with helper details and Stripe transfer ID stored in bank_details JSON."
+          },
+          "response": []
+        },
+        {
+          "name": "🔐 Admin - Update Withdrawal Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"COMPLETED\",\n    \"note\": \"Stripe transfer confirmed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/wallet/admin/withdrawals/:withdrawalId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "admin",
+                "withdrawals",
+                ":withdrawalId"
+              ],
+              "variable": [
+                {
+                  "key": "withdrawalId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Admin manually updates status (e.g., after verifying Stripe transfer).\n\nREJECTED or FAILED → automatically refunds available_balance + creates REFUND transaction."
           },
           "response": []
         }

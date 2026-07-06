@@ -205,4 +205,49 @@ export const JobController = {
       data: result,
     });
   }),
+
+  // Helper: start job (ASSIGNED → IN_PROGRESS)
+  startJob: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+
+    const result = await JobService.startJob({ userId, jobId });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Job started successfully!",
+      data: result,
+    });
+  }),
+
+  // Helper: mark job as complete (IN_PROGRESS → WAITING_FOR_APPROVAL)
+  completeJob: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+
+    const result = await JobService.completeJob({ userId, jobId });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Job marked as complete. Awaiting customer approval.",
+      data: result,
+    });
+  }),
+
+  // Customer: approve completion → COMPLETED + escrow released
+  approveJob: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+
+    const result = await JobService.approveJob({ userId, jobId });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Job approved and payment released to helper!",
+      data: result,
+    });
+  }),
 };

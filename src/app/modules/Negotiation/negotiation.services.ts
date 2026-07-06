@@ -3,11 +3,7 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 
 export const NegotiationService = {
-  /**
-   * Customer starts a negotiation session for a selected application.
-   * The job must be is_negotiable = true and the application must be SELECTED.
-   * Fails if a PENDING negotiation already exists for the same application.
-   */
+  // start negotiation session
   startNegotiation: async (payload: { userId: string; applicationId: string }) => {
     const { userId, applicationId } = payload;
 
@@ -22,12 +18,10 @@ export const NegotiationService = {
       throw new AppError(httpStatus.NOT_FOUND, "Job application not found!");
     }
 
-    // Only the job owner (customer) can start a negotiation
     if (application.job.customer_id !== userId) {
       throw new AppError(httpStatus.FORBIDDEN, "Only the job owner can start a negotiation!");
     }
 
-    // Application must be in SELECTED state
     if (application.status !== "SELECTED") {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -35,7 +29,6 @@ export const NegotiationService = {
       );
     }
 
-    // Job must allow negotiation
     if (!application.job.is_negotiable) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -43,7 +36,6 @@ export const NegotiationService = {
       );
     }
 
-    // Prevent duplicate active negotiations
     const existingNegotiation = await prisma.negotiation.findFirst({
       where: {
         application_id: applicationId,
@@ -58,7 +50,6 @@ export const NegotiationService = {
       );
     }
 
-    // Create the negotiation — initial final_amount = job.budget (a reasonable starting reference)
     const negotiation = await prisma.negotiation.create({
       data: {
         application_id: applicationId,
@@ -161,12 +152,7 @@ export const NegotiationService = {
     return negotiation;
   },
 
-  // ---- Socket-called services (used by socket handlers) ----
-
-  /**
-   * Verify the caller is a valid participant in the negotiation.
-   * Returns { customerId, helperId } for further checks.
-   */
+  // verify participant is valid
   verifyParticipant: async (payload: { userId: string; negotiationId: string }) => {
     const { userId, negotiationId } = payload;
 
@@ -199,11 +185,7 @@ export const NegotiationService = {
     return { negotiation, customerId, helperId };
   },
 
-  /**
-   * Save a new price offer to the DB.
-   * Either party can send. No restriction on consecutive offers from the same party
-   * (the other party can simply counter again — the "latest offer" wins).
-   */
+  // save counter offer price
   saveOffer: async (payload: {
     negotiationId: string;
     senderId: string;
@@ -231,14 +213,10 @@ export const NegotiationService = {
     return offer;
   },
 
-  /**
-   * Accept the latest offer in the negotiation.
-   * A party CANNOT accept their own last offer.
-   */
+  // accept latest price offer
   acceptLatestOffer: async (payload: { userId: string; negotiationId: string }) => {
     const { userId, negotiationId } = payload;
 
-    // Get the latest offer
     const latestOffer = await prisma.negotiationOffer.findFirst({
       where: { negotiation_id: negotiationId },
       orderBy: { created_at: "desc" },
@@ -248,12 +226,10 @@ export const NegotiationService = {
       throw new Error("No offers have been made yet. Cannot accept.");
     }
 
-    // Cannot accept your own offer
     if (latestOffer.sender_id === userId) {
       throw new Error("You cannot accept your own offer. Wait for the other party to respond.");
     }
 
-    // Lock in the accepted offer atomically
     const updatedNegotiation = await prisma.negotiation.update({
       where: { id: negotiationId },
       data: {
@@ -272,10 +248,7 @@ export const NegotiationService = {
     return updatedNegotiation;
   },
 
-  /**
-   * Reject the negotiation entirely.
-   * Either party can reject. Customer rejection = REJECTED, Helper rejection = CANCELLED.
-   */
+  // reject negotiation
   rejectNegotiation: async (payload: {
     userId: string;
     negotiationId: string;
@@ -283,8 +256,6 @@ export const NegotiationService = {
   }) => {
     const { userId, negotiationId, customerId } = payload;
 
-    // Customer rejects = REJECTED (deal fell through from buyer side)
-    // Helper cancels = CANCELLED (provider walked away)
     const newStatus = userId === customerId ? "REJECTED" : "CANCELLED";
 
     const updatedNegotiation = await prisma.negotiation.update({
