@@ -8,6 +8,7 @@ import httpStatus from "http-status";
 import AppError from "../../../errors/AppError";
 import prisma from "../../../db/prisma";
 import { FileUploadHelper } from "../../../upload/fileUpload";
+import { NotificationService } from "../Notification/notification.service";
 
 const userPublicSelect = {
   id: true,
@@ -333,6 +334,22 @@ export const UserService = {
       data: updateData,
       select: userPublicSelect,
     });
+
+    if (newStatus === "VERIFIED") {
+      await NotificationService.createNotification({
+        receiverId: id,
+        title: "Account Verified",
+        content: "Congratulations! Your helper account has been successfully verified.",
+        data: { userId: id, status: newStatus },
+      });
+    } else if (newStatus === "REJECTED") {
+      await NotificationService.createNotification({
+        receiverId: id,
+        title: "Verification Rejected",
+        content: `Your helper verification has been rejected. Reason: ${rejectionReason}`,
+        data: { userId: id, status: newStatus, reason: rejectionReason },
+      });
+    }
 
     return result;
   },

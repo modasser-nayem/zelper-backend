@@ -4,6 +4,7 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import config from "../../../config";
 import { TPaymentBreakdown } from "./payment.interface";
+import { NotificationService } from "../Notification/notification.service";
 
 const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 
@@ -162,7 +163,17 @@ export const PaymentService = {
         return { received: true };
       }
 
+      let jobTitle = "Job Assignment";
+
       await prisma.$transaction(async (tx) => {
+        const job = await tx.jobPost.findUnique({
+          where: { id: payment.job_id },
+          select: { title: true },
+        });
+        if (job) {
+          jobTitle = job.title;
+        }
+
         // fund escrow
         await tx.payment.update({
           where: { id: payment.id },
@@ -237,6 +248,13 @@ export const PaymentService = {
             note: `Platform commission for job: ${payment.job_id}`,
           },
         });
+      });
+
+      await NotificationService.createNotification({
+        receiverId: payment.helper_id,
+        title: "Job Assigned",
+        content: `A customer paid and assigned you to the job: '${jobTitle}'.`,
+        data: { jobId: payment.job_id, paymentId: payment.id },
       });
     }
 

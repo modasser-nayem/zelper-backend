@@ -6,6 +6,7 @@ import AppError from "../../../errors/AppError";
 import config from "../../../config";
 import { PaginationHelper } from "../../../helpers/pagination";
 import { TCreateWithdrawal, TUpdateWithdrawalStatus } from "./wallet.interface";
+import { NotificationService } from "../Notification/notification.service";
 
 const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 
@@ -290,6 +291,13 @@ export const WalletService = {
         },
       });
 
+      await NotificationService.createNotification({
+        receiverId: userId,
+        title: "Withdrawal Successful",
+        content: `Your withdrawal request of $${amount} has been successfully processed to your card.`,
+        data: { withdrawalId: completedWithdrawal.id, status: "COMPLETED" },
+      });
+
       return completedWithdrawal;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -316,6 +324,13 @@ export const WalletService = {
             note: `Stripe Transfer failed: ${error.message || error}. Refunded to available balance.`,
           },
         });
+      });
+
+      await NotificationService.createNotification({
+        receiverId: userId,
+        title: "Withdrawal Failed",
+        content: `Your withdrawal request of $${amount} has failed. The funds have been refunded to your wallet.`,
+        data: { withdrawalId: withdrawal.id, status: "FAILED", reason: error.message || error },
       });
 
       throw new AppError(

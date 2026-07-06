@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import { FileUploadHelper } from "../../../upload/fileUpload";
+import { NotificationService } from "../Notification/notification.service";
 import { TBrowseJobsQuery, TCreateJob, TJobListQuery, TJobMaskInput, TRawCountRow, TRawJobRow, TUpdateJob, TUserPublicFields } from "./job.interface";
 import { PaginationHelper } from "../../../helpers/pagination";
 
@@ -567,6 +568,13 @@ export const JobService = {
       });
     }
 
+    await NotificationService.createNotification({
+      receiverId: job.customer_id,
+      title: "New Job Application",
+      content: `A helper has applied to your job: '${job.title}'.`,
+      data: { jobId: job.id },
+    });
+
     return result;
   },
 
@@ -736,6 +744,13 @@ export const JobService = {
       });
     });
 
+    await NotificationService.createNotification({
+      receiverId: application.helper_id,
+      title: "Application Selected",
+      content: `Your application for the job '${job.title}' has been selected. Complete payment to finalize.`,
+      data: { jobId: job.id, applicationId: application.id },
+    });
+
     return result;
   },
 
@@ -834,11 +849,20 @@ export const JobService = {
       );
     }
 
-    return prisma.jobPost.update({
+    const result = await prisma.jobPost.update({
       where: { id: jobId },
       data: { status: "IN_PROGRESS" },
       select: { id: true, status: true, title: true },
     });
+
+    await NotificationService.createNotification({
+      receiverId: job.customer_id,
+      title: "Job Started",
+      content: `The helper has started working on your job: '${job.title}'.`,
+      data: { jobId: job.id },
+    });
+
+    return result;
   },
 
   // complete job
@@ -865,18 +889,32 @@ export const JobService = {
       );
     }
 
-    return prisma.jobPost.update({
+    const result = await prisma.jobPost.update({
       where: { id: jobId },
       data: { status: "WAITING_FOR_APPROVAL" },
       select: { id: true, status: true, title: true },
     });
+
+    await NotificationService.createNotification({
+      receiverId: job.customer_id,
+      title: "Job Work Completed",
+      content: `Helper marked the job '${job.title}' as completed. Please review and approve.`,
+      data: { jobId: job.id },
+    });
+
+    return result;
   },
 
   // approve job completion
   approveJob: async (payload: { userId: string; jobId: string }) => {
     const { userId, jobId } = payload;
 
-    const job = await prisma.jobPost.findUnique({ where: { id: jobId } });
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId },
+      include: {
+        selected_application: true,
+      },
+    });
 
     if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
 
@@ -901,6 +939,15 @@ export const JobService = {
     // release escrow
     const { PaymentService } = await import("../Payment/payment.services");
     await PaymentService.releaseEscrow({ jobId });
+
+    if (job.selected_application) {
+      await NotificationService.createNotification({
+        receiverId: job.selected_application.helper_id,
+        title: "Job Approved",
+        content: `Customer approved the completion of '${job.title}'. Escrow earnings released to your wallet.`,
+        data: { jobId: job.id },
+      });
+    }
 
     return updatedJob;
   },

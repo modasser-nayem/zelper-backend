@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   api:
     build:
@@ -6,7 +8,7 @@ services:
     container_name: someone-help-api
     image: someone-help-api:latest
     ports:
-      - "5021:5021"
+      - "5014:5014"
     env_file:
       - .env
     volumes:
@@ -16,14 +18,18 @@ services:
       - db
 
   db:
-    image: mongo:6-jammy
+    image: postgres:16-alpine
     container_name: someone-help-db
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: someone-help
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  mongo_data:
+  postgres_data:
     driver: local

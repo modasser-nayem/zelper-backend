@@ -28,6 +28,15 @@ const authenticateSocket = (socket: Socket, next: (err?: Error) => void) => {
   }
 };
 
+let ioInstance: Server | null = null;
+
+export const getIo = (): Server => {
+  if (!ioInstance) {
+    throw new Error("Socket.io has not been initialized!");
+  }
+  return ioInstance;
+};
+
 export const initSocket = (server: HttpServer): Server => {
   const io = new Server(server, {
     cors: {
@@ -35,6 +44,7 @@ export const initSocket = (server: HttpServer): Server => {
       methods: ["GET", "POST"],
     },
   });
+  ioInstance = io;
 
   io.use(authenticateSocket);
 

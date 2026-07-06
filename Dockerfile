@@ -46,7 +46,7 @@ COPY --from=builder /usr/src/app/public ./public
 RUN mkdir -p logs
 
 # Expose the API port
-EXPOSE 5021
+EXPOSE 5014
 
 # Start the application
 CMD ["npm", "start"]
