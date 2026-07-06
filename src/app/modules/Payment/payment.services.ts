@@ -185,15 +185,32 @@ export const PaymentService = {
           data: { status: "REJECTED" },
         });
 
-        // unlock conversation
-        await tx.conversation.create({
-          data: {
+        // unlock conversation idempotently
+        const existingConv = await tx.conversation.findFirst({
+          where: {
             job_id: payment.job_id,
             customer_id: payment.customer_id,
             helper_id: payment.helper_id,
-            status: "ACTIVE",
           },
         });
+
+        if (existingConv) {
+          if (existingConv.status !== "ACTIVE") {
+            await tx.conversation.update({
+              where: { id: existingConv.id },
+              data: { status: "ACTIVE" },
+            });
+          }
+        } else {
+          await tx.conversation.create({
+            data: {
+              job_id: payment.job_id,
+              customer_id: payment.customer_id,
+              helper_id: payment.helper_id,
+              status: "ACTIVE",
+            },
+          });
+        }
 
         // credit helper's pending balance
         const wallet = await tx.wallet.upsert({

@@ -2599,6 +2599,223 @@
       ]
     },
     {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "💬 Get My Conversations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/chat/conversations?page=1&limit=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Get list of conversations of the logged-in user with the companion user, including latest message and unread counts."
+          },
+          "response": []
+        },
+        {
+          "name": "💬 Get Conversation Messages",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/chat/conversations/:conversationId/messages?page=1&limit=20",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations",
+                ":conversationId",
+                "messages"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": false
+                }
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get list of messages in a conversation (paginated, ordered oldest to newest for instant rendering)."
+          },
+          "response": []
+        },
+        {
+          "name": "💬 Send Text Message (REST)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"conversationId\": \"\",\n    \"content\": \"Hello! I am ready to start the job.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/chat/messages",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "messages"
+              ]
+            },
+            "description": "Send a regular text message through the REST API."
+          },
+          "response": []
+        },
+        {
+          "name": "📸 Send Media Message (Multipart)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/chat/conversations/:conversationId/media",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations",
+                ":conversationId",
+                "media"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Upload an image/media file as a chat message. File size limit is 8MB."
+          },
+          "response": []
+        },
+        {
+          "name": "👁️ Mark Conversation as Seen",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/chat/conversations/:conversationId/seen",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations",
+                ":conversationId",
+                "seen"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Mark all unread incoming messages in the conversation as read."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Health Check",
       "request": {
         "method": "GET",
