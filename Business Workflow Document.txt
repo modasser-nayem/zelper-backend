@@ -292,16 +292,14 @@ Wallet
 Selects
 Withdraw
 Supported methods
-Bank
-bKash
-Nagad
+Stripe Connect Express Payout (direct to linked Debit Card or Bank Account)
 System creates
-Withdrawal
-
-Status = PENDING
-Admin approval or automatic payout
-SUCCESS
-Wallet updated.
+Withdrawal (starts in PENDING status, locking local available balance)
+Backend triggers automatic Stripe transfer
+If Stripe transfer succeeds:
+  Withdrawal status updated to COMPLETED
+If Stripe transfer fails:
+  Withdrawal status updated to FAILED and amount is automatically refunded back to the helper's available balance.
 
 Phase 16 — Review
 After job completion
