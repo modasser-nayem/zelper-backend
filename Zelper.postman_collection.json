@@ -1430,7 +1430,7 @@
       "name": "Jobs",
       "item": [
         {
-          "name": "📋 Customer - Create Job",
+          "name": "Customer - Create Job",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1515,7 +1515,7 @@
           ]
         },
         {
-          "name": "📋 Customer - Get My Job Posts",
+          "name": "Customer - Get My Job Posts",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1635,7 +1635,7 @@
           ]
         },
         {
-          "name": "📋 Customer - Get Job Applications List",
+          "name": "Customer - Get Job Applications List",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1709,7 +1709,7 @@
           ]
         },
         {
-          "name": "📋 Customer - Select Helper",
+          "name": "Customer - Select Helper",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1800,7 +1800,7 @@
           ]
         },
         {
-          "name": "📋 Customer - Reject Application",
+          "name": "Customer - Reject Application",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1891,7 +1891,7 @@
           ]
         },
         {
-          "name": "🙋 Helper - Browse Nearby Jobs",
+          "name": "Helper - Browse Nearby Jobs",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2019,7 +2019,7 @@
           ]
         },
         {
-          "name": "🙋 Helper - Get My Applications",
+          "name": "Helper - Get My Applications",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2119,7 +2119,7 @@
           ]
         },
         {
-          "name": "🙋 Helper - Apply to Job",
+          "name": "Helper - Apply to Job",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2193,7 +2193,7 @@
           ]
         },
         {
-          "name": "🙋 Helper - Withdraw Application",
+          "name": "Helper - Withdraw Application",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2267,7 +2267,7 @@
           ]
         },
         {
-          "name": "🔗 Get Single Job Details",
+          "name": "Get Single Job Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2339,7 +2339,7 @@
           ]
         },
         {
-          "name": "🔗 Update Job",
+          "name": "Update Job",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2440,7 +2440,7 @@
           ]
         },
         {
-          "name": "🔗 Delete Job",
+          "name": "Delete Job",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2512,7 +2512,7 @@
           ]
         },
         {
-          "name": "🙋 Helper - Start Job",
+          "name": "Helper - Start Job",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2587,7 +2587,7 @@
           ]
         },
         {
-          "name": "🙋 Helper - Complete Job",
+          "name": "Helper - Complete Job",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2662,7 +2662,7 @@
           ]
         },
         {
-          "name": "📋 Customer - Approve Job Completion",
+          "name": "Customer - Approve Job Completion",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3056,7 +3056,7 @@
       "name": "Payments",
       "item": [
         {
-          "name": "💳 Customer - Create Payment Intent",
+          "name": "Customer - Create Payment Intent",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3132,7 +3132,7 @@
           ]
         },
         {
-          "name": "📦 Get Job Payment Details",
+          "name": "Get Job Payment Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3207,7 +3207,7 @@
           ]
         },
         {
-          "name": "🔔 Stripe Webhook (Stripe → Server)",
+          "name": "Stripe Webhook (Stripe → Server)",
           "request": {
             "method": "POST",
             "header": [
@@ -3288,7 +3288,7 @@
       "name": "Wallet",
       "item": [
         {
-          "name": "💰 Get My Wallet",
+          "name": "Get My Wallet",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3347,7 +3347,7 @@
           ]
         },
         {
-          "name": "🔗 Connect Stripe Account (Step 1)",
+          "name": "Connect Stripe Account (Step 1)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3413,7 +3413,7 @@
           ]
         },
         {
-          "name": "✅ Confirm Stripe Onboarding (Step 2)",
+          "name": "Confirm Stripe Onboarding (Step 2)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3476,7 +3476,7 @@
           ]
         },
         {
-          "name": "📋 Get My Transactions",
+          "name": "Get My Transactions",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3577,7 +3577,7 @@
           ]
         },
         {
-          "name": "📋 Get My Withdrawals",
+          "name": "Get My Withdrawals",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3678,7 +3678,7 @@
           ]
         },
         {
-          "name": "💸 Request Withdrawal (Stripe)",
+          "name": "Request Withdrawal (Stripe)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3756,7 +3756,7 @@
           ]
         },
         {
-          "name": "🔐 Admin - Get All Withdrawals",
+          "name": "Admin - Get All Withdrawals",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3857,7 +3857,7 @@
           ]
         },
         {
-          "name": "🔐 Admin - Update Withdrawal Status",
+          "name": "Admin - Update Withdrawal Status",
           "request": {
             "auth": {
               "type": "bearer",
@@ -3954,7 +3954,7 @@
       "name": "Reviews",
       "item": [
         {
-          "name": "✍️ Submit Review",
+          "name": "️ Submit Review",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4028,7 +4028,7 @@
           ]
         },
         {
-          "name": "📋 Get My Reviews",
+          "name": "Get My Reviews",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4115,7 +4115,7 @@
           ]
         },
         {
-          "name": "📋 Get Helper Reviews",
+          "name": "Get Helper Reviews",
           "request": {
             "method": "GET",
             "header": [],
@@ -4213,7 +4213,7 @@
       "name": "Dashboard",
       "item": [
         {
-          "name": "🔐 Admin - Get Dashboard Stats",
+          "name": "Admin - Get Dashboard Stats",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4272,7 +4272,7 @@
           ]
         },
         {
-          "name": "📊 Admin - Get Chart Stats (Last 6 Months)",
+          "name": "Admin - Get Chart Stats (Last 6 Months)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4331,7 +4331,7 @@
           ]
         },
         {
-          "name": "💳 Admin - List All Payments",
+          "name": "Admin - List All Payments",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4444,7 +4444,7 @@
           ]
         },
         {
-          "name": "💰 Admin - List Helper Wallets",
+          "name": "Admin - List Helper Wallets",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4538,7 +4538,7 @@
       "name": "Chat",
       "item": [
         {
-          "name": "💬 Get My Conversations",
+          "name": "Get My Conversations",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4625,7 +4625,7 @@
           ]
         },
         {
-          "name": "💬 Get Conversation Messages",
+          "name": "Get Conversation Messages",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4730,7 +4730,7 @@
           ]
         },
         {
-          "name": "💬 Send Text Message (REST)",
+          "name": "Send Text Message (REST)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4806,7 +4806,7 @@
           ]
         },
         {
-          "name": "📸 Send Media Message (Multipart)",
+          "name": "Send Media Message (Multipart)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4902,7 +4902,7 @@
           ]
         },
         {
-          "name": "👁️ Mark Conversation as Seen",
+          "name": "️ Mark Conversation as Seen",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4984,7 +4984,7 @@
       "name": "Notifications",
       "item": [
         {
-          "name": "🔔 Get My Notifications",
+          "name": "Get My Notifications",
           "request": {
             "auth": {
               "type": "bearer",
@@ -5069,7 +5069,7 @@
           ]
         },
         {
-          "name": "🔔 Mark Notification as Read",
+          "name": "Mark Notification as Read",
           "request": {
             "auth": {
               "type": "bearer",
@@ -5144,7 +5144,7 @@
           ]
         },
         {
-          "name": "🔔 Mark All Notifications as Read",
+          "name": "Mark All Notifications as Read",
           "request": {
             "auth": {
               "type": "bearer",
@@ -5203,7 +5203,7 @@
           ]
         },
         {
-          "name": "📱 Save FCM Token",
+          "name": "Save FCM Token",
           "request": {
             "auth": {
               "type": "bearer",
