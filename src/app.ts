@@ -22,7 +22,7 @@ class App {
   private config() {
     this.app.use(
       cors({
-        origin: [config.FRONTEND_URL, "http://localhost:3000"],
+        origin: [config.FRONTEND_URL, "http://localhost:3032"],
         credentials: true,
         methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
