@@ -18,6 +18,7 @@ class App {
     this.routes();
     this.handleErrors();
   }
+  // configure express middlewares
 
   private config() {
     this.app.use(
