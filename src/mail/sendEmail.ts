@@ -5,7 +5,7 @@ import { APP_CONFIG } from "../constants/constants";
 const transporter = nodemailer.createTransport({
   host: config.mail.SMTP_HOST,
   port: config.mail.SMTP_PORT,
-  secure: true,
+  secure: config.mail.SMTP_PORT === 465,
   auth: {
     user: config.mail.SMTP_USER,
     pass: config.mail.SMTP_APP_PASS,

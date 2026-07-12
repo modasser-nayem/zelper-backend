@@ -28,6 +28,7 @@ class App {
           "http://localhost:3032",
           "http://localhost:3000",
           "http://localhost:3001",
+          "http://206.162.244.134:3032",
         ],
         credentials: true,
         methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
