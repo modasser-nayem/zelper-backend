@@ -3,7 +3,7 @@ import { AuthService } from "./auth.service";
 import { Request } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { COOKIE_NAME, setCookie } from "../../../helpers/cookie";
+import { COOKIE_NAME, setCookie, clearCookie } from "../../../helpers/cookie";
 
 export const AuthController = {
   createAccount: catchAsync(async (req, res) => {
@@ -118,6 +118,20 @@ export const AuthController = {
       statusCode: status.OK,
       message: "Access token is retrieved successfully!",
       data: result,
+    });
+  }),
+
+  // Logout user
+  logoutUser: catchAsync(async (req, res) => {
+    clearCookie({
+      res,
+      cookieName: COOKIE_NAME.REFRESH_TOKEN,
+    });
+
+    sendResponse(res, {
+      statusCode: status.OK,
+      message: "User logged out successfully!",
+      data: null,
     });
   }),
 };

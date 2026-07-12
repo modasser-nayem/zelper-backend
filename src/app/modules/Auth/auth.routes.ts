@@ -60,4 +60,7 @@ router.patch(
 // Refresh token
 router.post("/refresh-token", AuthController.refreshToken);
 
+// Logout
+router.post("/logout", AuthController.logoutUser);
+
 export const AuthRoutes = router;
