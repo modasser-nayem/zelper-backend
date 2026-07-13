@@ -4333,7 +4333,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Chart statistics retrieved successfully!\",\n    \"data\": [\n        {\n            \"key\": \"2026-07\",\n            \"label\": \"Jul 2026\",\n            \"revenue\": 150,\n            \"volume\": 1500,\n            \"totalJobs\": 12,\n            \"completedJobs\": 10\n        },\n        {\n            \"key\": \"2026-06\",\n            \"label\": \"Jun 2026\",\n            \"revenue\": 120,\n            \"volume\": 1200,\n            \"totalJobs\": 8,\n            \"completedJobs\": 7\n        }\n    ]\n}"
             }
           ]
         },
@@ -4446,7 +4446,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Payments retrieved successfully!\",\n    \"data\": [\n        {\n            \"id\": \"pay-123\",\n            \"job_id\": \"job-123\",\n            \"customer_id\": \"cust-123\",\n            \"helper_id\": \"help-123\",\n            \"amount\": 100,\n            \"platform_fee\": 10,\n            \"helper_amount\": 90,\n            \"status\": \"RELEASED\",\n            \"released_at\": \"2026-07-13T08:00:00.000Z\",\n            \"stripe_payment_intent\": \"pi_123\",\n            \"stripe_customer_id\": \"cus_123\",\n            \"created_at\": \"2026-07-13T08:00:00.000Z\",\n            \"updated_at\": \"2026-07-13T08:00:00.000Z\",\n            \"job\": {\n                \"id\": \"job-123\",\n                \"title\": \"Fix Leaking Kitchen Sink\",\n                \"status\": \"CLOSED\"\n            },\n            \"customer\": {\n                \"id\": \"cust-123\",\n                \"name\": \"Customer One\",\n                \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=CustomerOne\",\n                \"email\": \"customer1@gmail.com\"\n            },\n            \"helper\": {\n                \"id\": \"help-123\",\n                \"name\": \"Helper Verified\",\n                \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=HelperVer\",\n                \"email\": \"helper_ver@gmail.com\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 1,\n        \"totalPages\": 1\n    }\n}"
             }
           ]
         },
@@ -4535,7 +4535,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Wallets retrieved successfully!\",\n    \"data\": [\n        {\n            \"id\": \"wallet-123\",\n            \"helper_id\": \"help-123\",\n            \"available_balance\": \"250.00\",\n            \"pending_balance\": \"0.00\",\n            \"stripe_account_id\": \"acct_123\",\n            \"stripe_onboarding_done\": true,\n            \"created_at\": \"2026-07-13T08:00:00.000Z\",\n            \"updated_at\": \"2026-07-13T08:00:00.000Z\",\n            \"helper\": {\n                \"id\": \"help-123\",\n                \"name\": \"Helper Verified\",\n                \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=HelperVer\",\n                \"email\": \"helper_ver@gmail.com\",\n                \"phone\": \"+1-713-555-0202\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 1,\n        \"totalPages\": 1\n    }\n}"
             }
           ]
         }
@@ -4732,7 +4732,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Messages retrieved successfully!\",\n    \"data\": [\n        {\n            \"id\": \"msg-12345-67890\",\n            \"conversation_id\": \"conv-55\",\n            \"sender_id\": \"helperVerified-id\",\n            \"type\": \"TEXT\",\n            \"content\": \"Hello! I am ready to start the job.\",\n            \"is_read\": true,\n            \"created_at\": \"2026-07-13T08:05:00.000Z\",\n            \"sender\": {\n                \"id\": \"helperVerified-id\",\n                \"name\": \"Helper Verified\",\n                \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=HelperVer\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 20,\n        \"total\": 1,\n        \"totalPages\": 1\n    }\n}"
             }
           ]
         },
@@ -4808,7 +4808,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Message sent successfully!\",\n    \"data\": {\n        \"id\": \"msg-12345-67890\",\n        \"conversation_id\": \"conv-55\",\n        \"sender_id\": \"helperVerified-id\",\n        \"type\": \"TEXT\",\n        \"content\": \"Hello! I am ready to start the job.\",\n        \"is_read\": false,\n        \"created_at\": \"2026-07-13T08:05:00.000Z\",\n        \"sender\": {\n            \"id\": \"helperVerified-id\",\n            \"name\": \"Helper Verified\",\n            \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=HelperVer\"\n        }\n    }\n}"
             }
           ]
         },
@@ -4904,7 +4904,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Media message sent successfully!\",\n    \"data\": {\n        \"id\": \"msg-image-123\",\n        \"conversation_id\": \"conv-55\",\n        \"sender_id\": \"helperVerified-id\",\n        \"type\": \"IMAGE\",\n        \"content\": \"https://res.cloudinary.com/demo/image/upload/sample.jpg\",\n        \"is_read\": false,\n        \"created_at\": \"2026-07-13T08:06:00.000Z\",\n        \"sender\": {\n            \"id\": \"helperVerified-id\",\n            \"name\": \"Helper Verified\",\n            \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=HelperVer\"\n        }\n    }\n}"
             }
           ]
         },
@@ -4981,7 +4981,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Conversation marked as seen successfully!\",\n    \"data\": {\n        \"success\": true\n    }\n}"
             }
           ]
         }
@@ -5146,7 +5146,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Notification marked as read successfully!\",\n    \"data\": {\n        \"success\": true\n    }\n}"
             }
           ]
         },
@@ -5205,7 +5205,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"All notifications marked as read successfully!\",\n    \"data\": {\n        \"success\": true\n    }\n}"
             }
           ]
         },
@@ -5281,7 +5281,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"FCM Token registered successfully!\",\n    \"data\": {\n        \"success\": true\n    }\n}"
             }
           ]
         }
@@ -5329,7 +5329,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+          "body": "{\n    \"success\": true,\n    \"message\": \"System health check passed successfully!\",\n    \"data\": {\n        \"status\": \"healthy\",\n        \"uptime\": 86400,\n        \"database\": \"connected\"\n    }\n}"
         }
       ]
     }
