@@ -989,13 +989,13 @@
                   "key": "role",
                   "value": "",
                   "disabled": true,
-                  "description": "Filter by user role: CUSTOMER, HELPER, ADMIN"
+                  "description": "Filter by user role. Options: USER, ADMIN"
                 },
                 {
                   "key": "status",
                   "value": "",
                   "disabled": true,
-                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                  "description": "Filter by user status. Options: ACTIVE, SUSPENDED, DELETED"
                 },
                 {
                   "key": "page",
@@ -1012,12 +1012,14 @@
                 {
                   "key": "sortBy",
                   "value": "created_at",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Field name to sort by (optional, default: created_at)"
                 },
                 {
                   "key": "sortOrder",
                   "value": "desc",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Sort direction. Options: asc, desc (optional, default: desc)"
                 }
               ]
             }
@@ -1561,12 +1563,14 @@
                 {
                   "key": "sortBy",
                   "value": "created_at",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Field name to sort by (optional, default: created_at)"
                 },
                 {
                   "key": "sortOrder",
                   "value": "desc",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Sort direction. Options: asc, desc (optional, default: desc)"
                 }
               ]
             }
@@ -1917,18 +1921,21 @@
               "query": [
                 {
                   "key": "lat",
-                  "value": "23.8103",
-                  "disabled": false
+                  "value": "29.9792",
+                  "disabled": false,
+                  "description": "Latitude coordinates for geolocation lookup (Required)"
                 },
                 {
                   "key": "lng",
-                  "value": "90.4125",
-                  "disabled": false
+                  "value": "31.1342",
+                  "disabled": false,
+                  "description": "Longitude coordinates for geolocation lookup (Required)"
                 },
                 {
                   "key": "radius",
                   "value": "15",
-                  "disabled": false
+                  "disabled": false,
+                  "description": "Search radius in miles/km (optional, default: helper service_radius)"
                 },
                 {
                   "key": "searchTerm",
@@ -3207,7 +3214,7 @@
           ]
         },
         {
-          "name": "Stripe Webhook (Stripe → Server)",
+          "name": "Stripe Webhook (Stripe -> Server)",
           "request": {
             "method": "POST",
             "header": [
@@ -3517,7 +3524,7 @@
                   "key": "type",
                   "value": "",
                   "disabled": true,
-                  "description": "Filter type. Enums: \n- Transactions: DEPOSIT, WITHDRAWAL, COMMISSION, REFUND"
+                  "description": "Filter by transaction type. Options: JOB_EARNING, COMMISSION, WITHDRAWAL, REFUND"
                 }
               ]
             },
@@ -3618,7 +3625,7 @@
                   "key": "status",
                   "value": "",
                   "disabled": true,
-                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                  "description": "Filter by withdrawal status. Options: PENDING, PROCESSING, COMPLETED, FAILED, REJECTED"
                 }
               ]
             },
@@ -3797,7 +3804,7 @@
                   "key": "status",
                   "value": "PENDING",
                   "disabled": false,
-                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                  "description": "Filter by withdrawal status. Options: PENDING, PROCESSING, COMPLETED, FAILED, REJECTED"
                 }
               ]
             },
@@ -3954,7 +3961,7 @@
       "name": "Reviews",
       "item": [
         {
-          "name": "️ Submit Review",
+          "name": "Submit Review",
           "request": {
             "auth": {
               "type": "bearer",
@@ -4372,7 +4379,7 @@
                   "key": "status",
                   "value": "",
                   "disabled": true,
-                  "description": "Filter status. Enums: \n- Jobs: OPEN, ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, COMPLETED, CLOSED\n- Payments: PENDING, FUNDED, PAID_OUT, FAILED\n- Withdrawals: PENDING, COMPLETED, FAILED\n- User Status: ACTIVE, SUSPENDED"
+                  "description": "Filter by payment status. Options: PENDING, FUNDED, RELEASED, REFUNDED, FAILED"
                 },
                 {
                   "key": "searchTerm",
@@ -4902,7 +4909,7 @@
           ]
         },
         {
-          "name": "️ Mark Conversation as Seen",
+          "name": "Mark Conversation as Seen",
           "request": {
             "auth": {
               "type": "bearer",
