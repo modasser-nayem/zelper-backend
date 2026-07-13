@@ -4023,7 +4023,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Review submitted successfully\",\n    \"data\": {\n        \"id\": \"rev-99\",\n        \"rating\": 5,\n        \"comment\": \"Excellent job!\",\n        \"job_id\": \"job-123\"\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Review submitted successfully!\",\n    \"data\": {\n        \"id\": \"6a264b8b-e854-4682-8bc1-6f77f0a9937a\",\n        \"job_id\": \"3f312f7a-b749-48d9-9ca8-919642944356\",\n        \"customer_id\": \"customer1-id\",\n        \"helper_id\": \"helperVerified-id\",\n        \"rating\": 5,\n        \"comment\": \"Excellent service! Very professional.\",\n        \"created_at\": \"2026-07-13T08:00:00.000Z\"\n    }\n}"
             }
           ]
         },
@@ -4110,7 +4110,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"My reviews retrieved successfully!\",\n    \"data\": [\n        {\n            \"id\": \"6a264b8b-e854-4682-8bc1-6f77f0a9937a\",\n            \"job_id\": \"3f312f7a-b749-48d9-9ca8-919642944356\",\n            \"customer_id\": \"customer1-id\",\n            \"helper_id\": \"helperVerified-id\",\n            \"rating\": 5,\n            \"comment\": \"Excellent service! Very professional.\",\n            \"created_at\": \"2026-07-13T08:00:00.000Z\",\n            \"customer\": {\n                \"id\": \"customer1-id\",\n                \"name\": \"Customer One\",\n                \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=CustomerOne\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 1,\n        \"totalPages\": 1\n    }\n}"
             }
           ]
         },
@@ -4203,7 +4203,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Helper reviews retrieved successfully!\",\n    \"data\": [\n        {\n            \"id\": \"6a264b8b-e854-4682-8bc1-6f77f0a9937a\",\n            \"job_id\": \"3f312f7a-b749-48d9-9ca8-919642944356\",\n            \"customer_id\": \"customer1-id\",\n            \"helper_id\": \"helperVerified-id\",\n            \"rating\": 5,\n            \"comment\": \"Excellent service! Very professional.\",\n            \"created_at\": \"2026-07-13T08:00:00.000Z\",\n            \"customer\": {\n                \"id\": \"customer1-id\",\n                \"name\": \"Customer One\",\n                \"avatar\": \"https://api.dicebear.com/7.x/adventurer/svg?seed=CustomerOne\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 1,\n        \"totalPages\": 1\n    }\n}"
             }
           ]
         }
