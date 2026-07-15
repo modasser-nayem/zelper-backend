@@ -121,6 +121,21 @@ export const JobController = {
     });
   }),
 
+  // Helper: get my works (jobs assigned/hired)
+  getMyWorks: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const query = pickOptions(req.query, ["searchTerm", "page", "limit", "sortBy", "sortOrder"]) as TJobListQuery;
+    const result = await JobService.getMyWorks({ userId, query });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My works retrieved successfully!",
+      data: result.data,
+      meta: result.meta,
+    });
+  }),
+
   // Helper applies to a job post
   applyToJob: catchAsync(async (req, res) => {
     const userId = req.user.id;

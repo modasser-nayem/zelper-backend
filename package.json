@@ -15,8 +15,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "generate-module": "ts-node-dev src/utils/generate-module.ts",
-    "seed": "ts-node-dev --transpile-only src/db/seed.ts"
+    "generate-module": "ts-node-dev src/utils/generate-module.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -77,10 +76,5 @@
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.25.32"
-  },
-  "author": {
-    "name": "Ali Modasser Nayem",
-    "email": "modassernayem@gmail.com",
-    "url": "https://www.linkedin.com/in/alimodassernayem"
   }
 }

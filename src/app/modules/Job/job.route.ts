@@ -19,6 +19,9 @@ router.get("/browse", auth(), JobController.browseJobs);
 // Helper: get jobs I applied to
 router.get("/my/applications", auth(), JobController.getMyApplications);
 
+// Helper: get my works (jobs assigned/hired)
+router.get("/my/works", auth(), JobController.getMyWorks);
+
 // ==================== Shared Routes ====================
 
 // Create a new job post (Form-data: files array + data JSON key)

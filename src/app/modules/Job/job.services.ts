@@ -4,11 +4,22 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import { FileUploadHelper } from "../../../upload/fileUpload";
 import { NotificationService } from "../Notification/notification.service";
-import { TBrowseJobsQuery, TCreateJob, TJobListQuery, TJobMaskInput, TRawCountRow, TRawJobRow, TUpdateJob, TUserPublicFields } from "./job.interface";
+import {
+  TBrowseJobsQuery,
+  TCreateJob,
+  TJobListQuery,
+  TJobMaskInput,
+  TRawCountRow,
+  TRawJobRow,
+  TUpdateJob,
+  TUserPublicFields,
+} from "./job.interface";
 import { PaginationHelper } from "../../../helpers/pagination";
 
 // Utility function to apply privacy mask to customer details
-const maskCustomerDetails = (customer: TUserPublicFields | null | undefined) => {
+const maskCustomerDetails = (
+  customer: TUserPublicFields | null | undefined,
+) => {
   if (!customer) return null;
   return {
     id: customer.id,
@@ -40,7 +51,8 @@ const maskJobDetails = (job: TJobMaskInput, userId: string) => {
   if (!job) return null;
 
   const isOwner = job.customer_id === userId;
-  const isAssignedHelper = job.selected_application?.helper_id === userId && job.status !== "OPEN";
+  const isAssignedHelper =
+    job.selected_application?.helper_id === userId && job.status !== "OPEN";
 
   if (isOwner || isAssignedHelper) {
     return job; // Return exact details if owner or assigned helper
@@ -65,7 +77,9 @@ export const JobService = {
   }) => {
     const { customerId, data, files } = payload;
 
-    const customer = await prisma.user.findUnique({ where: { id: customerId } });
+    const customer = await prisma.user.findUnique({
+      where: { id: customerId },
+    });
     if (!customer) {
       throw new AppError(httpStatus.NOT_FOUND, "Customer account not found!");
     }
@@ -143,11 +157,17 @@ export const JobService = {
     }
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You do not have permission to update this job post!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to update this job post!",
+      );
     }
 
     if (job.status !== "OPEN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Job post can only be updated when status is OPEN!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Job post can only be updated when status is OPEN!",
+      );
     }
 
     // Handle optional file replacement
@@ -169,13 +189,17 @@ export const JobService = {
     const updateData: Prisma.JobPostUpdateInput = {};
 
     if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.description !== undefined)
+      updateData.description = data.description;
     if (data.budget !== undefined) updateData.budget = Number(data.budget);
-    if (data.is_negotiable !== undefined) updateData.is_negotiable = data.is_negotiable;
+    if (data.is_negotiable !== undefined)
+      updateData.is_negotiable = data.is_negotiable;
     if (data.is_urgent !== undefined) updateData.is_urgent = data.is_urgent;
     if (data.address !== undefined) updateData.address = data.address;
-    if (data.latitude !== undefined) updateData.latitude = Number(data.latitude);
-    if (data.longitude !== undefined) updateData.longitude = Number(data.longitude);
+    if (data.latitude !== undefined)
+      updateData.latitude = Number(data.latitude);
+    if (data.longitude !== undefined)
+      updateData.longitude = Number(data.longitude);
     if (data.scheduled_at !== undefined) {
       const scheduledDate = new Date(data.scheduled_at);
       if (isNaN(scheduledDate.getTime())) {
@@ -231,7 +255,10 @@ export const JobService = {
     }
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You do not have permission to delete this job post!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to delete this job post!",
+      );
     }
 
     // Delete files from S3/Cloudinary
@@ -283,23 +310,31 @@ export const JobService = {
   },
 
   // Customer: get my own job posts
-  getMyPosts: async (payload: {
-    userId: string;
-    query: TJobListQuery;
-  }) => {
+  getMyPosts: async (payload: { userId: string; query: TJobListQuery }) => {
     const { userId, query } = payload;
-    const { page, limit, skip, sortBy, sortOrder } = PaginationHelper.calculatePagination({
-      page: Number(query.page),
-      limit: Number(query.limit),
-      sortBy: query.sortBy,
-      sortOrder: query.sortOrder,
-    });
+    const { page, limit, skip, sortBy, sortOrder } =
+      PaginationHelper.calculatePagination({
+        page: Number(query.page),
+        limit: Number(query.limit),
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder,
+      });
 
     const searchCondition = query.searchTerm
       ? {
           OR: [
-            { title: { contains: query.searchTerm, mode: Prisma.QueryMode.insensitive } },
-            { description: { contains: query.searchTerm, mode: Prisma.QueryMode.insensitive } },
+            {
+              title: {
+                contains: query.searchTerm,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+            {
+              description: {
+                contains: query.searchTerm,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
           ],
         }
       : {};
@@ -386,11 +421,77 @@ export const JobService = {
     };
   },
 
+  // Helper: get my works (jobs assigned/hired)
+  getMyWorks: async (payload: { userId: string; query: TJobListQuery }) => {
+    const { userId, query } = payload;
+    const { page, limit, skip, sortBy, sortOrder } =
+      PaginationHelper.calculatePagination({
+        page: Number(query.page),
+        limit: Number(query.limit),
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder,
+      });
+
+    const searchCondition = query.searchTerm
+      ? {
+          OR: [
+            {
+              title: {
+                contains: query.searchTerm,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+            {
+              description: {
+                contains: query.searchTerm,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+          ],
+        }
+      : {};
+
+    const whereConditions = {
+      selected_application: {
+        helper_id: userId,
+      },
+      status: {
+        in: [
+          JobPostStatus.ASSIGNED,
+          JobPostStatus.IN_PROGRESS,
+          JobPostStatus.WAITING_FOR_APPROVAL,
+          JobPostStatus.COMPLETED,
+          JobPostStatus.CLOSED,
+          JobPostStatus.DISPUTED,
+        ],
+      },
+      ...searchCondition,
+    };
+
+    const [jobs, total] = await Promise.all([
+      prisma.jobPost.findMany({
+        where: whereConditions,
+        include: {
+          job_images: true,
+          selected_application: {
+            select: { id: true, helper_id: true, status: true },
+          },
+        },
+        orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
+        take: limit,
+        skip,
+      }),
+      prisma.jobPost.count({ where: whereConditions }),
+    ]);
+
+    return {
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      data: jobs,
+    };
+  },
+
   // Helper: browse nearby open jobs
-  browseJobs: async (payload: {
-    userId: string;
-    query: TBrowseJobsQuery;
-  }) => {
+  browseJobs: async (payload: { userId: string; query: TBrowseJobsQuery }) => {
     const { userId, query } = payload;
     const { page, limit, skip } = PaginationHelper.calculatePagination({
       page: Number(query.page),
@@ -427,28 +528,30 @@ export const JobService = {
       `;
 
       const jobIds = rawJobs.map((j) => j.id);
-      const fullJobs = await prisma.jobPost.findMany({
-        where: { id: { in: jobIds } },
-        include: {
-          job_images: true,
-          customer: {
-            select: {
-              id: true,
-              name: true,
-              avatar: true,
-              rating_average: true,
-              total_reviews: true,
-              completed_jobs: true,
-              verification_status: true,
-            },
+      const [fullJobs, applications] = await Promise.all([
+        prisma.jobPost.findMany({
+          where: { id: { in: jobIds } },
+          include: {
+            job_images: true,
           },
-        },
-      });
+        }),
+        prisma.jobApplication.findMany({
+          where: {
+            helper_id: userId,
+            job_id: { in: jobIds },
+            status: { not: "WITHDRAWN" },
+          },
+          select: { job_id: true },
+        }),
+      ]);
+
+      const appliedJobIds = new Set(applications.map((app) => app.job_id));
 
       const distanceMap = new Map(rawJobs.map((j) => [j.id, j.distance]));
       const sortedJobs = fullJobs
         .map((job) => ({
           ...maskJobDetails(job, userId),
+          already_applied: appliedJobIds.has(job.id),
           distance_km: distanceMap.get(job.id)
             ? Number(Number(distanceMap.get(job.id)).toFixed(2))
             : null,
@@ -474,8 +577,18 @@ export const JobService = {
       const searchCondition = query.searchTerm
         ? {
             OR: [
-              { title: { contains: query.searchTerm, mode: Prisma.QueryMode.insensitive } },
-              { description: { contains: query.searchTerm, mode: Prisma.QueryMode.insensitive } },
+              {
+                title: {
+                  contains: query.searchTerm,
+                  mode: Prisma.QueryMode.insensitive,
+                },
+              },
+              {
+                description: {
+                  contains: query.searchTerm,
+                  mode: Prisma.QueryMode.insensitive,
+                },
+              },
             ],
           }
         : {};
@@ -510,9 +623,23 @@ export const JobService = {
         prisma.jobPost.count({ where: whereConditions }),
       ]);
 
+      const jobIds = jobs.map((j) => j.id);
+      const applications = await prisma.jobApplication.findMany({
+        where: {
+          helper_id: userId,
+          job_id: { in: jobIds },
+          status: { not: "WITHDRAWN" },
+        },
+        select: { job_id: true },
+      });
+      const appliedJobIds = new Set(applications.map((app) => app.job_id));
+
       return {
         meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-        data: jobs.map((job) => maskJobDetails(job, userId)),
+        data: jobs.map((job) => ({
+          ...maskJobDetails(job, userId),
+          already_applied: appliedJobIds.has(job.id),
+        })),
       };
     }
   },
@@ -530,11 +657,17 @@ export const JobService = {
     }
 
     if (job.customer_id === userId) {
-      throw new AppError(httpStatus.BAD_REQUEST, "You cannot apply to your own job post!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You cannot apply to your own job post!",
+      );
     }
 
     if (job.status !== "OPEN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Job post is no longer open for applications!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Job post is no longer open for applications!",
+      );
     }
 
     // Check if helper already applied
@@ -548,7 +681,10 @@ export const JobService = {
     });
 
     if (existingApplication && existingApplication.status !== "WITHDRAWN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "You have already applied to this job!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You have already applied to this job!",
+      );
     }
 
     // Create or reactivate application
@@ -596,7 +732,10 @@ export const JobService = {
     }
 
     if (application.status === "WITHDRAWN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Application is already withdrawn!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Application is already withdrawn!",
+      );
     }
 
     const result = await prisma.jobApplication.update({
@@ -620,7 +759,10 @@ export const JobService = {
     }
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You do not have permission to view applications for this job!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to view applications for this job!",
+      );
     }
 
     const applications = await prisma.jobApplication.findMany({
@@ -680,11 +822,17 @@ export const JobService = {
     }
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You do not have permission to select a helper for this job!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to select a helper for this job!",
+      );
     }
 
     if (job.status !== "OPEN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Helper can only be selected when job status is OPEN!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Helper can only be selected when job status is OPEN!",
+      );
     }
 
     const application = await prisma.jobApplication.findUnique({
@@ -692,11 +840,20 @@ export const JobService = {
     });
 
     if (!application || application.job_id !== jobId) {
-      throw new AppError(httpStatus.NOT_FOUND, "Job application not found for this job post!");
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Job application not found for this job post!",
+      );
     }
 
-    if (application.status === "WITHDRAWN" || application.status === "REJECTED") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Cannot select a withdrawn or rejected application!");
+    if (
+      application.status === "WITHDRAWN" ||
+      application.status === "REJECTED"
+    ) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Cannot select a withdrawn or rejected application!",
+      );
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -771,11 +928,17 @@ export const JobService = {
     }
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You do not have permission to reject applications for this job!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to reject applications for this job!",
+      );
     }
 
     if (job.status !== "OPEN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Applications can only be rejected when job status is OPEN!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Applications can only be rejected when job status is OPEN!",
+      );
     }
 
     const application = await prisma.jobApplication.findUnique({
@@ -783,15 +946,24 @@ export const JobService = {
     });
 
     if (!application || application.job_id !== jobId) {
-      throw new AppError(httpStatus.NOT_FOUND, "Job application not found for this job post!");
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Job application not found for this job post!",
+      );
     }
 
     if (application.status === "REJECTED") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Application is already rejected!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Application is already rejected!",
+      );
     }
 
     if (application.status === "WITHDRAWN") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Cannot reject a withdrawn application!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Cannot reject a withdrawn application!",
+      );
     }
 
     // clear selected application if matching
@@ -839,7 +1011,10 @@ export const JobService = {
     if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
 
     if (job.selected_application?.helper_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "Only the assigned helper can start this job!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Only the assigned helper can start this job!",
+      );
     }
 
     if (job.status !== "ASSIGNED") {
@@ -879,7 +1054,10 @@ export const JobService = {
     if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
 
     if (job.selected_application?.helper_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "Only the assigned helper can complete this job!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Only the assigned helper can complete this job!",
+      );
     }
 
     if (job.status !== "IN_PROGRESS") {
@@ -919,7 +1097,10 @@ export const JobService = {
     if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "Only the customer can approve job completion!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Only the customer can approve job completion!",
+      );
     }
 
     if (job.status !== "WAITING_FOR_APPROVAL") {
