@@ -218,6 +218,33 @@ export const JobService = {
         };
       }
 
+      // Check if the job will be negotiable and has a helper selected
+      const isNegotiable =
+        data.is_negotiable !== undefined
+          ? data.is_negotiable
+          : job.is_negotiable;
+      const selectedApplicationId = job.selected_application_id;
+
+      if (isNegotiable && selectedApplicationId) {
+        const existingNegotiation = await tx.negotiation.findFirst({
+          where: {
+            application_id: selectedApplicationId,
+            status: "PENDING",
+          },
+        });
+
+        if (!existingNegotiation) {
+          await tx.negotiation.create({
+            data: {
+              application_id: selectedApplicationId,
+              status: "PENDING",
+              final_amount:
+                data.budget !== undefined ? Number(data.budget) : job.budget,
+            },
+          });
+        }
+      }
+
       return await tx.jobPost.update({
         where: { id: jobId },
         data: updateData,
@@ -232,6 +259,17 @@ export const JobService = {
               total_reviews: true,
               completed_jobs: true,
               verification_status: true,
+            },
+          },
+          selected_application: {
+            select: {
+              id: true,
+              helper_id: true,
+              status: true,
+              negotiations: {
+                where: { status: "PENDING" },
+                select: { id: true },
+              },
             },
           },
         },

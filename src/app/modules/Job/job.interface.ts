@@ -65,6 +65,7 @@ export type TUserPublicFields = {
 export type TSelectedApplicationRef = {
   id: string;
   helper_id: string;
+  negotiations?: { id: string }[];
 } | null;
 
 // Minimal job shape needed by the mask utilities
