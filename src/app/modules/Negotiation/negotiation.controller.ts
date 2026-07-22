@@ -7,11 +7,11 @@ export const NegotiationController = {
   // Get full negotiation session details + all offers (for page reload / history)
   getNegotiation: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const negotiationId = req.params.id;
+    const applicationId = req.params.id;
 
     const result = await NegotiationService.getNegotiation({
       userId,
-      negotiationId,
+      applicationId,
     });
 
     sendResponse(res, {

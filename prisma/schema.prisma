@@ -182,25 +182,6 @@ enum JobApplicationStatus {
   WITHDRAWN
 }
 
-model JobApplication {
-  id         String               @id @default(uuid())
-  job_id     String
-  helper_id  String
-  status     JobApplicationStatus @default(PENDING)
-  created_at DateTime             @default(now())
-  updated_at DateTime             @updatedAt
-
-  job              JobPost       @relation("JobApplications", fields: [job_id], references: [id], onDelete: Cascade)
-  helper           User          @relation("HelperApplications", fields: [helper_id], references: [id], onDelete: Cascade)
-  negotiations     Negotiation[]
-  selected_for_job JobPost?      @relation("SelectedJob")
-
-  @@unique([job_id, helper_id])
-  @@index([helper_id])
-  @@map("job_applications")
-}
-
-// ==================== Negotiation ====================
 enum NegotiationStatus {
   PENDING
   ACCEPTED
@@ -209,37 +190,42 @@ enum NegotiationStatus {
   EXPIRED
 }
 
-model Negotiation {
-  id                String            @id @default(uuid())
-  application_id    String
-  status            NegotiationStatus @default(PENDING)
-  final_amount      Float
-  accepted_offer_id String?           @unique
-  created_at        DateTime          @default(now())
-  updated_at        DateTime          @updatedAt
+model JobApplication {
+  id                       String               @id @default(uuid())
+  job_id                   String
+  helper_id                String
+  status                   JobApplicationStatus @default(PENDING)
+  negotiation_status       NegotiationStatus?
+  negotiation_final_amount Float?
+  accepted_offer_id        String?              @unique
+  created_at               DateTime             @default(now())
+  updated_at               DateTime             @updatedAt
 
-  application        JobApplication     @relation(fields: [application_id], references: [id], onDelete: Cascade)
+  job                JobPost            @relation("JobApplications", fields: [job_id], references: [id], onDelete: Cascade)
+  helper             User               @relation("HelperApplications", fields: [helper_id], references: [id], onDelete: Cascade)
   negotiation_offers NegotiationOffer[]
-  accepted_offer     NegotiationOffer?  @relation("NegotiationAcceptedOffer", fields: [accepted_offer_id], references: [id], onDelete: Cascade)
+  accepted_offer     NegotiationOffer?  @relation("ApplicationAcceptedOffer", fields: [accepted_offer_id], references: [id], onDelete: Cascade)
+  selected_for_job   JobPost?           @relation("SelectedJob")
 
-  @@index([application_id])
-  @@map("negotiations")
+  @@unique([job_id, helper_id])
+  @@index([helper_id])
+  @@map("job_applications")
 }
 
 // ==================== Negotiation Offer ====================
 model NegotiationOffer {
   id             String   @id @default(uuid())
-  negotiation_id String
+  application_id String
   sender_id      String
   amount         Float    @default(0)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
-  negotiation             Negotiation  @relation(fields: [negotiation_id], references: [id], onDelete: Cascade)
-  sender                  User         @relation(fields: [sender_id], references: [id], onDelete: Cascade)
-  accepted_in_negotiation Negotiation? @relation("NegotiationAcceptedOffer")
+  application     JobApplication   @relation(fields: [application_id], references: [id], onDelete: Cascade)
+  sender          User             @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+  accepted_by_app JobApplication?  @relation("ApplicationAcceptedOffer")
 
-  @@index([negotiation_id])
+  @@index([application_id])
   @@index([sender_id])
   @@map("negotiation_offers")
 }

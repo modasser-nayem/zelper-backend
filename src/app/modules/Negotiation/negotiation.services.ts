@@ -9,31 +9,27 @@ export const NegotiationService = {
    */
   getNegotiation: async (payload: {
     userId: string;
-    negotiationId: string;
+    applicationId: string;
   }) => {
-    const { userId, negotiationId } = payload;
+    const { userId, applicationId } = payload;
 
-    const negotiation = await prisma.negotiation.findUnique({
-      where: { id: negotiationId },
+    const application = await prisma.jobApplication.findUnique({
+      where: { id: applicationId },
       include: {
-        application: {
-          include: {
-            job: {
-              select: {
-                id: true,
-                title: true,
-                budget: true,
-                is_negotiable: true,
-                customer_id: true,
-              },
-            },
-            helper: {
-              select: {
-                id: true,
-                name: true,
-                avatar: true,
-              },
-            },
+        job: {
+          select: {
+            id: true,
+            title: true,
+            budget: true,
+            is_negotiable: true,
+            customer_id: true,
+          },
+        },
+        helper: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
           },
         },
         negotiation_offers: {
@@ -48,22 +44,18 @@ export const NegotiationService = {
           },
           orderBy: { created_at: "asc" },
         },
-        accepted_offer: {
-          select: {
-            id: true,
-            amount: true,
-            sender_id: true,
-          },
-        },
       },
     });
 
-    if (!negotiation) {
-      throw new AppError(httpStatus.NOT_FOUND, "Negotiation not found!");
+    if (!application) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Negotiation session not found!",
+      );
     }
 
-    const customerId = negotiation.application.job.customer_id;
-    const helperId = negotiation.application.helper_id;
+    const customerId = application.job.customer_id;
+    const helperId = application.helper_id;
 
     if (userId !== customerId && userId !== helperId) {
       throw new AppError(
@@ -72,7 +64,33 @@ export const NegotiationService = {
       );
     }
 
-    return negotiation;
+    // Map JobApplication to Negotiation response expected by frontend
+    return {
+      id: application.id,
+      application_id: application.id,
+      status: application.negotiation_status,
+      final_amount: application.negotiation_final_amount,
+      accepted_offer_id: application.accepted_offer_id,
+      created_at: application.created_at,
+      updated_at: application.updated_at,
+      negotiation_offers: application.negotiation_offers.map((offer) => ({
+        id: offer.id,
+        negotiation_id: offer.application_id, // map application_id back to negotiation_id
+        application_id: offer.application_id,
+        sender_id: offer.sender_id,
+        sender: offer.sender,
+        amount: offer.amount,
+        created_at: offer.created_at,
+        updated_at: offer.updated_at,
+      })),
+      application: {
+        id: application.id,
+        helper_id: application.helper_id,
+        status: application.status,
+        job: application.job,
+        helper: application.helper,
+      },
+    };
   },
 
   // verify participant is valid
@@ -82,35 +100,39 @@ export const NegotiationService = {
   }) => {
     const { userId, negotiationId } = payload;
 
-    const negotiation = await prisma.negotiation.findUnique({
+    const application = await prisma.jobApplication.findUnique({
       where: { id: negotiationId },
       include: {
-        application: {
-          include: {
-            job: { select: { customer_id: true } },
-          },
-        },
+        job: { select: { customer_id: true } },
       },
     });
 
-    if (!negotiation) {
-      throw new Error("Negotiation not found!");
+    if (!application) {
+      throw new Error("Negotiation session not found!");
     }
 
-    const customerId = negotiation.application.job.customer_id;
-    const helperId = negotiation.application.helper_id;
+    const customerId = application.job.customer_id;
+    const helperId = application.helper_id;
 
     if (userId !== customerId && userId !== helperId) {
       throw new Error("You are not a participant in this negotiation!");
     }
 
-    if (negotiation.status !== "PENDING") {
+    if (application.negotiation_status !== "PENDING") {
       throw new Error(
-        `Negotiation is already ${negotiation.status.toLowerCase()}.`,
+        `Negotiation is already ${application.negotiation_status?.toLowerCase() || "unknown"}.`,
       );
     }
 
-    return { negotiation, customerId, helperId };
+    return {
+      negotiation: {
+        id: application.id,
+        status: application.negotiation_status,
+        final_amount: application.negotiation_final_amount,
+      },
+      customerId,
+      helperId,
+    };
   },
 
   // save counter offer price
@@ -127,7 +149,7 @@ export const NegotiationService = {
 
     const offer = await prisma.negotiationOffer.create({
       data: {
-        negotiation_id: negotiationId,
+        application_id: negotiationId,
         sender_id: senderId,
         amount,
       },
@@ -138,7 +160,16 @@ export const NegotiationService = {
       },
     });
 
-    return offer;
+    return {
+      id: offer.id,
+      negotiation_id: offer.application_id, // backwards compatibility for socket emission
+      application_id: offer.application_id,
+      sender_id: offer.sender_id,
+      sender: offer.sender,
+      amount: offer.amount,
+      created_at: offer.created_at,
+      updated_at: offer.updated_at,
+    };
   },
 
   // accept latest price offer
@@ -149,7 +180,7 @@ export const NegotiationService = {
     const { userId, negotiationId } = payload;
 
     const latestOffer = await prisma.negotiationOffer.findFirst({
-      where: { negotiation_id: negotiationId },
+      where: { application_id: negotiationId },
       orderBy: { created_at: "desc" },
     });
 
@@ -163,22 +194,27 @@ export const NegotiationService = {
       );
     }
 
-    const updatedNegotiation = await prisma.negotiation.update({
+    const updatedApplication = await prisma.jobApplication.update({
       where: { id: negotiationId },
       data: {
-        status: "ACCEPTED",
-        final_amount: latestOffer.amount,
+        negotiation_status: "ACCEPTED",
+        negotiation_final_amount: latestOffer.amount,
         accepted_offer_id: latestOffer.id,
       },
       select: {
         id: true,
-        status: true,
-        final_amount: true,
+        negotiation_status: true,
+        negotiation_final_amount: true,
         accepted_offer_id: true,
       },
     });
 
-    return updatedNegotiation;
+    return {
+      id: updatedApplication.id,
+      status: updatedApplication.negotiation_status,
+      final_amount: updatedApplication.negotiation_final_amount,
+      accepted_offer_id: updatedApplication.accepted_offer_id,
+    };
   },
 
   // reject negotiation
@@ -191,15 +227,18 @@ export const NegotiationService = {
 
     const newStatus = userId === customerId ? "REJECTED" : "CANCELLED";
 
-    const updatedNegotiation = await prisma.negotiation.update({
+    const updatedApplication = await prisma.jobApplication.update({
       where: { id: negotiationId },
-      data: { status: newStatus },
+      data: { negotiation_status: newStatus },
       select: {
         id: true,
-        status: true,
+        negotiation_status: true,
       },
     });
 
-    return updatedNegotiation;
+    return {
+      id: updatedApplication.id,
+      status: updatedApplication.negotiation_status,
+    };
   },
 };

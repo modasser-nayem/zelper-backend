@@ -167,13 +167,17 @@ Emitted to all clients in the conversation room `chat:conversationId`.
 
 ## 4. Real-Time Price Negotiation Module
 
+> [!NOTE]
+> There is no longer a separate `Negotiation` table in the database. A "Negotiation session" corresponds directly to a `JobApplication`. 
+> Consequently, the parameter `negotiationId` passed in socket events is the `applicationId` of the application.
+
 ### `[LISTEN]` Join Negotiation Room (`join_negotiation`)
 Before participating in a negotiable job budget, users must join the room.
 - **Event**: `join_negotiation`
 - **Request Payload**:
 ```json
 {
-  "negotiationId": "string (uuid)"
+  "negotiationId": "string (uuid) [Maps directly to the applicationId]"
 }
 ```
 
@@ -183,7 +187,7 @@ Emitted to the caller confirming room entry.
 - **Response Payload**:
 ```json
 {
-  "negotiationId": "string (uuid)"
+  "negotiationId": "string (uuid) [applicationId]"
 }
 ```
 
@@ -193,7 +197,7 @@ Propose a new budget.
 - **Request Payload**:
 ```json
 {
-  "negotiationId": "string (uuid)",
+  "negotiationId": "string (uuid) [applicationId]",
   "amount": "number"
 }
 ```
@@ -206,7 +210,8 @@ Emitted to all clients in the room `negotiation:negotiationId`.
 {
   "offer": {
     "id": "string (uuid)",
-    "negotiation_id": "string (uuid)",
+    "negotiation_id": "string (uuid) [Legacy support, equal to application_id]",
+    "application_id": "string (uuid)",
     "sender_id": "string (uuid)",
     "amount": 150,
     "created_at": "string (ISO datetime)",
@@ -225,7 +230,7 @@ Accept the latest budget counter proposal.
 - **Request Payload**:
 ```json
 {
-  "negotiationId": "string (uuid)"
+  "negotiationId": "string (uuid) [applicationId]"
 }
 ```
 
@@ -236,7 +241,7 @@ Emitted to all clients in the room `negotiation:negotiationId`.
 ```json
 {
   "negotiation": {
-    "id": "string (uuid)",
+    "id": "string (uuid) [applicationId]",
     "status": "ACCEPTED",
     "final_amount": 150,
     "accepted_offer_id": "string (uuid)"
@@ -250,7 +255,7 @@ Decline negotiation.
 - **Request Payload**:
 ```json
 {
-  "negotiationId": "string (uuid)"
+  "negotiationId": "string (uuid) [applicationId]"
 }
 ```
 
@@ -261,7 +266,7 @@ Emitted to all clients in the room `negotiation:negotiationId`.
 ```json
 {
   "negotiation": {
-    "id": "string (uuid)",
+    "id": "string (uuid) [applicationId]",
     "status": "REJECTED" // or "CANCELLED"
   },
   "rejected_by": "string (uuid)"

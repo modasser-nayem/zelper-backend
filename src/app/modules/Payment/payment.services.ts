@@ -30,22 +30,22 @@ const resolveAgreedAmount = async (
     return job.budget;
   }
 
-  const negotiation = await prisma.negotiation.findFirst({
-    where: {
-      application_id: applicationId,
-      status: "ACCEPTED",
-    },
-    orderBy: { updated_at: "desc" },
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
   });
 
-  if (!negotiation) {
+  if (!application) {
+    throw new AppError(httpStatus.NOT_FOUND, "Job application not found!");
+  }
+
+  if (application.negotiation_status !== "ACCEPTED") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "Negotiation has not been accepted yet. Complete the price negotiation before proceeding to payment.",
     );
   }
 
-  return negotiation.final_amount;
+  return application.negotiation_final_amount || job.budget;
 };
 
 export const PaymentService = {

@@ -226,19 +226,16 @@ export const JobService = {
       const selectedApplicationId = job.selected_application_id;
 
       if (isNegotiable && selectedApplicationId) {
-        const existingNegotiation = await tx.negotiation.findFirst({
-          where: {
-            application_id: selectedApplicationId,
-            status: "PENDING",
-          },
+        const app = await tx.jobApplication.findUnique({
+          where: { id: selectedApplicationId },
         });
 
-        if (!existingNegotiation) {
-          await tx.negotiation.create({
+        if (app && !app.negotiation_status) {
+          await tx.jobApplication.update({
+            where: { id: selectedApplicationId },
             data: {
-              application_id: selectedApplicationId,
-              status: "PENDING",
-              final_amount:
+              negotiation_status: "PENDING",
+              negotiation_final_amount:
                 data.budget !== undefined ? Number(data.budget) : job.budget,
             },
           });
@@ -266,10 +263,6 @@ export const JobService = {
               id: true,
               helper_id: true,
               status: true,
-              negotiations: {
-                where: { status: "PENDING" },
-                select: { id: true },
-              },
             },
           },
         },
@@ -335,16 +328,6 @@ export const JobService = {
           select: {
             id: true,
             helper_id: true,
-            negotiations: {
-              where: { status: "PENDING" },
-              select: {
-                id: true,
-                status: true,
-                final_amount: true,
-                created_at: true,
-                updated_at: true,
-              },
-            },
           },
         },
       },
@@ -396,21 +379,7 @@ export const JobService = {
           job_images: true,
           _count: { select: { job_applications: true } },
           selected_application: {
-            select: {
-              id: true,
-              helper_id: true,
-              status: true,
-              negotiations: {
-                where: { status: "PENDING" },
-                select: {
-                  id: true,
-                  status: true,
-                  final_amount: true,
-                  created_at: true,
-                  updated_at: true,
-                },
-              },
-            },
+            select: { id: true, helper_id: true, status: true },
           },
         },
         orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
@@ -461,29 +430,17 @@ export const JobService = {
                 select: {
                   id: true,
                   helper_id: true,
-                  negotiations: {
-                    where: { status: "PENDING" },
-                    select: {
-                      id: true,
-                      status: true,
-                      final_amount: true,
-                      created_at: true,
-                      updated_at: true,
-                    },
-                  },
                 },
               },
             },
           },
-          negotiations: {
-            where: { status: "PENDING" },
-            select: {
-              id: true,
-              status: true,
-              final_amount: true,
-              created_at: true,
-              updated_at: true,
+          negotiation_offers: {
+            include: {
+              sender: {
+                select: { id: true, name: true, avatar: true },
+              },
             },
+            orderBy: { created_at: "asc" },
           },
         },
         orderBy: { created_at: "desc" },
@@ -497,7 +454,9 @@ export const JobService = {
       application_id: app.id,
       application_status: app.status,
       applied_at: app.created_at,
-      negotiations: app.negotiations,
+      negotiation_status: app.negotiation_status,
+      negotiation_final_amount: app.negotiation_final_amount,
+      negotiation_offers: app.negotiation_offers,
       job: maskJobDetails(app.job, userId),
     }));
 
@@ -560,21 +519,7 @@ export const JobService = {
         include: {
           job_images: true,
           selected_application: {
-            select: {
-              id: true,
-              helper_id: true,
-              status: true,
-              negotiations: {
-                where: { status: "PENDING" },
-                select: {
-                  id: true,
-                  status: true,
-                  final_amount: true,
-                  created_at: true,
-                  updated_at: true,
-                },
-              },
-            },
+            select: { id: true, helper_id: true, status: true },
           },
         },
         orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
@@ -873,15 +818,13 @@ export const JobService = {
             verification_status: true,
           },
         },
-        negotiations: {
-          where: { status: "PENDING" },
-          select: {
-            id: true,
-            status: true,
-            final_amount: true,
-            created_at: true,
-            updated_at: true,
+        negotiation_offers: {
+          include: {
+            sender: {
+              select: { id: true, name: true, avatar: true },
+            },
           },
+          orderBy: { created_at: "asc" },
         },
       },
       orderBy: { created_at: "desc" },
@@ -966,10 +909,14 @@ export const JobService = {
         });
       }
 
-      // Update the newly chosen application status to SELECTED
+      // Update the newly chosen application status to SELECTED and initialize negotiation if negotiable
       await tx.jobApplication.update({
         where: { id: applicationId },
-        data: { status: "SELECTED" },
+        data: {
+          status: "SELECTED",
+          negotiation_status: job.is_negotiable ? "PENDING" : null,
+          negotiation_final_amount: job.is_negotiable ? job.budget : null,
+        },
       });
 
       // Update job to reference the selected application
@@ -996,16 +943,6 @@ export const JobService = {
               id: true,
               helper_id: true,
               status: true,
-              negotiations: {
-                where: { status: "PENDING" },
-                select: {
-                  id: true,
-                  status: true,
-                  final_amount: true,
-                  created_at: true,
-                  updated_at: true,
-                },
-              },
             },
           },
         },

@@ -1,5 +1,5 @@
 // ---- REST types ----
-export type TStartNegotiation = {
+export type TGetNegotiation = {
   applicationId: string;
 };
 
