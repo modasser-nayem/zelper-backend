@@ -335,6 +335,16 @@ export const JobService = {
           select: {
             id: true,
             helper_id: true,
+            negotiations: {
+              where: { status: "PENDING" },
+              select: {
+                id: true,
+                status: true,
+                final_amount: true,
+                created_at: true,
+                updated_at: true,
+              },
+            },
           },
         },
       },
@@ -386,7 +396,21 @@ export const JobService = {
           job_images: true,
           _count: { select: { job_applications: true } },
           selected_application: {
-            select: { id: true, helper_id: true, status: true },
+            select: {
+              id: true,
+              helper_id: true,
+              status: true,
+              negotiations: {
+                where: { status: "PENDING" },
+                select: {
+                  id: true,
+                  status: true,
+                  final_amount: true,
+                  created_at: true,
+                  updated_at: true,
+                },
+              },
+            },
           },
         },
         orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
@@ -434,8 +458,31 @@ export const JobService = {
                 },
               },
               selected_application: {
-                select: { id: true, helper_id: true },
+                select: {
+                  id: true,
+                  helper_id: true,
+                  negotiations: {
+                    where: { status: "PENDING" },
+                    select: {
+                      id: true,
+                      status: true,
+                      final_amount: true,
+                      created_at: true,
+                      updated_at: true,
+                    },
+                  },
+                },
               },
+            },
+          },
+          negotiations: {
+            where: { status: "PENDING" },
+            select: {
+              id: true,
+              status: true,
+              final_amount: true,
+              created_at: true,
+              updated_at: true,
             },
           },
         },
@@ -450,6 +497,7 @@ export const JobService = {
       application_id: app.id,
       application_status: app.status,
       applied_at: app.created_at,
+      negotiations: app.negotiations,
       job: maskJobDetails(app.job, userId),
     }));
 
@@ -512,7 +560,21 @@ export const JobService = {
         include: {
           job_images: true,
           selected_application: {
-            select: { id: true, helper_id: true, status: true },
+            select: {
+              id: true,
+              helper_id: true,
+              status: true,
+              negotiations: {
+                where: { status: "PENDING" },
+                select: {
+                  id: true,
+                  status: true,
+                  final_amount: true,
+                  created_at: true,
+                  updated_at: true,
+                },
+              },
+            },
           },
         },
         orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
@@ -811,6 +873,16 @@ export const JobService = {
             verification_status: true,
           },
         },
+        negotiations: {
+          where: { status: "PENDING" },
+          select: {
+            id: true,
+            status: true,
+            final_amount: true,
+            created_at: true,
+            updated_at: true,
+          },
+        },
       },
       orderBy: { created_at: "desc" },
     });
@@ -924,6 +996,16 @@ export const JobService = {
               id: true,
               helper_id: true,
               status: true,
+              negotiations: {
+                where: { status: "PENDING" },
+                select: {
+                  id: true,
+                  status: true,
+                  final_amount: true,
+                  created_at: true,
+                  updated_at: true,
+                },
+              },
             },
           },
         },
