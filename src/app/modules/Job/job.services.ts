@@ -535,19 +535,10 @@ export const JobService = {
       page: Number(query.page),
       limit: Number(query.limit),
     });
-    const radius = Number(query.radius || 15);
 
     let userLat = query.lat ? Number(query.lat) : null;
     let userLng = query.lng ? Number(query.lng) : null;
-
-    // Fallback to profile location
-    if (userLat === null || userLng === null) {
-      const profile = await prisma.user.findUnique({ where: { id: userId } });
-      if (profile && profile.latitude !== null && profile.longitude !== null) {
-        userLat = profile.latitude;
-        userLng = profile.longitude;
-      }
-    }
+    const radius = query.radius ? Number(query.radius) : null;
 
     if (userLat !== null && userLng !== null) {
       // Spatial query using Spherical Law of Cosines
@@ -560,7 +551,7 @@ export const JobService = {
         WHERE status = 'OPEN'
           AND customer_id != ${userId}
           ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
-          AND (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) <= ${radius}
+          ${radius !== null ? Prisma.sql`AND (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) <= ${radius}` : Prisma.empty}
         ORDER BY distance ASC
         LIMIT ${limit} OFFSET ${skip}
       `;
@@ -602,7 +593,7 @@ export const JobService = {
         WHERE status = 'OPEN'
           AND customer_id != ${userId}
           ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
-          AND (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) <= ${radius}
+          ${radius !== null ? Prisma.sql`AND (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) <= ${radius}` : Prisma.empty}
       `;
       const total = countRes[0]?.count || 0;
 
@@ -611,7 +602,7 @@ export const JobService = {
         data: sortedJobs,
       };
     } else {
-      // No location: return recent open jobs without distance
+      // No location query: return recent open jobs without distance (ordered by created_at desc)
       const searchCondition = query.searchTerm
         ? {
             OR: [
