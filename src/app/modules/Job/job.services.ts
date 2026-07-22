@@ -998,8 +998,12 @@ export const JobService = {
   },
 
   // start job
-  startJob: async (payload: { userId: string; jobId: string }) => {
-    const { userId, jobId } = payload;
+  startJob: async (payload: {
+    userId: string;
+    jobId: string;
+    files?: Express.Multer.File[];
+  }) => {
+    const { userId, jobId, files } = payload;
 
     const job = await prisma.jobPost.findUnique({
       where: { id: jobId },
@@ -1024,10 +1028,20 @@ export const JobService = {
       );
     }
 
+    // Upload before images if any are uploaded
+    let beforeImages: string[] = [];
+    if (files && files.length > 0) {
+      const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
+      beforeImages = uploadResults.map((r) => r.url);
+    }
+
     const result = await prisma.jobPost.update({
       where: { id: jobId },
-      data: { status: "IN_PROGRESS" },
-      select: { id: true, status: true, title: true },
+      data: {
+        status: "IN_PROGRESS",
+        before_images: beforeImages,
+      },
+      select: { id: true, status: true, title: true, before_images: true },
     });
 
     await NotificationService.createNotification({
@@ -1041,8 +1055,12 @@ export const JobService = {
   },
 
   // complete job
-  completeJob: async (payload: { userId: string; jobId: string }) => {
-    const { userId, jobId } = payload;
+  completeJob: async (payload: {
+    userId: string;
+    jobId: string;
+    files?: Express.Multer.File[];
+  }) => {
+    const { userId, jobId, files } = payload;
 
     const job = await prisma.jobPost.findUnique({
       where: { id: jobId },
@@ -1067,10 +1085,20 @@ export const JobService = {
       );
     }
 
+    // Upload after images if any are uploaded
+    let afterImages: string[] = [];
+    if (files && files.length > 0) {
+      const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
+      afterImages = uploadResults.map((r) => r.url);
+    }
+
     const result = await prisma.jobPost.update({
       where: { id: jobId },
-      data: { status: "WAITING_FOR_APPROVAL" },
-      select: { id: true, status: true, title: true },
+      data: {
+        status: "WAITING_FOR_APPROVAL",
+        after_images: afterImages,
+      },
+      select: { id: true, status: true, title: true, after_images: true },
     });
 
     await NotificationService.createNotification({

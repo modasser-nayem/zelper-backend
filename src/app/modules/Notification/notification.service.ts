@@ -7,7 +7,9 @@ import logger from "../../../utils/logger";
 export const NotificationService = {
   // save fcm token
   addFcmToken: async (payload: { userId: string; token: string }) => {
-    logger.info(`FCM Token received for user ${payload.userId}: ${payload.token}`);
+    logger.info(
+      `FCM Token received for user ${payload.userId}: ${payload.token}`,
+    );
     return { success: true };
   },
 

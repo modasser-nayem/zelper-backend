@@ -251,11 +251,12 @@ export const UserService = {
       );
     }
 
-    if (!documentType || typeof documentType !== "string" || !documentType.trim()) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "documentType is required!",
-      );
+    if (
+      !documentType ||
+      typeof documentType !== "string" ||
+      !documentType.trim()
+    ) {
+      throw new AppError(httpStatus.BAD_REQUEST, "documentType is required!");
     }
 
     const docTypeTrimmed = documentType.trim();
@@ -339,7 +340,8 @@ export const UserService = {
       await NotificationService.createNotification({
         receiverId: id,
         title: "Account Verified",
-        content: "Congratulations! Your helper account has been successfully verified.",
+        content:
+          "Congratulations! Your helper account has been successfully verified.",
         data: { userId: id, status: newStatus },
       });
     } else if (newStatus === "REJECTED") {

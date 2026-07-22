@@ -5,7 +5,7 @@ export type TCreatePaymentIntent = {
 
 // ---- Internal service types ----
 export type TPaymentBreakdown = {
-  agreedAmount: number;        // final negotiated or posted budget
-  platformFee: number;         // deducted immediately
-  helperAmount: number;        // held in escrow until job approved
+  agreedAmount: number; // final negotiated or posted budget
+  platformFee: number; // deducted immediately
+  helperAmount: number; // held in escrow until job approved
 };

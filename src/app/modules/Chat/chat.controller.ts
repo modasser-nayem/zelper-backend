@@ -35,7 +35,11 @@ export const ChatController = {
       limit?: string;
     };
 
-    const result = await ChatService.getMessages({ userId, conversationId, query });
+    const result = await ChatService.getMessages({
+      userId,
+      conversationId,
+      query,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -77,7 +81,10 @@ export const ChatController = {
       });
     }
 
-    const uploadResult = await FileUploadHelper.uploadSingle(file, "chat-media");
+    const uploadResult = await FileUploadHelper.uploadSingle(
+      file,
+      "chat-media",
+    );
 
     const result = await ChatService.sendMessage({
       userId,
@@ -101,7 +108,10 @@ export const ChatController = {
     const userId = req.user.id;
     const conversationId = req.params.id;
 
-    const result = await ChatService.markMessagesAsRead({ userId, conversationId });
+    const result = await ChatService.markMessagesAsRead({
+      userId,
+      conversationId,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

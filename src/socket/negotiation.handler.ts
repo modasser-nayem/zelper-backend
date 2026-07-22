@@ -9,7 +9,8 @@ import {
 } from "../app/modules/Negotiation/negotiation.interface";
 import logger from "../utils/logger";
 
-const negotiationRoom = (negotiationId: string) => `negotiation:${negotiationId}`;
+const negotiationRoom = (negotiationId: string) =>
+  `negotiation:${negotiationId}`;
 
 export const handleNegotiationEvents = (io: Server, socket: Socket) => {
   const userId: string = socket.data.userId;
@@ -19,20 +20,27 @@ export const handleNegotiationEvents = (io: Server, socket: Socket) => {
   };
 
   // join negotiation room
-  socket.on(SOCKET_EVENTS.JOIN_NEGOTIATION, async (payload: TJoinNegotiationPayload) => {
-    try {
-      const { negotiationId } = payload;
+  socket.on(
+    SOCKET_EVENTS.JOIN_NEGOTIATION,
+    async (payload: TJoinNegotiationPayload) => {
+      try {
+        const { negotiationId } = payload;
 
-      await NegotiationService.verifyParticipant({ userId, negotiationId });
+        await NegotiationService.verifyParticipant({ userId, negotiationId });
 
-      await socket.join(negotiationRoom(negotiationId));
-      logger.info(`User ${userId} joined negotiation room: ${negotiationId}`);
+        await socket.join(negotiationRoom(negotiationId));
+        logger.info(`User ${userId} joined negotiation room: ${negotiationId}`);
 
-      socket.emit(SOCKET_EVENTS.JOINED_NEGOTIATION, { negotiationId });
-    } catch (err: unknown) {
-      emitError(err instanceof Error ? err.message : "Failed to join negotiation room.");
-    }
-  });
+        socket.emit(SOCKET_EVENTS.JOINED_NEGOTIATION, { negotiationId });
+      } catch (err: unknown) {
+        emitError(
+          err instanceof Error
+            ? err.message
+            : "Failed to join negotiation room.",
+        );
+      }
+    },
+  );
 
   // send counter price offer
   socket.on(SOCKET_EVENTS.SEND_OFFER, async (payload: TSendOfferPayload) => {
@@ -58,57 +66,80 @@ export const handleNegotiationEvents = (io: Server, socket: Socket) => {
         },
       });
 
-      logger.info(`Offer saved — Negotiation: ${negotiationId}, By: ${userId}, Amount: ${amount}`);
+      logger.info(
+        `Offer saved — Negotiation: ${negotiationId}, By: ${userId}, Amount: ${amount}`,
+      );
     } catch (err: unknown) {
       emitError(err instanceof Error ? err.message : "Failed to send offer.");
     }
   });
 
   // accept offer
-  socket.on(SOCKET_EVENTS.ACCEPT_OFFER, async (payload: TAcceptOfferPayload) => {
-    try {
-      const { negotiationId } = payload;
+  socket.on(
+    SOCKET_EVENTS.ACCEPT_OFFER,
+    async (payload: TAcceptOfferPayload) => {
+      try {
+        const { negotiationId } = payload;
 
-      await NegotiationService.verifyParticipant({ userId, negotiationId });
+        await NegotiationService.verifyParticipant({ userId, negotiationId });
 
-      const updatedNegotiation = await NegotiationService.acceptLatestOffer({
-        userId,
-        negotiationId,
-      });
+        const updatedNegotiation = await NegotiationService.acceptLatestOffer({
+          userId,
+          negotiationId,
+        });
 
-      io.to(negotiationRoom(negotiationId)).emit(SOCKET_EVENTS.NEGOTIATION_ACCEPTED, {
-        negotiation: updatedNegotiation,
-      });
+        io.to(negotiationRoom(negotiationId)).emit(
+          SOCKET_EVENTS.NEGOTIATION_ACCEPTED,
+          {
+            negotiation: updatedNegotiation,
+          },
+        );
 
-      logger.info(
-        `Negotiation ACCEPTED — ID: ${negotiationId}, By: ${userId}, Final: ${updatedNegotiation.final_amount}`,
-      );
-    } catch (err: unknown) {
-      emitError(err instanceof Error ? err.message : "Failed to accept offer.");
-    }
-  });
+        logger.info(
+          `Negotiation ACCEPTED — ID: ${negotiationId}, By: ${userId}, Final: ${updatedNegotiation.final_amount}`,
+        );
+      } catch (err: unknown) {
+        emitError(
+          err instanceof Error ? err.message : "Failed to accept offer.",
+        );
+      }
+    },
+  );
 
   // reject negotiation
-  socket.on(SOCKET_EVENTS.REJECT_NEGOTIATION, async (payload: TRejectNegotiationPayload) => {
-    try {
-      const { negotiationId } = payload;
+  socket.on(
+    SOCKET_EVENTS.REJECT_NEGOTIATION,
+    async (payload: TRejectNegotiationPayload) => {
+      try {
+        const { negotiationId } = payload;
 
-      const { customerId } = await NegotiationService.verifyParticipant({ userId, negotiationId });
+        const { customerId } = await NegotiationService.verifyParticipant({
+          userId,
+          negotiationId,
+        });
 
-      const updatedNegotiation = await NegotiationService.rejectNegotiation({
-        userId,
-        negotiationId,
-        customerId,
-      });
+        const updatedNegotiation = await NegotiationService.rejectNegotiation({
+          userId,
+          negotiationId,
+          customerId,
+        });
 
-      io.to(negotiationRoom(negotiationId)).emit(SOCKET_EVENTS.NEGOTIATION_REJECTED, {
-        negotiation: updatedNegotiation,
-        rejected_by: userId,
-      });
+        io.to(negotiationRoom(negotiationId)).emit(
+          SOCKET_EVENTS.NEGOTIATION_REJECTED,
+          {
+            negotiation: updatedNegotiation,
+            rejected_by: userId,
+          },
+        );
 
-      logger.info(`Negotiation ENDED (${updatedNegotiation.status}) — ID: ${negotiationId}, By: ${userId}`);
-    } catch (err: unknown) {
-      emitError(err instanceof Error ? err.message : "Failed to reject negotiation.");
-    }
-  });
+        logger.info(
+          `Negotiation ENDED (${updatedNegotiation.status}) — ID: ${negotiationId}, By: ${userId}`,
+        );
+      } catch (err: unknown) {
+        emitError(
+          err instanceof Error ? err.message : "Failed to reject negotiation.",
+        );
+      }
+    },
+  );
 };

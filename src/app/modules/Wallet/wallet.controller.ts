@@ -26,12 +26,17 @@ export const WalletController = {
     const returnUrl = `${baseUrl}/wallet/connect/success`;
     const refreshUrl = `${baseUrl}/wallet/connect/refresh`;
 
-    const result = await WalletService.createConnectAccount({ userId, returnUrl, refreshUrl });
+    const result = await WalletService.createConnectAccount({
+      userId,
+      returnUrl,
+      refreshUrl,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
-      message: "Stripe Connect account created. Redirect the user to the onboarding URL.",
+      message:
+        "Stripe Connect account created. Redirect the user to the onboarding URL.",
       data: result,
     });
   }),
@@ -58,7 +63,10 @@ export const WalletController = {
       type?: string;
     };
 
-    const result = await WalletService.getMyTransactions({ userId: req.user.id, query });
+    const result = await WalletService.getMyTransactions({
+      userId: req.user.id,
+      query,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -79,7 +87,8 @@ export const WalletController = {
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
-      message: "Withdrawal processed successfully! Funds transferred instantly via Stripe.",
+      message:
+        "Withdrawal processed successfully! Funds transferred instantly via Stripe.",
       data: result,
     });
   }),
@@ -92,7 +101,10 @@ export const WalletController = {
       status?: string;
     };
 
-    const result = await WalletService.getMyWithdrawals({ userId: req.user.id, query });
+    const result = await WalletService.getMyWithdrawals({
+      userId: req.user.id,
+      query,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

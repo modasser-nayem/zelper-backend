@@ -79,7 +79,14 @@ export const JobController = {
   // Helper: browse nearby open jobs
   browseJobs: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const query = pickOptions(req.query, ["searchTerm", "lat", "lng", "radius", "page", "limit"]) as TBrowseJobsQuery;
+    const query = pickOptions(req.query, [
+      "searchTerm",
+      "lat",
+      "lng",
+      "radius",
+      "page",
+      "limit",
+    ]) as TBrowseJobsQuery;
     const result = await JobService.browseJobs({ userId, query });
 
     sendResponse(res, {
@@ -94,7 +101,13 @@ export const JobController = {
   // Customer: get my job posts
   getMyPosts: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const query = pickOptions(req.query, ["searchTerm", "page", "limit", "sortBy", "sortOrder"]) as TJobListQuery;
+    const query = pickOptions(req.query, [
+      "searchTerm",
+      "page",
+      "limit",
+      "sortBy",
+      "sortOrder",
+    ]) as TJobListQuery;
     const result = await JobService.getMyPosts({ userId, query });
 
     sendResponse(res, {
@@ -109,7 +122,11 @@ export const JobController = {
   // Helper: get my job applications
   getMyApplications: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const query = pickOptions(req.query, ["searchTerm", "page", "limit"]) as TJobListQuery;
+    const query = pickOptions(req.query, [
+      "searchTerm",
+      "page",
+      "limit",
+    ]) as TJobListQuery;
     const result = await JobService.getMyApplications({ userId, query });
 
     sendResponse(res, {
@@ -124,7 +141,13 @@ export const JobController = {
   // Helper: get my works (jobs assigned/hired)
   getMyWorks: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const query = pickOptions(req.query, ["searchTerm", "page", "limit", "sortBy", "sortOrder"]) as TJobListQuery;
+    const query = pickOptions(req.query, [
+      "searchTerm",
+      "page",
+      "limit",
+      "sortBy",
+      "sortOrder",
+    ]) as TJobListQuery;
     const result = await JobService.getMyWorks({ userId, query });
 
     sendResponse(res, {
@@ -225,8 +248,9 @@ export const JobController = {
   startJob: catchAsync(async (req, res) => {
     const userId = req.user.id;
     const jobId = req.params.id;
+    const files = req.files as Express.Multer.File[];
 
-    const result = await JobService.startJob({ userId, jobId });
+    const result = await JobService.startJob({ userId, jobId, files });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -240,8 +264,9 @@ export const JobController = {
   completeJob: catchAsync(async (req, res) => {
     const userId = req.user.id;
     const jobId = req.params.id;
+    const files = req.files as Express.Multer.File[];
 
-    const result = await JobService.completeJob({ userId, jobId });
+    const result = await JobService.completeJob({ userId, jobId, files });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

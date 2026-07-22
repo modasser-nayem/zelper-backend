@@ -30,7 +30,12 @@ export const DashboardController = {
 
   // list all payments for admin panel
   getAdminPayments: catchAsync(async (req, res) => {
-    const query = req.query as { page?: string; limit?: string; status?: string; searchTerm?: string };
+    const query = req.query as {
+      page?: string;
+      limit?: string;
+      status?: string;
+      searchTerm?: string;
+    };
     const result = await DashboardService.getAdminPayments({ query });
 
     sendResponse(res, {

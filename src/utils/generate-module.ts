@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 // Capitalize the first letter of the module name
 function capitalize(text: string): string {
@@ -11,15 +11,15 @@ function getFileComment(fileName: string): string {
   const baseName = path.basename(fileName, path.extname(fileName)); // Get the name without extension
 
   switch (baseName) {
-    case 'controller':
+    case "controller":
       return `// ${baseName.charAt(0).toUpperCase() + baseName.slice(1)}: Handles HTTP requests for the ${baseName} module.`;
-    case 'service':
+    case "service":
       return `// ${baseName.charAt(0).toUpperCase() + baseName.slice(1)}: Contains business logic for the ${baseName} module.`;
-    case 'routes':
+    case "routes":
       return `// ${baseName.charAt(0).toUpperCase() + baseName.slice(1)}: Defines the routes and endpoint handlers for the ${baseName} module.`;
-    case 'validation':
+    case "validation":
       return `// ${baseName.charAt(0).toUpperCase() + baseName.slice(1)}: Contains validation logic for inputs in the ${baseName} module.`;
-    case 'interface':
+    case "interface":
       return `// ${baseName.charAt(0).toUpperCase() + baseName.slice(1)}: Defines the interfaces and types for the ${baseName} module.`;
     default:
       return `// ${baseName.charAt(0).toUpperCase() + baseName.slice(1)}: Module file for the ${baseName} functionality.`;
@@ -29,10 +29,16 @@ function getFileComment(fileName: string): string {
 // Main function to create module directory and files
 async function createModule(moduleName: string): Promise<void> {
   const capitalizedModuleName = capitalize(moduleName);
-  
+
   // Fix the base path to your project's root directory
-  const projectRoot = path.resolve(__dirname, '..'); // Adjust this based on where your script is
-  const moduleDir = path.join(projectRoot, 'src', 'app', 'modules', capitalizedModuleName);
+  const projectRoot = path.resolve(__dirname, ".."); // Adjust this based on where your script is
+  const moduleDir = path.join(
+    projectRoot,
+    "src",
+    "app",
+    "modules",
+    capitalizedModuleName,
+  );
 
   // Check if the module directory already exists
   if (fs.existsSync(moduleDir)) {
@@ -59,13 +65,17 @@ async function createModule(moduleName: string): Promise<void> {
     fs.writeFileSync(filePath, `${comment}\n`); // Write comment as the content of the file
   }
 
-  console.log(`Module "${capitalizedModuleName}" with commented files created successfully.`);
+  console.log(
+    `Module "${capitalizedModuleName}" with commented files created successfully.`,
+  );
 }
 
 // Parse command-line arguments to get the module name
 const args = process.argv.slice(2);
 if (args.length < 1) {
-  console.log('Please provide a module name. Usage: npm run generate <moduleName>');
+  console.log(
+    "Please provide a module name. Usage: npm run generate <moduleName>",
+  );
   process.exit(1);
 }
 

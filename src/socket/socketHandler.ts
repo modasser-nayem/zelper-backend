@@ -20,7 +20,10 @@ const authenticateSocket = (socket: Socket, next: (err?: Error) => void) => {
   }
 
   try {
-    const decoded = jwt.verify(token, config.token.ACCESS_TOKEN_SECRET) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      config.token.ACCESS_TOKEN_SECRET,
+    ) as JwtPayload;
     socket.data.userId = decoded.id as string;
     next();
   } catch {

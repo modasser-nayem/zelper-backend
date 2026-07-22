@@ -28,4 +28,3 @@ const moduleRoutes: { path: string; route: Router }[] = [
 moduleRoutes.forEach((route) => routers.use(route.path, route.route));
 
 export default routers;
-

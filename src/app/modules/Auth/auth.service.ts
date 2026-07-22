@@ -449,16 +449,18 @@ export class AuthService {
       );
     }
 
-    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      return await tx.otp.update({
-        where: { id: otpData.id },
-        data: {
-          is_verified: true,
-          verified_at: new Date(),
-          attempts: otpData.attempts + 1,
-        },
-      });
-    });
+    const result = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        return await tx.otp.update({
+          where: { id: otpData.id },
+          data: {
+            is_verified: true,
+            verified_at: new Date(),
+            attempts: otpData.attempts + 1,
+          },
+        });
+      },
+    );
 
     return {
       isVerified: true,

@@ -330,7 +330,11 @@ export const WalletService = {
         receiverId: userId,
         title: "Withdrawal Failed",
         content: `Your withdrawal request of $${amount} has failed. The funds have been refunded to your wallet.`,
-        data: { withdrawalId: withdrawal.id, status: "FAILED", reason: error.message || error },
+        data: {
+          withdrawalId: withdrawal.id,
+          status: "FAILED",
+          reason: error.message || error,
+        },
       });
 
       throw new AppError(

@@ -4,7 +4,9 @@ import { emailSchema, passwordSchema } from "../../validation/global";
 export const AuthValidation = {
   // sign up
   signup: z.object({
-    name: z.string({ required_error: "name is required" }).min(1, "Name cannot be empty"),
+    name: z
+      .string({ required_error: "name is required" })
+      .min(1, "Name cannot be empty"),
     email: emailSchema,
     password: passwordSchema,
     phone: z.string().optional(),

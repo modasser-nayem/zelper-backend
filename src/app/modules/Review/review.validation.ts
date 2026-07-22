@@ -3,7 +3,9 @@ import { z } from "zod";
 export const ReviewValidation = {
   createReview: z.object({
     body: z.object({
-      jobId: z.string({ required_error: "Job ID is required" }).uuid("Invalid job ID"),
+      jobId: z
+        .string({ required_error: "Job ID is required" })
+        .uuid("Invalid job ID"),
       rating: z
         .number({ required_error: "Rating is required" })
         .int("Rating must be an integer")

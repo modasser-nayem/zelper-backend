@@ -9,7 +9,10 @@ export const PaymentController = {
     const customerId = req.user.id;
     const { jobId } = req.body;
 
-    const result = await PaymentService.createPaymentIntent({ customerId, jobId });
+    const result = await PaymentService.createPaymentIntent({
+      customerId,
+      jobId,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -24,11 +27,16 @@ export const PaymentController = {
     const signature = req.headers["stripe-signature"] as string;
 
     if (!signature) {
-      res.status(httpStatus.BAD_REQUEST).json({ success: false, message: "Missing stripe-signature header!" });
+      res
+        .status(httpStatus.BAD_REQUEST)
+        .json({ success: false, message: "Missing stripe-signature header!" });
       return;
     }
 
-    const result = await PaymentService.handleWebhookEvent(req.body as Buffer, signature);
+    const result = await PaymentService.handleWebhookEvent(
+      req.body as Buffer,
+      signature,
+    );
 
     // Stripe requires a 200 response quickly — do NOT use sendResponse structure here
     res.status(httpStatus.OK).json(result);

@@ -16,7 +16,11 @@ router.get("/me", auth(), WalletController.getMyWallet);
 router.post("/me/connect", auth(), WalletController.createConnectAccount);
 
 // Confirm Stripe onboarding after redirect (call on return_url landing)
-router.get("/me/connect/confirm", auth(), WalletController.confirmConnectOnboarding);
+router.get(
+  "/me/connect/confirm",
+  auth(),
+  WalletController.confirmConnectOnboarding,
+);
 
 // Get transaction history
 router.get("/me/transactions", auth(), WalletController.getMyTransactions);
@@ -35,7 +39,11 @@ router.post(
 // ==================== Admin Routes ====================
 
 // List all withdrawal requests
-router.get("/admin/withdrawals", auth(UserRole.ADMIN), WalletController.getAllWithdrawals);
+router.get(
+  "/admin/withdrawals",
+  auth(UserRole.ADMIN),
+  WalletController.getAllWithdrawals,
+);
 
 // Update withdrawal status (PROCESSING / COMPLETED / FAILED / REJECTED)
 router.patch(

@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-export const parseFormData = (req: Request, res: Response, next: NextFunction) => {
+export const parseFormData = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   if (req.body && typeof req.body.data === "string") {
     try {
       req.body = JSON.parse(req.body.data);

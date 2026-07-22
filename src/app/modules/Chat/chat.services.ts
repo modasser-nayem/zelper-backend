@@ -72,7 +72,7 @@ export const ChatService = {
           latestMessage: conv.messages[0] || null,
           unreadCount,
         };
-      })
+      }),
     );
 
     return {
@@ -97,8 +97,14 @@ export const ChatService = {
       throw new AppError(httpStatus.NOT_FOUND, "Conversation not found!");
     }
 
-    if (conversation.customer_id !== userId && conversation.helper_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You are not a participant in this conversation!");
+    if (
+      conversation.customer_id !== userId &&
+      conversation.helper_id !== userId
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You are not a participant in this conversation!",
+      );
     }
 
     const { page, limit, skip } = PaginationHelper.calculatePagination({
@@ -146,8 +152,14 @@ export const ChatService = {
       throw new AppError(httpStatus.NOT_FOUND, "Conversation not found!");
     }
 
-    if (conversation.customer_id !== userId && conversation.helper_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You are not a participant in this conversation!");
+    if (
+      conversation.customer_id !== userId &&
+      conversation.helper_id !== userId
+    ) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You are not a participant in this conversation!",
+      );
     }
 
     const message = await prisma.$transaction(async (tx) => {

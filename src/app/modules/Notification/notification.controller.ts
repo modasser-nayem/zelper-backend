@@ -28,7 +28,10 @@ export const NotificationController = {
       limit?: string;
     };
 
-    const result = await NotificationService.getMyNotifications({ userId, query });
+    const result = await NotificationService.getMyNotifications({
+      userId,
+      query,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -44,7 +47,10 @@ export const NotificationController = {
     const userId = req.user.id;
     const notificationId = req.params.id;
 
-    const result = await NotificationService.markAsRead({ userId, notificationId });
+    const result = await NotificationService.markAsRead({
+      userId,
+      notificationId,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

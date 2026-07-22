@@ -22,15 +22,24 @@ export const ReviewService = {
     }
 
     if (job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "Only the customer who posted the job can leave a review!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Only the customer who posted the job can leave a review!",
+      );
     }
 
     if (job.status !== "COMPLETED") {
-      throw new AppError(httpStatus.BAD_REQUEST, "Reviews can only be submitted for completed jobs.");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Reviews can only be submitted for completed jobs.",
+      );
     }
 
     if (!job.selected_application) {
-      throw new AppError(httpStatus.BAD_REQUEST, "This job does not have an assigned helper.");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "This job does not have an assigned helper.",
+      );
     }
 
     const helperId = job.selected_application.helper_id;
@@ -41,7 +50,10 @@ export const ReviewService = {
     });
 
     if (existingReview) {
-      throw new AppError(httpStatus.CONFLICT, "You have already reviewed this job!");
+      throw new AppError(
+        httpStatus.CONFLICT,
+        "You have already reviewed this job!",
+      );
     }
 
     const review = await prisma.$transaction(async (tx) => {

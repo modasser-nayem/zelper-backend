@@ -59,7 +59,11 @@ router.get("/:id/applications", auth(), JobController.getJobApplications);
 router.patch("/:id/select-helper", auth(), JobController.selectHelper);
 
 // Customer rejects a helper's application
-router.patch("/:id/reject-application", auth(), JobController.rejectApplication);
+router.patch(
+  "/:id/reject-application",
+  auth(),
+  JobController.rejectApplication,
+);
 
 // ==================== Helper (Help Others) Routes ====================
 
@@ -72,10 +76,22 @@ router.post("/:id/withdraw", auth(), JobController.withdrawApplication);
 // ==================== Job Lifecycle Routes ====================
 
 // Helper: start the job (ASSIGNED → IN_PROGRESS)
-router.patch("/:id/start", auth(), JobController.startJob);
+router.patch(
+  "/:id/start",
+  auth(),
+  uploadFile.array("files"),
+  parseFormData,
+  JobController.startJob,
+);
 
 // Helper: mark job as completed (IN_PROGRESS → WAITING_FOR_APPROVAL)
-router.patch("/:id/complete", auth(), JobController.completeJob);
+router.patch(
+  "/:id/complete",
+  auth(),
+  uploadFile.array("files"),
+  parseFormData,
+  JobController.completeJob,
+);
 
 // Customer: approve job completion → COMPLETED + escrow released
 router.patch("/:id/approve", auth(), JobController.approveJob);

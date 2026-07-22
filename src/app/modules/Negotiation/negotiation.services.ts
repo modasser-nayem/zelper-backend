@@ -4,7 +4,10 @@ import AppError from "../../../errors/AppError";
 
 export const NegotiationService = {
   // start negotiation session
-  startNegotiation: async (payload: { userId: string; applicationId: string }) => {
+  startNegotiation: async (payload: {
+    userId: string;
+    applicationId: string;
+  }) => {
     const { userId, applicationId } = payload;
 
     const application = await prisma.jobApplication.findUnique({
@@ -19,7 +22,10 @@ export const NegotiationService = {
     }
 
     if (application.job.customer_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "Only the job owner can start a negotiation!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Only the job owner can start a negotiation!",
+      );
     }
 
     if (application.status !== "SELECTED") {
@@ -90,7 +96,10 @@ export const NegotiationService = {
    * Get a full negotiation session with all offers (ordered oldest → newest).
    * Only the customer or the helper on the application can view.
    */
-  getNegotiation: async (payload: { userId: string; negotiationId: string }) => {
+  getNegotiation: async (payload: {
+    userId: string;
+    negotiationId: string;
+  }) => {
     const { userId, negotiationId } = payload;
 
     const negotiation = await prisma.negotiation.findUnique({
@@ -146,14 +155,20 @@ export const NegotiationService = {
     const helperId = negotiation.application.helper_id;
 
     if (userId !== customerId && userId !== helperId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You are not a participant in this negotiation!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You are not a participant in this negotiation!",
+      );
     }
 
     return negotiation;
   },
 
   // verify participant is valid
-  verifyParticipant: async (payload: { userId: string; negotiationId: string }) => {
+  verifyParticipant: async (payload: {
+    userId: string;
+    negotiationId: string;
+  }) => {
     const { userId, negotiationId } = payload;
 
     const negotiation = await prisma.negotiation.findUnique({
@@ -179,7 +194,9 @@ export const NegotiationService = {
     }
 
     if (negotiation.status !== "PENDING") {
-      throw new Error(`Negotiation is already ${negotiation.status.toLowerCase()}.`);
+      throw new Error(
+        `Negotiation is already ${negotiation.status.toLowerCase()}.`,
+      );
     }
 
     return { negotiation, customerId, helperId };
@@ -214,7 +231,10 @@ export const NegotiationService = {
   },
 
   // accept latest price offer
-  acceptLatestOffer: async (payload: { userId: string; negotiationId: string }) => {
+  acceptLatestOffer: async (payload: {
+    userId: string;
+    negotiationId: string;
+  }) => {
     const { userId, negotiationId } = payload;
 
     const latestOffer = await prisma.negotiationOffer.findFirst({
@@ -227,7 +247,9 @@ export const NegotiationService = {
     }
 
     if (latestOffer.sender_id === userId) {
-      throw new Error("You cannot accept your own offer. Wait for the other party to respond.");
+      throw new Error(
+        "You cannot accept your own offer. Wait for the other party to respond.",
+      );
     }
 
     const updatedNegotiation = await prisma.negotiation.update({

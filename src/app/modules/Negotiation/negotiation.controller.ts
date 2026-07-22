@@ -9,7 +9,10 @@ export const NegotiationController = {
     const userId = req.user.id;
     const { applicationId } = req.body;
 
-    const result = await NegotiationService.startNegotiation({ userId, applicationId });
+    const result = await NegotiationService.startNegotiation({
+      userId,
+      applicationId,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -24,7 +27,10 @@ export const NegotiationController = {
     const userId = req.user.id;
     const negotiationId = req.params.id;
 
-    const result = await NegotiationService.getNegotiation({ userId, negotiationId });
+    const result = await NegotiationService.getNegotiation({
+      userId,
+      negotiationId,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

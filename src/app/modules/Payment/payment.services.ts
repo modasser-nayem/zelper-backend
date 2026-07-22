@@ -11,13 +11,18 @@ const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 // calculate fee and helper amount
 const calculateBreakdown = (agreedAmount: number): TPaymentBreakdown => {
   const feePercent = config.stripe.PLATFORM_FEE_PERCENT;
-  const platformFee = parseFloat(((agreedAmount * feePercent) / 100).toFixed(2));
+  const platformFee = parseFloat(
+    ((agreedAmount * feePercent) / 100).toFixed(2),
+  );
   const helperAmount = parseFloat((agreedAmount - platformFee).toFixed(2));
   return { agreedAmount, platformFee, helperAmount };
 };
 
 // get final agreed price based on negotiation
-const resolveAgreedAmount = async (jobId: string, applicationId: string): Promise<number> => {
+const resolveAgreedAmount = async (
+  jobId: string,
+  applicationId: string,
+): Promise<number> => {
   const job = await prisma.jobPost.findUnique({ where: { id: jobId } });
   if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
 
@@ -45,7 +50,10 @@ const resolveAgreedAmount = async (jobId: string, applicationId: string): Promis
 
 export const PaymentService = {
   // create stripe payment intent
-  createPaymentIntent: async (payload: { customerId: string; jobId: string }) => {
+  createPaymentIntent: async (payload: {
+    customerId: string;
+    jobId: string;
+  }) => {
     const { customerId, jobId } = payload;
 
     const job = await prisma.jobPost.findUnique({
@@ -71,7 +79,10 @@ export const PaymentService = {
     }
 
     if (job.status === "ASSIGNED") {
-      throw new AppError(httpStatus.BAD_REQUEST, "This job is already paid and assigned!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "This job is already paid and assigned!",
+      );
     }
 
     if (job.status !== "OPEN") {
@@ -148,7 +159,10 @@ export const PaymentService = {
         config.stripe.STRIPE_WEBHOOK_SECRET,
       );
     } catch {
-      throw new AppError(httpStatus.BAD_REQUEST, "Invalid Stripe webhook signature!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Invalid Stripe webhook signature!",
+      );
     }
 
     if (event.type === "payment_intent.succeeded") {
@@ -302,7 +316,10 @@ export const PaymentService = {
     });
 
     if (!payment) {
-      throw new AppError(httpStatus.NOT_FOUND, "No active escrow payment found for this job!");
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "No active escrow payment found for this job!",
+      );
     }
 
     await prisma.$transaction(async (tx) => {
@@ -346,16 +363,24 @@ export const PaymentService = {
     const payment = await prisma.payment.findFirst({
       where: { job_id: jobId },
       include: {
-        job: { select: { id: true, title: true, customer_id: true, status: true } },
+        job: {
+          select: { id: true, title: true, customer_id: true, status: true },
+        },
       },
     });
 
     if (!payment) {
-      throw new AppError(httpStatus.NOT_FOUND, "No payment found for this job!");
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "No payment found for this job!",
+      );
     }
 
     if (payment.customer_id !== userId && payment.helper_id !== userId) {
-      throw new AppError(httpStatus.FORBIDDEN, "You are not a party to this payment!");
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You are not a party to this payment!",
+      );
     }
 
     return payment;

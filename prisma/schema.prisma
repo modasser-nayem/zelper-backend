@@ -140,6 +140,8 @@ model JobPost {
   address                 String
   status                  JobPostStatus @default(OPEN)
   selected_application_id String?       @unique
+  before_images           String[]      @default([])
+  after_images            String[]      @default([])
 
   // relations
   job_images       JobImage[]
