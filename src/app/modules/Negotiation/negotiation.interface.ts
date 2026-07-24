@@ -28,8 +28,20 @@ export type TOfferReceivedPayload = {
     negotiation_id: string;
     sender_id: string;
     amount: number;
+    is_delivered: boolean;
+    is_read: boolean;
     created_at: Date;
   };
+};
+
+export type TOffersDeliveredPayload = {
+  negotiationId: string;
+  receiverId: string;
+};
+
+export type TOffersSeenPayload = {
+  negotiationId: string;
+  readerId: string;
 };
 
 export type TNegotiationAcceptedPayload = {

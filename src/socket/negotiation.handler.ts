@@ -12,7 +12,11 @@ import logger from "../utils/logger";
 const negotiationRoom = (negotiationId: string) =>
   `negotiation:${negotiationId}`;
 
-export const handleNegotiationEvents = (io: Server, socket: Socket) => {
+export const handleNegotiationEvents = (
+  io: Server,
+  socket: Socket,
+  onlineUsers: Map<string, Set<string>>,
+) => {
   const userId: string = socket.data.userId;
 
   const emitError = (msg: string) => {
@@ -32,6 +36,27 @@ export const handleNegotiationEvents = (io: Server, socket: Socket) => {
         logger.info(`User ${userId} joined negotiation room: ${negotiationId}`);
 
         socket.emit(SOCKET_EVENTS.JOINED_NEGOTIATION, { negotiationId });
+
+        // Mark negotiation offers as read & delivered since user is now in the room viewing it
+        await NegotiationService.markOffersAsRead({
+          userId,
+          applicationId: negotiationId,
+        });
+
+        // notify counterpart/room that offers are seen
+        io.to(negotiationRoom(negotiationId)).emit(SOCKET_EVENTS.OFFERS_SEEN, {
+          negotiationId,
+          readerId: userId,
+        });
+
+        // notify counterpart/room that offers are delivered
+        io.to(negotiationRoom(negotiationId)).emit(
+          SOCKET_EVENTS.OFFERS_DELIVERED,
+          {
+            negotiationId,
+            receiverId: userId,
+          },
+        );
       } catch (err: unknown) {
         emitError(
           err instanceof Error
@@ -47,32 +72,73 @@ export const handleNegotiationEvents = (io: Server, socket: Socket) => {
     try {
       const { negotiationId, amount } = payload;
 
-      await NegotiationService.verifyParticipant({ userId, negotiationId });
+      const { customerId, helperId } =
+        await NegotiationService.verifyParticipant({
+          userId,
+          negotiationId,
+        });
+
+      const companionId = userId === customerId ? helperId : customerId;
+      const isCompanionOnline = onlineUsers.has(companionId);
 
       const offer = await NegotiationService.saveOffer({
         negotiationId,
         senderId: userId,
         amount,
+        is_delivered: isCompanionOnline,
       });
 
       io.to(negotiationRoom(negotiationId)).emit(SOCKET_EVENTS.OFFER_RECEIVED, {
         offer: {
           id: offer.id,
           negotiation_id: offer.negotiation_id,
+          application_id: offer.application_id,
           sender_id: offer.sender_id,
           sender: offer.sender,
           amount: offer.amount,
+          is_delivered: offer.is_delivered,
+          is_read: offer.is_read,
           created_at: offer.created_at,
         },
       });
 
       logger.info(
-        `Offer saved — Negotiation: ${negotiationId}, By: ${userId}, Amount: ${amount}`,
+        `Offer saved — Negotiation: ${negotiationId}, By: ${userId}, Amount: ${amount}, Companion Online: ${isCompanionOnline}`,
       );
     } catch (err: unknown) {
       emitError(err instanceof Error ? err.message : "Failed to send offer.");
     }
   });
+
+  // mark counter offers as read/seen
+  socket.on(
+    SOCKET_EVENTS.OFFER_SEEN,
+    async (payload: { negotiationId: string }) => {
+      try {
+        const { negotiationId } = payload;
+
+        await NegotiationService.verifyParticipant({ userId, negotiationId });
+
+        await NegotiationService.markOffersAsRead({
+          userId,
+          applicationId: negotiationId,
+        });
+
+        io.to(negotiationRoom(negotiationId)).emit(SOCKET_EVENTS.OFFERS_SEEN, {
+          negotiationId,
+          readerId: userId,
+        });
+
+        logger.info(
+          `Counter offers marked seen — Negotiation: ${negotiationId}, Reader: ${userId}`,
+        );
+      } catch (err: unknown) {
+        emitError(
+          err instanceof Error ? err.message : "Failed to mark offer as seen.",
+        );
+      }
+    },
+  );
 
   // accept offer
   socket.on(

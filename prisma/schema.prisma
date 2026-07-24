@@ -218,6 +218,8 @@ model NegotiationOffer {
   application_id String
   sender_id      String
   amount         Float    @default(0)
+  is_delivered   Boolean  @default(false)
+  is_read        Boolean  @default(false)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
@@ -368,6 +370,7 @@ model Message {
   sender_id       String
   type            MessageType @default(TEXT)
   content         String
+  is_delivered    Boolean     @default(false)
   is_read         Boolean     @default(false)
   created_at      DateTime    @default(now())
 

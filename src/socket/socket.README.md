@@ -108,6 +108,7 @@ Emitted to all clients in the conversation room `chat:conversationId`.
   "sender_id": "string (uuid)",
   "type": "TEXT",
   "content": "Hello!",
+  "is_delivered": false,
   "is_read": false,
   "created_at": "string (ISO datetime)",
   "sender": {
@@ -131,6 +132,7 @@ Emitted directly to the companion user's personal room `user:companionId` (for a
     "sender_id": "string (uuid)",
     "type": "TEXT",
     "content": "Hello!",
+    "is_delivered": false,
     "is_read": false,
     "created_at": "string (ISO datetime)",
     "sender": {
@@ -152,7 +154,7 @@ Mark all incoming messages in the thread as read.
 }
 ```
 
-### `[BROADCAST]` Messages Read Notification (`messages_seen`)
+### `[BROADCAST]` Messages Read/Seen Notification (`messages_seen`)
 Emitted to all clients in the conversation room `chat:conversationId`.
 - **Event**: `messages_seen`
 - **Response Payload**:
@@ -160,6 +162,17 @@ Emitted to all clients in the conversation room `chat:conversationId`.
 {
   "conversationId": "string (uuid)",
   "readerId": "string (uuid)"
+}
+```
+
+### `[BROADCAST]` Messages Delivered Notification (`messages_delivered`)
+Emitted to all clients in the conversation room `chat:conversationId` when a user connects/comes online.
+- **Event**: `messages_delivered`
+- **Response Payload**:
+```json
+{
+  "conversationId": "string (uuid)",
+  "receiverId": "string (uuid)"
 }
 ```
 
@@ -214,6 +227,8 @@ Emitted to all clients in the room `negotiation:negotiationId`.
     "application_id": "string (uuid)",
     "sender_id": "string (uuid)",
     "amount": 150,
+    "is_delivered": false,
+    "is_read": false,
     "created_at": "string (ISO datetime)",
     "sender": {
       "id": "string (uuid)",
@@ -221,6 +236,38 @@ Emitted to all clients in the room `negotiation:negotiationId`.
       "avatar": "string (url)"
     }
   }
+}
+```
+
+### `[LISTEN]` Mark Counter Offers as Seen (`offer_seen`)
+Mark all counter offers in this thread as read/seen.
+- **Event**: `offer_seen`
+- **Request Payload**:
+```json
+{
+  "negotiationId": "string (uuid) [applicationId]"
+}
+```
+
+### `[BROADCAST]` Counter Offers Seen Notification (`offers_seen`)
+Emitted to all clients in the room `negotiation:negotiationId`.
+- **Event**: `offers_seen`
+- **Response Payload**:
+```json
+{
+  "negotiationId": "string (uuid) [applicationId]",
+  "readerId": "string (uuid)"
+}
+```
+
+### `[BROADCAST]` Counter Offers Delivered Notification (`offers_delivered`)
+Emitted to all clients in the room `negotiation:negotiationId` when a user connects/comes online.
+- **Event**: `offers_delivered`
+- **Response Payload**:
+```json
+{
+  "negotiationId": "string (uuid) [applicationId]",
+  "receiverId": "string (uuid)"
 }
 ```
 

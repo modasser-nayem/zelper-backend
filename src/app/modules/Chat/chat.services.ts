@@ -142,7 +142,12 @@ export const ChatService = {
     data: TSendMessagePayload;
   }) => {
     const { userId, data } = payload;
-    const { conversationId, content, type = MessageType.TEXT } = data;
+    const {
+      conversationId,
+      content,
+      type = MessageType.TEXT,
+      is_delivered = false,
+    } = data;
 
     const conversation = await prisma.conversation.findUnique({
       where: { id: conversationId },
@@ -169,6 +174,7 @@ export const ChatService = {
           sender_id: userId,
           content,
           type,
+          is_delivered,
         },
         include: {
           sender: {
@@ -189,7 +195,7 @@ export const ChatService = {
     return message;
   },
 
-  // mark all incoming messages as read
+  // mark all incoming messages as read/seen
   markMessagesAsRead: async (payload: {
     userId: string;
     conversationId: string;
@@ -204,16 +210,65 @@ export const ChatService = {
       throw new AppError(httpStatus.NOT_FOUND, "Conversation not found!");
     }
 
-    // update message read status
+    // update message read and delivery status
     await prisma.message.updateMany({
       where: {
         conversation_id: conversationId,
         sender_id: { not: userId },
-        is_read: false,
+        OR: [{ is_read: false }, { is_delivered: false }],
       },
-      data: { is_read: true },
+      data: { is_read: true, is_delivered: true },
     });
 
     return { success: true };
+  },
+
+  // mark incoming messages as delivered
+  markMessagesAsDelivered: async (payload: {
+    userId: string;
+    conversationId: string;
+  }) => {
+    const { userId, conversationId } = payload;
+
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new AppError(httpStatus.NOT_FOUND, "Conversation not found!");
+    }
+
+    await prisma.message.updateMany({
+      where: {
+        conversation_id: conversationId,
+        sender_id: { not: userId },
+        is_delivered: false,
+      },
+      data: { is_delivered: true },
+    });
+
+    return { success: true };
+  },
+
+  // mark all undelivered messages across all user's conversations as delivered
+  markAllUserMessagesAsDelivered: async (userId: string) => {
+    const conversations = await prisma.conversation.findMany({
+      where: {
+        OR: [{ customer_id: userId }, { helper_id: userId }],
+      },
+      select: { id: true },
+    });
+    const conversationIds = conversations.map((c) => c.id);
+
+    await prisma.message.updateMany({
+      where: {
+        conversation_id: { in: conversationIds },
+        sender_id: { not: userId },
+        is_delivered: false,
+      },
+      data: { is_delivered: true },
+    });
+
+    return conversationIds;
   },
 };

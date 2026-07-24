@@ -44,6 +44,21 @@ export const handleChatEvents = (
         logger.info(`User ${userId} joined chat room: ${conversationId}`);
 
         socket.emit(SOCKET_EVENTS.JOINED_CHAT, { conversationId });
+
+        // mark all incoming messages as read & delivered since user is now viewing this chat room
+        await ChatService.markMessagesAsRead({ userId, conversationId });
+
+        // notify sender/room that reader has seen the messages
+        io.to(chatRoom(conversationId)).emit(SOCKET_EVENTS.MESSAGES_SEEN, {
+          conversationId,
+          readerId: userId,
+        });
+
+        // notify sender/room that reader has received/delivered the messages
+        io.to(chatRoom(conversationId)).emit(SOCKET_EVENTS.MESSAGES_DELIVERED, {
+          conversationId,
+          receiverId: userId,
+        });
       } catch (err: unknown) {
         emitError(
           err instanceof Error ? err.message : "Failed to join chat room.",
@@ -74,9 +89,20 @@ export const handleChatEvents = (
           return emitError("You are not a participant in this conversation.");
         }
 
+        const companionId =
+          conversation.customer_id === userId
+            ? conversation.helper_id
+            : conversation.customer_id;
+
+        const isCompanionOnline = onlineUsers.has(companionId);
+
         const message = await ChatService.sendMessage({
           userId,
-          data: { conversationId, content },
+          data: {
+            conversationId,
+            content,
+            is_delivered: isCompanionOnline,
+          },
         });
 
         io.to(chatRoom(conversationId)).emit(
@@ -85,10 +111,6 @@ export const handleChatEvents = (
         );
 
         // notify companion via user room
-        const companionId =
-          conversation.customer_id === userId
-            ? conversation.helper_id
-            : conversation.customer_id;
         io.to(userRoom(companionId)).emit(
           SOCKET_EVENTS.NEW_MESSAGE_NOTIFICATION,
           {
@@ -98,7 +120,7 @@ export const handleChatEvents = (
         );
 
         logger.info(
-          `Message sent — Conv: ${conversationId}, Sender: ${userId}`,
+          `Message sent — Conv: ${conversationId}, Sender: ${userId}, Online: ${isCompanionOnline}`,
         );
       } catch (err: unknown) {
         emitError(

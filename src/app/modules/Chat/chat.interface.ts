@@ -4,4 +4,5 @@ export type TSendMessagePayload = {
   conversationId: string;
   content: string;
   type?: MessageType;
+  is_delivered?: boolean;
 };

@@ -140,8 +140,9 @@ export const NegotiationService = {
     negotiationId: string;
     senderId: string;
     amount: number;
+    is_delivered?: boolean;
   }) => {
-    const { negotiationId, senderId, amount } = payload;
+    const { negotiationId, senderId, amount, is_delivered = false } = payload;
 
     if (amount <= 0) {
       throw new Error("Offer amount must be greater than 0!");
@@ -152,6 +153,7 @@ export const NegotiationService = {
         application_id: negotiationId,
         sender_id: senderId,
         amount,
+        is_delivered,
       },
       include: {
         sender: {
@@ -167,9 +169,45 @@ export const NegotiationService = {
       sender_id: offer.sender_id,
       sender: offer.sender,
       amount: offer.amount,
+      is_delivered: offer.is_delivered,
+      is_read: offer.is_read,
       created_at: offer.created_at,
       updated_at: offer.updated_at,
     };
+  },
+
+  // mark negotiation offers as delivered
+  markOffersAsDelivered: async (payload: {
+    userId: string;
+    applicationId: string;
+  }) => {
+    const { userId, applicationId } = payload;
+    await prisma.negotiationOffer.updateMany({
+      where: {
+        application_id: applicationId,
+        sender_id: { not: userId },
+        is_delivered: false,
+      },
+      data: { is_delivered: true },
+    });
+    return { success: true };
+  },
+
+  // mark negotiation offers as read/seen
+  markOffersAsRead: async (payload: {
+    userId: string;
+    applicationId: string;
+  }) => {
+    const { userId, applicationId } = payload;
+    await prisma.negotiationOffer.updateMany({
+      where: {
+        application_id: applicationId,
+        sender_id: { not: userId },
+        OR: [{ is_read: false }, { is_delivered: false }],
+      },
+      data: { is_read: true, is_delivered: true },
+    });
+    return { success: true };
   },
 
   // accept latest price offer
@@ -240,5 +278,27 @@ export const NegotiationService = {
       id: updatedApplication.id,
       status: updatedApplication.negotiation_status,
     };
+  },
+
+  // mark all undelivered negotiation offers across all user's applications as delivered
+  markAllUserOffersAsDelivered: async (userId: string) => {
+    const applications = await prisma.jobApplication.findMany({
+      where: {
+        OR: [{ helper_id: userId }, { job: { customer_id: userId } }],
+      },
+      select: { id: true },
+    });
+    const applicationIds = applications.map((a) => a.id);
+
+    await prisma.negotiationOffer.updateMany({
+      where: {
+        application_id: { in: applicationIds },
+        sender_id: { not: userId },
+        is_delivered: false,
+      },
+      data: { is_delivered: true },
+    });
+
+    return applicationIds;
   },
 };

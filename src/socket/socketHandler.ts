@@ -6,6 +6,8 @@ import logger from "../utils/logger";
 import { handleNegotiationEvents } from "./negotiation.handler";
 import { handleChatEvents } from "./chat.handler";
 import { SOCKET_EVENTS } from "./socket.constant";
+import { ChatService } from "../app/modules/Chat/chat.services";
+import { NegotiationService } from "../app/modules/Negotiation/negotiation.services";
 
 const userRoom = (userId: string) => `user:${userId}`;
 
@@ -64,11 +66,39 @@ export const initSocket = (server: HttpServer): Server => {
       userSockets = new Set<string>();
       onlineUsers.set(userId, userSockets);
       io.emit(SOCKET_EVENTS.USER_STATUS, { userId, status: "online" });
+
+      // mark pending messages & counter offers as delivered since user is now online
+      (async () => {
+        try {
+          const conversationIds =
+            await ChatService.markAllUserMessagesAsDelivered(userId);
+          conversationIds.forEach((id) => {
+            io.to(`chat:${id}`).emit(SOCKET_EVENTS.MESSAGES_DELIVERED, {
+              conversationId: id,
+              receiverId: userId,
+            });
+          });
+
+          const applicationIds =
+            await NegotiationService.markAllUserOffersAsDelivered(userId);
+          applicationIds.forEach((id) => {
+            io.to(`negotiation:${id}`).emit(SOCKET_EVENTS.OFFERS_DELIVERED, {
+              negotiationId: id,
+              receiverId: userId,
+            });
+          });
+        } catch (err) {
+          logger.error(
+            "Error marking messages/offers as delivered on connection:",
+            err,
+          );
+        }
+      })();
     }
     userSockets.add(socket.id);
 
     // inject sub-handlers
-    handleNegotiationEvents(io, socket);
+    handleNegotiationEvents(io, socket, onlineUsers);
     handleChatEvents(io, socket, onlineUsers);
 
     socket.on(SOCKET_EVENTS.DISCONNECT, () => {
