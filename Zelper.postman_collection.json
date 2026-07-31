@@ -2703,7 +2703,7 @@
       "name": "Payments",
       "item": [
         {
-          "name": "Customer - Create Payment Intent",
+          "name": "Customer - Create Checkout Session",
           "request": {
             "auth": {
               "type": "bearer",
@@ -2719,7 +2719,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"jobId\": \"\"\n}",
+              "raw": "{\n    \"jobId\": \"\",\n    \"successUrl\": \"https://example.com/success\",\n    \"cancelUrl\": \"https://example.com/cancel\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2727,11 +2727,11 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/payments/create-intent",
+              "raw": "{{BASE_URL}}/payments/create-checkout-session",
               "host": ["{{BASE_URL}}"],
-              "path": ["payments", "create-intent"]
+              "path": ["payments", "create-checkout-session"]
             },
-            "description": "Creates a Stripe PaymentIntent for the selected job.\n\nReturns:\n- clientSecret: use with Stripe.js SDK on the frontend to collect card details\n- amount: total customer pays\n- platformFee: commission deducted immediately\n- helperAmount: held in escrow until job approved\n\nPrice used:\n- is_negotiable = false -> job.budget\n- is_negotiable = true  -> Negotiation.final_amount (must be ACCEPTED)"
+            "description": "Creates a Stripe Checkout Session for the selected job.\n\nReturns:\n- sessionId: unique checkout session ID\n- sessionUrl: redirect customer to this URL to complete payment\n- paymentId: the local payment transaction record ID\n- amount: total budget/agreed price\n- platformFee: commission\n- helperAmount: net amount for the helper"
           },
           "response": [
             {
@@ -2741,7 +2741,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"jobId\": \"\"\n}",
+                  "raw": "{\n    \"jobId\": \"\",\n    \"successUrl\": \"https://example.com/success\",\n    \"cancelUrl\": \"https://example.com/cancel\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2749,9 +2749,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{BASE_URL}}/payments/create-intent",
+                  "raw": "{{BASE_URL}}/payments/create-checkout-session",
                   "host": ["{{BASE_URL}}"],
-                  "path": ["payments", "create-intent"]
+                  "path": ["payments", "create-checkout-session"]
                 }
               },
               "status": "OK",
@@ -2764,7 +2764,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Request processed successfully\",\n    \"data\": {}\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Checkout session created successfully!\",\n    \"data\": {\n        \"paymentId\": \"550e8400-e29b-41d4-a716-446655440000\",\n        \"sessionId\": \"cs_test_a1b2c3...\",\n        \"sessionUrl\": \"https://checkout.stripe.com/c/pay/cs_test_a1b2c3...\",\n        \"amount\": 100,\n        \"platformFee\": 10,\n        \"helperAmount\": 90,\n        \"currency\": \"usd\"\n    }\n}"
             }
           ]
         },

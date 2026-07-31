@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import httpStatus from "http-status";
 import prisma from "../../../db/prisma";
+import crypto from "crypto";
 import AppError from "../../../errors/AppError";
 import config from "../../../config";
 import { TPaymentBreakdown } from "./payment.interface";
@@ -49,13 +50,131 @@ const resolveAgreedAmount = async (
   return application.negotiation_final_amount || job.budget;
 };
 
+// fulfill funded payment details and credit helper wallet
+const fulfillPayment = async (
+  paymentId: string,
+  stripePaymentIntentId?: string,
+) => {
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+  });
+
+  if (!payment || payment.status !== "PENDING") {
+    return;
+  }
+
+  let jobTitle = "Job Assignment";
+
+  await prisma.$transaction(async (tx) => {
+    const job = await tx.jobPost.findUnique({
+      where: { id: payment.job_id },
+      select: { title: true },
+    });
+    if (job) {
+      jobTitle = job.title;
+    }
+
+    // fund escrow
+    await tx.payment.update({
+      where: { id: payment.id },
+      data: {
+        status: "FUNDED",
+        ...(stripePaymentIntentId
+          ? { stripe_payment_intent: stripePaymentIntentId }
+          : {}),
+      },
+    });
+
+    // assign job
+    await tx.jobPost.update({
+      where: { id: payment.job_id },
+      data: { status: "ASSIGNED" },
+    });
+
+    // reject other helper applications
+    await tx.jobApplication.updateMany({
+      where: {
+        job_id: payment.job_id,
+        helper_id: { not: payment.helper_id },
+        status: "PENDING",
+      },
+      data: { status: "REJECTED" },
+    });
+
+    // unlock conversation idempotently
+    const existingConv = await tx.conversation.findFirst({
+      where: {
+        job_id: payment.job_id,
+        customer_id: payment.customer_id,
+        helper_id: payment.helper_id,
+      },
+    });
+
+    if (existingConv) {
+      if (existingConv.status !== "ACTIVE") {
+        await tx.conversation.update({
+          where: { id: existingConv.id },
+          data: { status: "ACTIVE" },
+        });
+      }
+    } else {
+      await tx.conversation.create({
+        data: {
+          job_id: payment.job_id,
+          customer_id: payment.customer_id,
+          helper_id: payment.helper_id,
+          status: "ACTIVE",
+        },
+      });
+    }
+
+    // credit helper's pending balance
+    const wallet = await tx.wallet.upsert({
+      where: { helper_id: payment.helper_id },
+      create: {
+        helper_id: payment.helper_id,
+        available_balance: 0,
+        pending_balance: payment.helper_amount,
+      },
+      update: {
+        pending_balance: {
+          increment: payment.helper_amount,
+        },
+      },
+    });
+
+    // log commission transaction
+    await tx.walletTransaction.create({
+      data: {
+        wallet_id: wallet.id,
+        type: "COMMISSION",
+        amount: payment.platform_fee,
+        reference_id: payment.id,
+        note: `Platform commission for job: ${payment.job_id}`,
+      },
+    });
+  });
+
+  await NotificationService.createNotification({
+    receiverId: payment.helper_id,
+    type: NotificationType.JOB_ASSIGNED,
+    title: "Job Assigned",
+    content: `A customer paid and assigned you to the job: '${jobTitle}'.`,
+    data: { jobId: payment.job_id, paymentId: payment.id },
+  });
+};
+
 export const PaymentService = {
   // create stripe payment intent
-  createPaymentIntent: async (payload: {
+
+  // create stripe checkout session
+  createCheckoutSession: async (payload: {
     customerId: string;
     jobId: string;
+    successUrl: string;
+    cancelUrl: string;
   }) => {
-    const { customerId, jobId } = payload;
+    const { customerId, jobId, successUrl, cancelUrl } = payload;
 
     const job = await prisma.jobPost.findUnique({
       where: { id: jobId },
@@ -113,21 +232,70 @@ export const PaymentService = {
     const agreedAmount = await resolveAgreedAmount(jobId, applicationId);
     const { platformFee, helperAmount } = calculateBreakdown(agreedAmount);
 
-    // stripe requires amount in cents
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(agreedAmount * 100),
-      currency: "usd",
+    const paymentId = crypto.randomUUID();
+
+    const appendQueryParam = (url: string, key: string, value: string) => {
+      const separator = url.includes("?") ? "&" : "?";
+      return `${url}${separator}${key}=${value}`;
+    };
+
+    // build success url with placeholder parameters for the client
+    let finalSuccessUrl = successUrl;
+    if (!finalSuccessUrl.includes("session_id=")) {
+      finalSuccessUrl = appendQueryParam(
+        finalSuccessUrl,
+        "session_id",
+        "{CHECKOUT_SESSION_ID}",
+      );
+    }
+    if (!finalSuccessUrl.includes("payment_id=")) {
+      finalSuccessUrl = appendQueryParam(
+        finalSuccessUrl,
+        "payment_id",
+        paymentId,
+      );
+    }
+
+    // build cancel url
+    let finalCancelUrl = cancelUrl;
+    if (!finalCancelUrl.includes("payment_id=")) {
+      finalCancelUrl = appendQueryParam(
+        finalCancelUrl,
+        "payment_id",
+        paymentId,
+      );
+    }
+
+    // create stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `Zelper — Job: ${job.title}`,
+              description: job.description || undefined,
+            },
+            unit_amount: Math.round(agreedAmount * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: finalSuccessUrl,
+      cancel_url: finalCancelUrl,
       metadata: {
         job_id: jobId,
         customer_id: customerId,
         helper_id: helperId,
         application_id: applicationId,
       },
-      description: `Zelper — Job: ${job.title}`,
     });
 
     const payment = await prisma.payment.create({
       data: {
+        id: paymentId,
         job_id: jobId,
         customer_id: customerId,
         helper_id: helperId,
@@ -135,13 +303,14 @@ export const PaymentService = {
         platform_fee: platformFee,
         helper_amount: helperAmount,
         status: "PENDING",
-        stripe_payment_intent: paymentIntent.id,
+        stripe_payment_intent: session.id, // Store session id to look up in checkout.session.completed webhook
       },
     });
 
     return {
       paymentId: payment.id,
-      clientSecret: paymentIntent.client_secret,
+      sessionId: session.id,
+      sessionUrl: session.url,
       amount: agreedAmount,
       platformFee,
       helperAmount,
@@ -166,120 +335,28 @@ export const PaymentService = {
       );
     }
 
-    if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
 
       const payment = await prisma.payment.findFirst({
-        where: { stripe_payment_intent: paymentIntent.id },
+        where: { stripe_payment_intent: session.id },
       });
 
-      if (!payment || payment.status !== "PENDING") {
-        // skip if already processed or not found
-        return { received: true };
+      if (payment) {
+        const paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : undefined;
+        await fulfillPayment(payment.id, paymentIntentId);
       }
-
-      let jobTitle = "Job Assignment";
-
-      await prisma.$transaction(async (tx) => {
-        const job = await tx.jobPost.findUnique({
-          where: { id: payment.job_id },
-          select: { title: true },
-        });
-        if (job) {
-          jobTitle = job.title;
-        }
-
-        // fund escrow
-        await tx.payment.update({
-          where: { id: payment.id },
-          data: { status: "FUNDED" },
-        });
-
-        // assign job
-        await tx.jobPost.update({
-          where: { id: payment.job_id },
-          data: { status: "ASSIGNED" },
-        });
-
-        // reject other helper applications
-        await tx.jobApplication.updateMany({
-          where: {
-            job_id: payment.job_id,
-            helper_id: { not: payment.helper_id },
-            status: "PENDING",
-          },
-          data: { status: "REJECTED" },
-        });
-
-        // unlock conversation idempotently
-        const existingConv = await tx.conversation.findFirst({
-          where: {
-            job_id: payment.job_id,
-            customer_id: payment.customer_id,
-            helper_id: payment.helper_id,
-          },
-        });
-
-        if (existingConv) {
-          if (existingConv.status !== "ACTIVE") {
-            await tx.conversation.update({
-              where: { id: existingConv.id },
-              data: { status: "ACTIVE" },
-            });
-          }
-        } else {
-          await tx.conversation.create({
-            data: {
-              job_id: payment.job_id,
-              customer_id: payment.customer_id,
-              helper_id: payment.helper_id,
-              status: "ACTIVE",
-            },
-          });
-        }
-
-        // credit helper's pending balance
-        const wallet = await tx.wallet.upsert({
-          where: { helper_id: payment.helper_id },
-          create: {
-            helper_id: payment.helper_id,
-            available_balance: 0,
-            pending_balance: payment.helper_amount,
-          },
-          update: {
-            pending_balance: {
-              increment: payment.helper_amount,
-            },
-          },
-        });
-
-        // log commission transaction
-        await tx.walletTransaction.create({
-          data: {
-            wallet_id: wallet.id,
-            type: "COMMISSION",
-            amount: payment.platform_fee,
-            reference_id: payment.id,
-            note: `Platform commission for job: ${payment.job_id}`,
-          },
-        });
-      });
-
-      await NotificationService.createNotification({
-        receiverId: payment.helper_id,
-        type: NotificationType.JOB_ASSIGNED,
-        title: "Job Assigned",
-        content: `A customer paid and assigned you to the job: '${jobTitle}'.`,
-        data: { jobId: payment.job_id, paymentId: payment.id },
-      });
     }
 
-    if (event.type === "payment_intent.payment_failed") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    if (event.type === "checkout.session.expired") {
+      const session = event.data.object as Stripe.Checkout.Session;
 
       await prisma.payment.updateMany({
         where: {
-          stripe_payment_intent: paymentIntent.id,
+          stripe_payment_intent: session.id,
           status: "PENDING",
         },
         data: { status: "FAILED" },

@@ -12,12 +12,12 @@ router.post("/webhook", PaymentController.handleWebhook);
 
 // ── Authenticated routes ──────────────────────────────────────────────────────
 
-// Customer: create a PaymentIntent for a selected job
+// Customer: create a Stripe Checkout Session for a selected job
 router.post(
-  "/create-intent",
+  "/create-checkout-session",
   auth(),
-  requestValidate(PaymentValidation.createPaymentIntent),
-  PaymentController.createPaymentIntent,
+  requestValidate(PaymentValidation.createCheckoutSession),
+  PaymentController.createCheckoutSession,
 );
 
 // Customer or Helper: get payment details for a job

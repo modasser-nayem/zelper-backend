@@ -4,20 +4,22 @@ import sendResponse from "../../../shared/sendResponse";
 import { PaymentService } from "./payment.services";
 
 export const PaymentController = {
-  // Customer creates a Stripe PaymentIntent → receives client_secret for Stripe.js
-  createPaymentIntent: catchAsync(async (req, res) => {
+  // Customer creates a Stripe Checkout Session → redirects to Stripe Checkout page
+  createCheckoutSession: catchAsync(async (req, res) => {
     const customerId = req.user.id;
-    const { jobId } = req.body;
+    const { jobId, successUrl, cancelUrl } = req.body;
 
-    const result = await PaymentService.createPaymentIntent({
+    const result = await PaymentService.createCheckoutSession({
       customerId,
       jobId,
+      successUrl,
+      cancelUrl,
     });
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
-      message: "Payment intent created successfully!",
+      message: "Checkout session created successfully!",
       data: result,
     });
   }),

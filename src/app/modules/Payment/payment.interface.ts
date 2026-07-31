@@ -1,6 +1,7 @@
-// ---- REST types ----
-export type TCreatePaymentIntent = {
+export type TCreateCheckoutSession = {
   jobId: string;
+  successUrl: string;
+  cancelUrl: string;
 };
 
 // ---- Internal service types ----
