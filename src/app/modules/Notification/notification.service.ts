@@ -1,8 +1,9 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../../db/prisma";
 import { PaginationHelper } from "../../../helpers/pagination";
-import { getIo } from "../../../socket/socketHandler";
 import logger from "../../../utils/logger";
+import { NotificationType } from "./notification.interface";
+import { notificationQueue } from "./notification.queue";
 
 export const NotificationService = {
   // save fcm token
@@ -13,32 +14,27 @@ export const NotificationService = {
     return { success: true };
   },
 
-  // create and send notification (DB + real-time Socket)
+  // create and send notification (DB + real-time Socket via Background Queue)
   createNotification: async (payload: {
     receiverId: string;
+    type: NotificationType;
     title: string;
     content: string;
     data?: Record<string, unknown> | null;
   }) => {
-    const { receiverId, title, content, data } = payload;
+    const { receiverId, type, title, content, data } = payload;
 
-    const notification = await prisma.notification.create({
-      data: {
-        receiver_id: receiverId,
-        title,
-        content,
-        data: data ? (data as Prisma.InputJsonValue) : Prisma.JsonNull,
-      },
+    // Enqueue the notification job to be executed asynchronously
+    notificationQueue.add({
+      receiverId,
+      type,
+      title,
+      content,
+      data,
     });
 
-    try {
-      const io = getIo();
-      io.to(`user:${receiverId}`).emit("notification_received", notification);
-    } catch {
-      // safe fallback if socket server not fully initialized or ready
-    }
-
-    return notification;
+    // Return immediately to avoid blocking the caller
+    return { queued: true };
   },
 
   // get my notifications (paginated)

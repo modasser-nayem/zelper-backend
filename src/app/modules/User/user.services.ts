@@ -9,6 +9,7 @@ import AppError from "../../../errors/AppError";
 import prisma from "../../../db/prisma";
 import { FileUploadHelper } from "../../../upload/fileUpload";
 import { NotificationService } from "../Notification/notification.service";
+import { NotificationType } from "../Notification/notification.interface";
 
 const userPublicSelect = {
   id: true,
@@ -339,6 +340,7 @@ export const UserService = {
     if (newStatus === "VERIFIED") {
       await NotificationService.createNotification({
         receiverId: id,
+        type: NotificationType.ACCOUNT_VERIFIED,
         title: "Account Verified",
         content:
           "Congratulations! Your helper account has been successfully verified.",
@@ -347,6 +349,7 @@ export const UserService = {
     } else if (newStatus === "REJECTED") {
       await NotificationService.createNotification({
         receiverId: id,
+        type: NotificationType.VERIFICATION_REJECTED,
         title: "Verification Rejected",
         content: `Your helper verification has been rejected. Reason: ${rejectionReason}`,
         data: { userId: id, status: newStatus, reason: rejectionReason },

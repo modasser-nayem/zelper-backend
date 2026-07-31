@@ -1,6 +1,8 @@
 import httpStatus from "http-status";
 import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
+import { NotificationService } from "../Notification/notification.service";
+import { NotificationType } from "../Notification/notification.interface";
 
 export const NegotiationService = {
   /**
@@ -217,6 +219,17 @@ export const NegotiationService = {
   }) => {
     const { userId, negotiationId } = payload;
 
+    const application = await prisma.jobApplication.findUnique({
+      where: { id: negotiationId },
+      include: {
+        job: true,
+      },
+    });
+
+    if (!application) {
+      throw new Error("Job application not found!");
+    }
+
     const latestOffer = await prisma.negotiationOffer.findFirst({
       where: { application_id: negotiationId },
       orderBy: { created_at: "desc" },
@@ -244,6 +257,25 @@ export const NegotiationService = {
         negotiation_status: true,
         negotiation_final_amount: true,
         accepted_offer_id: true,
+      },
+    });
+
+    // Determine the companion/counterparty
+    const companionId =
+      userId === application.job.customer_id
+        ? application.helper_id
+        : application.job.customer_id;
+
+    // Create real-time notification
+    await NotificationService.createNotification({
+      receiverId: companionId,
+      type: NotificationType.NEGOTIATION_CONFIRMED,
+      title: "Negotiation Confirmed",
+      content: `The budget negotiation for '${application.job.title}' was confirmed at $${latestOffer.amount}.`,
+      data: {
+        jobId: application.job_id,
+        applicationId: application.id,
+        finalAmount: latestOffer.amount,
       },
     });
 

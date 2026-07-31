@@ -405,6 +405,7 @@ model Review {
 model Notification {
   id          String  @id @default(uuid())
   receiver_id String
+  type        String  @default("GENERAL")
   title       String
   content     String
   data        Json?

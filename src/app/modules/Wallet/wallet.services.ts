@@ -7,6 +7,7 @@ import config from "../../../config";
 import { PaginationHelper } from "../../../helpers/pagination";
 import { TCreateWithdrawal, TUpdateWithdrawalStatus } from "./wallet.interface";
 import { NotificationService } from "../Notification/notification.service";
+import { NotificationType } from "../Notification/notification.interface";
 
 const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 
@@ -293,6 +294,7 @@ export const WalletService = {
 
       await NotificationService.createNotification({
         receiverId: userId,
+        type: NotificationType.WITHDRAWAL_SUCCESSFUL,
         title: "Withdrawal Successful",
         content: `Your withdrawal request of $${amount} has been successfully processed to your card.`,
         data: { withdrawalId: completedWithdrawal.id, status: "COMPLETED" },
@@ -328,6 +330,7 @@ export const WalletService = {
 
       await NotificationService.createNotification({
         receiverId: userId,
+        type: NotificationType.WITHDRAWAL_FAILED,
         title: "Withdrawal Failed",
         content: `Your withdrawal request of $${amount} has failed. The funds have been refunded to your wallet.`,
         data: {

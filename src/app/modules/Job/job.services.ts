@@ -4,6 +4,7 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import { FileUploadHelper } from "../../../upload/fileUpload";
 import { NotificationService } from "../Notification/notification.service";
+import { NotificationType } from "../Notification/notification.interface";
 import {
   TBrowseJobsQuery,
   TCreateJob,
@@ -742,6 +743,7 @@ export const JobService = {
 
     await NotificationService.createNotification({
       receiverId: job.customer_id,
+      type: NotificationType.NEW_JOB_APPLICATION,
       title: "New Job Application",
       content: `A helper has applied to your job: '${job.title}'.`,
       data: { jobId: job.id },
@@ -761,6 +763,9 @@ export const JobService = {
           helper_id: userId,
         },
       },
+      include: {
+        job: true,
+      },
     });
 
     if (!application) {
@@ -777,6 +782,14 @@ export const JobService = {
     const result = await prisma.jobApplication.update({
       where: { id: application.id },
       data: { status: "WITHDRAWN" },
+    });
+
+    await NotificationService.createNotification({
+      receiverId: application.job.customer_id,
+      type: NotificationType.APPLICATION_WITHDRAWN,
+      title: "Application Withdrawn",
+      content: `A helper has withdrawn their application for the job: '${application.job.title}'.`,
+      data: { jobId: application.job_id, applicationId: application.id },
     });
 
     return result;
@@ -951,6 +964,7 @@ export const JobService = {
 
     await NotificationService.createNotification({
       receiverId: application.helper_id,
+      type: NotificationType.APPLICATION_SELECTED,
       title: "Application Selected",
       content: `Your application for the job '${job.title}' has been selected. Complete payment to finalize.`,
       data: { jobId: job.id, applicationId: application.id },
@@ -1042,6 +1056,14 @@ export const JobService = {
       });
     });
 
+    await NotificationService.createNotification({
+      receiverId: application.helper_id,
+      type: NotificationType.APPLICATION_REJECTED,
+      title: "Application Rejected",
+      content: `Your application for the job '${job.title}' has been rejected.`,
+      data: { jobId: job.id, applicationId: application.id },
+    });
+
     return result;
   },
 
@@ -1094,6 +1116,7 @@ export const JobService = {
 
     await NotificationService.createNotification({
       receiverId: job.customer_id,
+      type: NotificationType.JOB_STARTED,
       title: "Job Started",
       content: `The helper has started working on your job: '${job.title}'.`,
       data: { jobId: job.id },
@@ -1151,6 +1174,7 @@ export const JobService = {
 
     await NotificationService.createNotification({
       receiverId: job.customer_id,
+      type: NotificationType.JOB_WORK_COMPLETED,
       title: "Job Work Completed",
       content: `Helper marked the job '${job.title}' as completed. Please review and approve.`,
       data: { jobId: job.id },
@@ -1200,6 +1224,7 @@ export const JobService = {
     if (job.selected_application) {
       await NotificationService.createNotification({
         receiverId: job.selected_application.helper_id,
+        type: NotificationType.JOB_APPROVED,
         title: "Job Approved",
         content: `Customer approved the completion of '${job.title}'. Escrow earnings released to your wallet.`,
         data: { jobId: job.id },

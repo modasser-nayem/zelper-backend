@@ -5,6 +5,7 @@ import AppError from "../../../errors/AppError";
 import config from "../../../config";
 import { TPaymentBreakdown } from "./payment.interface";
 import { NotificationService } from "../Notification/notification.service";
+import { NotificationType } from "../Notification/notification.interface";
 
 const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 
@@ -266,6 +267,7 @@ export const PaymentService = {
 
       await NotificationService.createNotification({
         receiverId: payment.helper_id,
+        type: NotificationType.JOB_ASSIGNED,
         title: "Job Assigned",
         content: `A customer paid and assigned you to the job: '${jobTitle}'.`,
         data: { jobId: payment.job_id, paymentId: payment.id },

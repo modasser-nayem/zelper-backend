@@ -27,6 +27,7 @@ export const SOCKET_EVENTS = {
   MESSAGES_SEEN: "messages_seen",
   MESSAGES_DELIVERED: "messages_delivered",
   NEW_MESSAGE_NOTIFICATION: "new_message_notification",
+  NOTIFICATION_RECEIVED: "notification_received",
 
   // negotiation events continuation
   OFFERS_DELIVERED: "offers_delivered",
