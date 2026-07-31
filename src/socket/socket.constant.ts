@@ -7,6 +7,8 @@ export const SOCKET_EVENTS = {
   // presence events
   USER_STATUS: "user_status",
   CHECK_ONLINE: "check_online",
+  GET_ONLINE_USERS: "get_online_users",
+  ONLINE_USERS_LIST: "online_users_list",
 
   // negotiation events
   JOIN_NEGOTIATION: "join_negotiation",

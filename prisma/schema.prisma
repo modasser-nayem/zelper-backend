@@ -368,17 +368,22 @@ model Message {
   id              String      @id @default(uuid())
   conversation_id String
   sender_id       String
+  reply_to_id     String?
   type            MessageType @default(TEXT)
   content         String
+  images          String[]    @default([])
   is_delivered    Boolean     @default(false)
   is_read         Boolean     @default(false)
   created_at      DateTime    @default(now())
 
   conversation Conversation @relation("ConversationMessages", fields: [conversation_id], references: [id], onDelete: Cascade)
   sender       User         @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
+  reply_to     Message?     @relation("MessageReplies", fields: [reply_to_id], references: [id], onDelete: SetNull)
+  replies      Message[]    @relation("MessageReplies")
 
   @@index([conversation_id])
   @@index([sender_id])
+  @@index([reply_to_id])
   @@map("messages")
 }
 

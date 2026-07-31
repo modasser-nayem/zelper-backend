@@ -5,6 +5,8 @@ import pickOptions from "../../../shared/pick";
 import { ChatService } from "./chat.services";
 import { FileUploadHelper } from "../../../upload/fileUpload";
 import { MessageType } from "@prisma/client";
+import { getIo } from "../../../socket/socketHandler";
+import { SOCKET_EVENTS } from "../../../socket/socket.constant";
 
 export const ChatController = {
   // get user conversations
@@ -58,6 +60,16 @@ export const ChatController = {
       data: req.body,
     });
 
+    try {
+      const io = getIo();
+      io.to(`chat:${req.body.conversationId}`).emit(
+        SOCKET_EVENTS.MESSAGE_RECEIVED,
+        result,
+      );
+    } catch {
+      // ignore fallback
+    }
+
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
@@ -66,34 +78,62 @@ export const ChatController = {
     });
   }),
 
-  // upload media file and send message
+  // upload media file(s) and send message
   sendMediaMessage: catchAsync(async (req, res) => {
     const userId = req.user.id;
     const conversationId = req.params.id;
-    const file = req.file as Express.Multer.File;
+    const singleFile = req.file as Express.Multer.File | undefined;
+    const reqFiles = req.files;
+    let fileList: Express.Multer.File[] = [];
 
-    if (!file) {
+    if (singleFile) {
+      fileList = [singleFile];
+    } else if (Array.isArray(reqFiles)) {
+      fileList = reqFiles;
+    } else if (reqFiles && typeof reqFiles === "object") {
+      Object.values(reqFiles).forEach((fArray) => {
+        if (Array.isArray(fArray)) fileList.push(...fArray);
+      });
+    }
+
+    if (fileList.length === 0) {
       return sendResponse(res, {
         statusCode: httpStatus.BAD_REQUEST,
         success: false,
-        message: "Media file is required!",
+        message: "At least one media file is required!",
         data: null,
       });
     }
 
-    const uploadResult = await FileUploadHelper.uploadSingle(
-      file,
-      "chat-media",
+    const uploadResults = await Promise.all(
+      fileList.map((f) => FileUploadHelper.uploadSingle(f, "chat-media")),
     );
+
+    const imageUrls = uploadResults.map((r) => r.url);
+    const reply_to_id = req.body?.reply_to_id as string | undefined;
+    const caption = (req.body?.content as string | undefined) || "";
+    const mainContent = caption.trim() !== "" ? caption.trim() : imageUrls[0];
 
     const result = await ChatService.sendMessage({
       userId,
       data: {
         conversationId,
-        content: uploadResult.url,
+        content: mainContent,
         type: MessageType.IMAGE,
+        reply_to_id,
+        images: imageUrls,
       },
     });
+
+    try {
+      const io = getIo();
+      io.to(`chat:${conversationId}`).emit(
+        SOCKET_EVENTS.MESSAGE_RECEIVED,
+        result,
+      );
+    } catch {
+      // ignore fallback
+    }
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -117,6 +157,24 @@ export const ChatController = {
       statusCode: httpStatus.OK,
       success: true,
       message: "Messages marked as read successfully!",
+      data: result,
+    });
+  }),
+
+  // get or create conversation by jobId
+  getOrCreateConversationByJobId: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.jobId;
+
+    const result = await ChatService.getOrCreateConversationByJobId({
+      userId,
+      jobId,
+    });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Conversation retrieved successfully!",
       data: result,
     });
   }),

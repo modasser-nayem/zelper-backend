@@ -119,6 +119,13 @@ export const ChatService = {
           sender: {
             select: { id: true, name: true, avatar: true },
           },
+          reply_to: {
+            include: {
+              sender: {
+                select: { id: true, name: true },
+              },
+            },
+          },
         },
         orderBy: { created_at: "desc" },
         take: limit,
@@ -146,6 +153,8 @@ export const ChatService = {
       conversationId,
       content,
       type = MessageType.TEXT,
+      reply_to_id,
+      images = [],
       is_delivered = false,
     } = data;
 
@@ -174,11 +183,20 @@ export const ChatService = {
           sender_id: userId,
           content,
           type,
+          reply_to_id,
+          images,
           is_delivered,
         },
         include: {
           sender: {
             select: { id: true, name: true, avatar: true },
+          },
+          reply_to: {
+            include: {
+              sender: {
+                select: { id: true, name: true },
+              },
+            },
           },
         },
       });
@@ -270,5 +288,78 @@ export const ChatService = {
     });
 
     return conversationIds;
+  },
+
+  // get or create conversation by jobId
+  getOrCreateConversationByJobId: async (payload: {
+    userId: string;
+    jobId: string;
+  }) => {
+    const { userId, jobId } = payload;
+
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId },
+      include: {
+        selected_application: true,
+      },
+    });
+
+    if (!job) {
+      throw new AppError(httpStatus.NOT_FOUND, "Job post not found!");
+    }
+
+    if (!job.selected_application) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "No helper has been selected or assigned for this job yet!",
+      );
+    }
+
+    const customerId = job.customer_id;
+    const helperId = job.selected_application.helper_id;
+
+    if (userId !== customerId && userId !== helperId) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You are not authorized to access this conversation!",
+      );
+    }
+
+    let conversation = await prisma.conversation.findFirst({
+      where: {
+        job_id: jobId,
+        customer_id: customerId,
+        helper_id: helperId,
+      },
+      include: {
+        job: { select: { id: true, title: true, status: true } },
+        customer: { select: { id: true, name: true, avatar: true } },
+        helper: { select: { id: true, name: true, avatar: true } },
+      },
+    });
+
+    if (!conversation) {
+      conversation = await prisma.conversation.create({
+        data: {
+          job_id: jobId,
+          customer_id: customerId,
+          helper_id: helperId,
+          status: "ACTIVE",
+        },
+        include: {
+          job: { select: { id: true, title: true, status: true } },
+          customer: { select: { id: true, name: true, avatar: true } },
+          helper: { select: { id: true, name: true, avatar: true } },
+        },
+      });
+    }
+
+    const isCustomer = conversation.customer_id === userId;
+    const companion = isCustomer ? conversation.helper : conversation.customer;
+
+    return {
+      ...conversation,
+      companion,
+    };
   },
 };

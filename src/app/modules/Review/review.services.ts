@@ -28,10 +28,10 @@ export const ReviewService = {
       );
     }
 
-    if (job.status !== "COMPLETED") {
+    if (job.status !== "COMPLETED" && job.status !== "CLOSED") {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "Reviews can only be submitted for completed jobs.",
+        "Reviews can only be submitted for completed or closed jobs.",
       );
     }
 
@@ -52,7 +52,7 @@ export const ReviewService = {
     if (existingReview) {
       throw new AppError(
         httpStatus.CONFLICT,
-        "You have already reviewed this job!",
+        "You have already reviewed this work!",
       );
     }
 
@@ -81,6 +81,13 @@ export const ReviewService = {
         where: { helper_id: helperId },
       });
 
+      const completedJobsCount = await tx.jobPost.count({
+        where: {
+          selected_application: { helper_id: helperId },
+          status: { in: ["COMPLETED", "CLOSED"] },
+        },
+      });
+
       const rating_average = stats._avg.rating ?? 0;
       const total_reviews = stats._count.rating ?? 0;
 
@@ -89,7 +96,7 @@ export const ReviewService = {
         data: {
           rating_average,
           total_reviews,
-          completed_jobs: { increment: 1 },
+          completed_jobs: completedJobsCount,
         },
       });
 

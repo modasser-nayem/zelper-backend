@@ -97,6 +97,17 @@ export const initSocket = (server: HttpServer): Server => {
     }
     userSockets.add(socket.id);
 
+    // Send current list of online users to the newly connected socket
+    socket.emit(SOCKET_EVENTS.ONLINE_USERS_LIST, {
+      userIds: Array.from(onlineUsers.keys()),
+    });
+
+    socket.on(SOCKET_EVENTS.GET_ONLINE_USERS, () => {
+      socket.emit(SOCKET_EVENTS.ONLINE_USERS_LIST, {
+        userIds: Array.from(onlineUsers.keys()),
+      });
+    });
+
     // inject sub-handlers
     handleNegotiationEvents(io, socket, onlineUsers);
     handleChatEvents(io, socket, onlineUsers);

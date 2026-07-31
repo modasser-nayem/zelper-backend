@@ -70,9 +70,14 @@ export const handleChatEvents = (
   // send message
   socket.on(
     SOCKET_EVENTS.SEND_MESSAGE,
-    async (payload: { conversationId: string; content: string }) => {
+    async (payload: {
+      conversationId: string;
+      content: string;
+      reply_to_id?: string;
+      images?: string[];
+    }) => {
       try {
-        const { conversationId, content } = payload;
+        const { conversationId, content, reply_to_id, images = [] } = payload;
 
         const conversation = await prisma.conversation.findUnique({
           where: { id: conversationId },
@@ -101,6 +106,8 @@ export const handleChatEvents = (
           data: {
             conversationId,
             content,
+            reply_to_id,
+            images,
             is_delivered: isCompanionOnline,
           },
         });

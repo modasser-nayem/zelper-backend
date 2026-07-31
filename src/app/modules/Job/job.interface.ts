@@ -27,6 +27,7 @@ export type IBrowseJobsFilter = IJobFilterRequest & {
 // Query param types — all values from req.query are strings (page/limit/sort handled by PaginationHelper)
 export type TJobListQuery = {
   searchTerm?: string;
+  status?: string;
   page?: string;
   limit?: string;
   sortBy?: string;

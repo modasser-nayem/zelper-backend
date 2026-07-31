@@ -103,6 +103,7 @@ export const JobController = {
     const userId = req.user.id;
     const query = pickOptions(req.query, [
       "searchTerm",
+      "status",
       "page",
       "limit",
       "sortBy",
@@ -143,6 +144,7 @@ export const JobController = {
     const userId = req.user.id;
     const query = pickOptions(req.query, [
       "searchTerm",
+      "status",
       "page",
       "limit",
       "sortBy",

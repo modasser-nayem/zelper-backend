@@ -8,6 +8,13 @@ const router = express.Router();
 // list conversations
 router.get("/conversations", auth(), ChatController.getConversations);
 
+// get or create conversation by job id
+router.get(
+  "/conversations/job/:jobId",
+  auth(),
+  ChatController.getOrCreateConversationByJobId,
+);
+
 // list conversation messages
 router.get("/conversations/:id/messages", auth(), ChatController.getMessages);
 
@@ -18,7 +25,7 @@ router.post("/messages", auth(), ChatController.sendMessage);
 router.post(
   "/conversations/:id/media",
   auth(),
-  uploadFile.single("file"),
+  uploadFile.any(),
   ChatController.sendMediaMessage,
 );
 

@@ -76,6 +76,7 @@ export const handleNegotiationEvents = (
         await NegotiationService.verifyParticipant({
           userId,
           negotiationId,
+          requirePending: true,
         });
 
       const companionId = userId === customerId ? helperId : customerId;
@@ -147,7 +148,11 @@ export const handleNegotiationEvents = (
       try {
         const { negotiationId } = payload;
 
-        await NegotiationService.verifyParticipant({ userId, negotiationId });
+        await NegotiationService.verifyParticipant({
+          userId,
+          negotiationId,
+          requirePending: true,
+        });
 
         const updatedNegotiation = await NegotiationService.acceptLatestOffer({
           userId,
@@ -182,6 +187,7 @@ export const handleNegotiationEvents = (
         const { customerId } = await NegotiationService.verifyParticipant({
           userId,
           negotiationId,
+          requirePending: true,
         });
 
         const updatedNegotiation = await NegotiationService.rejectNegotiation({

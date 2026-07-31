@@ -371,7 +371,21 @@ export const JobService = {
         }
       : {};
 
-    const whereConditions = { customer_id: userId, ...searchCondition };
+    let statusFilter: any = {};
+    if (query.status) {
+      const s = String(query.status).toUpperCase();
+      if (s === "COMPLETED" || s === "CLOSED") {
+        statusFilter = { status: { in: ["COMPLETED", "CLOSED"] } };
+      } else {
+        statusFilter = { status: s as JobPostStatus };
+      }
+    }
+
+    const whereConditions = {
+      customer_id: userId,
+      ...statusFilter,
+      ...searchCondition,
+    };
 
     const [jobs, total] = await Promise.all([
       prisma.jobPost.findMany({
@@ -382,6 +396,7 @@ export const JobService = {
           selected_application: {
             select: { id: true, helper_id: true, status: true },
           },
+          reviews: true,
         },
         orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
         take: limit,
@@ -497,20 +512,24 @@ export const JobService = {
         }
       : {};
 
+    const validStatuses = [
+      JobPostStatus.ASSIGNED,
+      JobPostStatus.IN_PROGRESS,
+      JobPostStatus.WAITING_FOR_APPROVAL,
+      JobPostStatus.COMPLETED,
+      JobPostStatus.CLOSED,
+      JobPostStatus.DISPUTED,
+    ];
+
+    const worksStatusFilter = query.status
+      ? { status: query.status as JobPostStatus }
+      : { status: { in: validStatuses } };
+
     const whereConditions = {
       selected_application: {
         helper_id: userId,
       },
-      status: {
-        in: [
-          JobPostStatus.ASSIGNED,
-          JobPostStatus.IN_PROGRESS,
-          JobPostStatus.WAITING_FOR_APPROVAL,
-          JobPostStatus.COMPLETED,
-          JobPostStatus.CLOSED,
-          JobPostStatus.DISPUTED,
-        ],
-      },
+      ...worksStatusFilter,
       ...searchCondition,
     };
 
@@ -1098,11 +1117,12 @@ export const JobService = {
       );
     }
 
-    // Upload before images if any are uploaded
-    let beforeImages: string[] = [];
+    // Upload before images if any are uploaded, preserving existing before_images
+    let beforeImages: string[] = job.before_images || [];
     if (files && files.length > 0) {
       const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
-      beforeImages = uploadResults.map((r) => r.url);
+      const newUrls = uploadResults.map((r) => r.url);
+      beforeImages = [...beforeImages, ...newUrls];
     }
 
     const result = await prisma.jobPost.update({
@@ -1111,7 +1131,10 @@ export const JobService = {
         status: "IN_PROGRESS",
         before_images: beforeImages,
       },
-      select: { id: true, status: true, title: true, before_images: true },
+      include: {
+        job_images: true,
+        selected_application: true,
+      },
     });
 
     await NotificationService.createNotification({
@@ -1156,11 +1179,12 @@ export const JobService = {
       );
     }
 
-    // Upload after images if any are uploaded
-    let afterImages: string[] = [];
+    // Upload after images if any are uploaded, preserving existing after_images
+    let afterImages: string[] = job.after_images || [];
     if (files && files.length > 0) {
       const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
-      afterImages = uploadResults.map((r) => r.url);
+      const newUrls = uploadResults.map((r) => r.url);
+      afterImages = [...afterImages, ...newUrls];
     }
 
     const result = await prisma.jobPost.update({
@@ -1169,7 +1193,10 @@ export const JobService = {
         status: "WAITING_FOR_APPROVAL",
         after_images: afterImages,
       },
-      select: { id: true, status: true, title: true, after_images: true },
+      include: {
+        job_images: true,
+        selected_application: true,
+      },
     });
 
     await NotificationService.createNotification({
@@ -1222,6 +1249,18 @@ export const JobService = {
     await PaymentService.releaseEscrow({ jobId });
 
     if (job.selected_application) {
+      const completedJobsCount = await prisma.jobPost.count({
+        where: {
+          selected_application: { helper_id: job.selected_application.helper_id },
+          status: { in: ["COMPLETED", "CLOSED"] },
+        },
+      });
+
+      await prisma.user.update({
+        where: { id: job.selected_application.helper_id },
+        data: { completed_jobs: completedJobsCount },
+      });
+
       await NotificationService.createNotification({
         receiverId: job.selected_application.helper_id,
         type: NotificationType.JOB_APPROVED,

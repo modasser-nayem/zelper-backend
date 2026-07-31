@@ -99,8 +99,9 @@ export const NegotiationService = {
   verifyParticipant: async (payload: {
     userId: string;
     negotiationId: string;
+    requirePending?: boolean;
   }) => {
-    const { userId, negotiationId } = payload;
+    const { userId, negotiationId, requirePending = false } = payload;
 
     const application = await prisma.jobApplication.findUnique({
       where: { id: negotiationId },
@@ -120,7 +121,7 @@ export const NegotiationService = {
       throw new Error("You are not a participant in this negotiation!");
     }
 
-    if (application.negotiation_status !== "PENDING") {
+    if (requirePending && application.negotiation_status !== "PENDING") {
       throw new Error(
         `Negotiation is already ${application.negotiation_status?.toLowerCase() || "unknown"}.`,
       );
