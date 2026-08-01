@@ -70,6 +70,9 @@ router.patch(
 // Helper applies to a job post
 router.post("/:id/apply", auth(), JobController.applyToJob);
 
+// Helper: get my own application for a specific job (for details page pre-assignment)
+router.get("/:id/my-application", auth(), JobController.getMyApplicationForJob);
+
 // Helper withdraws job application
 router.post("/:id/withdraw", auth(), JobController.withdrawApplication);
 

@@ -139,6 +139,21 @@ export const JobController = {
     });
   }),
 
+  // Helper: get my own application for a specific job (pre-assignment details)
+  getMyApplicationForJob: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+
+    const result = await JobService.getMyApplicationForJob({ userId, jobId });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Application retrieved successfully!",
+      data: result,
+    });
+  }),
+
   // Helper: get my works (jobs assigned/hired)
   getMyWorks: catchAsync(async (req, res) => {
     const userId = req.user.id;

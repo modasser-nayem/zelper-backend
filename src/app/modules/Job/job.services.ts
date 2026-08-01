@@ -482,6 +482,33 @@ export const JobService = {
     };
   },
 
+  // Helper: get my own application for a specific job
+  getMyApplicationForJob: async (payload: {
+    userId: string;
+    jobId: string;
+  }) => {
+    const { userId, jobId } = payload;
+
+    const application = await prisma.jobApplication.findFirst({
+      where: {
+        helper_id: userId,
+        job_id: jobId,
+      },
+      include: {
+        negotiation_offers: {
+          include: {
+            sender: {
+              select: { id: true, name: true, avatar: true },
+            },
+          },
+          orderBy: { created_at: "asc" },
+        },
+      },
+    });
+
+    return application;
+  },
+
   // Helper: get my works (jobs assigned/hired)
   getMyWorks: async (payload: { userId: string; query: TJobListQuery }) => {
     const { userId, query } = payload;

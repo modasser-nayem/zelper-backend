@@ -35,4 +35,12 @@ export const SOCKET_EVENTS = {
   OFFERS_DELIVERED: "offers_delivered",
   OFFER_SEEN: "offer_seen",
   OFFERS_SEEN: "offers_seen",
+
+  // location tracking events (active jobs only: ASSIGNED → IN_PROGRESS → WAITING_FOR_APPROVAL)
+  JOIN_LOCATION_ROOM:   "location:join",       // client → server: join a job's tracking room
+  LEAVE_LOCATION_ROOM:  "location:leave",      // client → server: leave the tracking room
+  LOCATION_UPDATE:      "location:update",     // client → server: broadcast my position
+  LOCATION_STOP:        "location:stop",       // client → server: I stopped sharing
+  PARTNER_LOCATION:     "location:partner",    // server → client: partner's updated position
+  PARTNER_STOPPED:      "location:partner_stopped", // server → client: partner stopped sharing
 } as const;

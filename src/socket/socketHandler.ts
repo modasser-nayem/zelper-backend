@@ -5,6 +5,7 @@ import config from "../config";
 import logger from "../utils/logger";
 import { handleNegotiationEvents } from "./negotiation.handler";
 import { handleChatEvents } from "./chat.handler";
+import { handleLocationEvents } from "./location.handler";
 import { SOCKET_EVENTS } from "./socket.constant";
 import { ChatService } from "../app/modules/Chat/chat.services";
 import { NegotiationService } from "../app/modules/Negotiation/negotiation.services";
@@ -111,6 +112,7 @@ export const initSocket = (server: HttpServer): Server => {
     // inject sub-handlers
     handleNegotiationEvents(io, socket, onlineUsers);
     handleChatEvents(io, socket, onlineUsers);
+    handleLocationEvents(io, socket);
 
     socket.on(SOCKET_EVENTS.DISCONNECT, () => {
       logger.info(`Socket disconnected: ${socket.id} (user: ${userId})`);
