@@ -78,7 +78,7 @@ export class AuthService {
       });
     }
 
-    return this.getLoginTokens({ id: result.id, role: result.role });
+    return this.getLoginTokens(result);
   };
 
   //  Login User
@@ -122,7 +122,7 @@ export class AuthService {
       });
     }
 
-    return this.getLoginTokens({ id: user.id, role: user.role });
+    return this.getLoginTokens(user);
   };
 
   // Social Login
@@ -191,10 +191,7 @@ export class AuthService {
       });
     }
 
-    return this.getLoginTokens({
-      id: user.id,
-      role: user.role,
-    });
+    return this.getLoginTokens(user);
   };
 
   // Forgot Password
@@ -334,7 +331,7 @@ export class AuthService {
       throw new AppError(status.NOT_FOUND, "User not found");
     }
 
-    return this.getLoginTokens({ id: user.id, role: user.role });
+    return this.getLoginTokens(user);
   };
 
   // change password
@@ -520,10 +517,34 @@ export class AuthService {
     }
   };
 
-  private static getLoginTokens(payload: { id: string; role: string }) {
+  private static getLoginTokens(user: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string | null;
+    role: string;
+    status: string;
+    auth_provider: string;
+    created_at: Date;
+    updated_at: Date;
+  }) {
+    const tokenPayload = { id: user.id, role: user.role };
+    const userInfo = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar || null,
+      role: user.role,
+      status: user.status,
+      auth_provider: user.auth_provider,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
+
     return {
-      accessToken: JwtHelper.generateToken(payload, "ACCESS_TOKEN"),
-      refreshToken: JwtHelper.generateToken(payload, "REFRESH_TOKEN"),
+      accessToken: JwtHelper.generateToken(tokenPayload, "ACCESS_TOKEN"),
+      refreshToken: JwtHelper.generateToken(tokenPayload, "REFRESH_TOKEN"),
+      user: userInfo,
     };
   }
 }
