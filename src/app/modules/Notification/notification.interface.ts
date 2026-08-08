@@ -9,6 +9,7 @@ export enum NotificationType {
   NEGOTIATION_CONFIRMED = "NEGOTIATION_CONFIRMED",
 
   // Job status & lifecycle notifications
+  NEW_JOB_POSTED = "NEW_JOB_POSTED",
   JOB_ASSIGNED = "JOB_ASSIGNED",
   JOB_STARTED = "JOB_STARTED",
   JOB_WORK_COMPLETED = "JOB_WORK_COMPLETED",

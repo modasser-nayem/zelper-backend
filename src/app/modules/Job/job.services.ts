@@ -5,6 +5,7 @@ import AppError from "../../../errors/AppError";
 import { FileUploadHelper } from "../../../upload/fileUpload";
 import { NotificationService } from "../Notification/notification.service";
 import { NotificationType } from "../Notification/notification.interface";
+import { getIo } from "../../../socket/socketHandler";
 import {
   TBrowseJobsQuery,
   TCreateJob,
@@ -135,6 +136,23 @@ export const JobService = {
         },
       },
     });
+
+    // Real-time socket broadcast to all connected helpers/users
+    try {
+      const io = getIo();
+      if (io) {
+        io.emit("new_job_posted", {
+          id: result.id,
+          title: result.title,
+          budget: result.budget,
+          latitude: result.latitude,
+          longitude: result.longitude,
+          address: result.address,
+        });
+      }
+    } catch {
+      // ignore socket errors
+    }
 
     return result;
   },
@@ -590,9 +608,15 @@ export const JobService = {
       limit: Number(query.limit),
     });
 
-    let userLat = query.lat ? Number(query.lat) : null;
-    let userLng = query.lng ? Number(query.lng) : null;
-    const radius = query.radius ? Number(query.radius) : null;
+    let userLat = query.lat !== undefined && query.lat !== null && query.lat !== "" ? Number(query.lat) : null;
+    let userLng = query.lng !== undefined && query.lng !== null && query.lng !== "" ? Number(query.lng) : null;
+    const radius = query.radius !== undefined && query.radius !== null && query.radius !== "" ? Number(query.radius) : null;
+
+    // If radius is requested but no lat/lng supplied, default center coordinates to NYC default
+    if ((userLat === null || userLng === null) && radius !== null) {
+      userLat = 40.7128;
+      userLng = -74.0060;
+    }
 
     if (userLat !== null && userLng !== null) {
       // Spatial query using Spherical Law of Cosines
@@ -600,13 +624,20 @@ export const JobService = {
         SELECT 
           id, customer_id, title, description, budget, is_negotiable, is_urgent,
           scheduled_at, latitude, longitude, address, status, created_at,
-          (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) AS distance
+          CASE 
+            WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN
+              (6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude))))))
+            ELSE NULL
+          END AS distance
         FROM job_posts
         WHERE status = 'OPEN'
           AND customer_id != ${userId}
           ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
-          ${radius !== null ? Prisma.sql`AND (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) <= ${radius}` : Prisma.empty}
-        ORDER BY distance ASC
+          ${radius !== null ? Prisma.sql`AND (
+            (latitude IS NOT NULL AND longitude IS NOT NULL AND (6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))))) <= ${radius})
+            OR (latitude IS NULL OR longitude IS NULL)
+          )` : Prisma.empty}
+        ORDER BY distance ASC NULLS LAST, created_at DESC
         LIMIT ${limit} OFFSET ${skip}
       `;
 
@@ -635,11 +666,15 @@ export const JobService = {
         .map((job) => ({
           ...maskJobDetails(job, userId),
           already_applied: appliedJobIds.has(job.id),
-          distance_km: distanceMap.get(job.id)
+          distance_km: distanceMap.get(job.id) !== null && distanceMap.get(job.id) !== undefined
             ? Number(Number(distanceMap.get(job.id)).toFixed(2))
             : null,
         }))
-        .sort((a, b) => (a.distance_km ?? 0) - (b.distance_km ?? 0));
+        .sort((a, b) => {
+          if (a.distance_km === null) return 1;
+          if (b.distance_km === null) return -1;
+          return a.distance_km - b.distance_km;
+        });
 
       const countRes = await prisma.$queryRaw<TRawCountRow[]>`
         SELECT COUNT(*)::int as count
@@ -647,7 +682,10 @@ export const JobService = {
         WHERE status = 'OPEN'
           AND customer_id != ${userId}
           ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
-          ${radius !== null ? Prisma.sql`AND (6371 * acos(cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))) <= ${radius}` : Prisma.empty}
+          ${radius !== null ? Prisma.sql`AND (
+            (latitude IS NOT NULL AND longitude IS NOT NULL AND (6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))))) <= ${radius})
+            OR (latitude IS NULL OR longitude IS NULL)
+          )` : Prisma.empty}
       `;
       const total = countRes[0]?.count || 0;
 
