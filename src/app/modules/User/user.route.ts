@@ -35,7 +35,7 @@ router.put(
 
 // ========== Admin ===========
 
-// Get all  users
+// Get all users
 router.get("/", auth("ADMIN"), UserController.getAllUsers);
 
 // Get single user by id

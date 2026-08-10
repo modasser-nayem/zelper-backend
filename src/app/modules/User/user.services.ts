@@ -3,7 +3,7 @@ import {
   IPaginationOptions,
   PaginationHelper,
 } from "../../../helpers/pagination";
-import { Prisma, UserRole, UserStatus } from "@prisma/client";
+import { Prisma, ServiceHelperStatus, UserRole, UserStatus } from "@prisma/client";
 import httpStatus from "http-status";
 import AppError from "../../../errors/AppError";
 import prisma from "../../../db/prisma";
@@ -134,7 +134,7 @@ export const UserService = {
   }) => {
     const { page, limit, skip, sortBy, sortOrder } =
       PaginationHelper.calculatePagination(payload.options);
-    const { searchTerm, role, status: userStatus } = payload.filters;
+    const { searchTerm, role, status: userStatus, verification_status } = payload.filters;
 
     const andConditions: Prisma.UserWhereInput[] = [];
 
@@ -160,6 +160,17 @@ export const UserService = {
       andConditions.push({ status: userStatus as UserStatus });
     }
 
+    if (
+      typeof verification_status === "string" &&
+      Object.values(ServiceHelperStatus).includes(
+        verification_status.toUpperCase() as ServiceHelperStatus,
+      )
+    ) {
+      andConditions.push({
+        verification_status: verification_status.toUpperCase() as ServiceHelperStatus,
+      });
+    }
+
     const whereConditions: Prisma.UserWhereInput = { AND: andConditions };
 
     const result = await prisma.user.findMany({
@@ -183,6 +194,8 @@ export const UserService = {
       data: result,
     };
   },
+
+
 
   // Get Single User
   getSingleUser: async (id: string) => {

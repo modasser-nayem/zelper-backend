@@ -45,6 +45,7 @@ export const UserController = {
       "role",
       "status",
       "gender",
+      "verification_status",
     ]);
     const options = pickOptions(req.query, [
       "page",
@@ -63,6 +64,8 @@ export const UserController = {
       meta: result.meta,
     });
   }),
+
+
 
   // Get Single User
   getSingleUser: catchAsync(async (req, res) => {

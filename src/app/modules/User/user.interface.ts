@@ -7,4 +7,5 @@ export type IUserFilterRequest = {
   searchTerm?: string | undefined;
   role?: string;
   status?: string;
+  verification_status?: string;
 };
