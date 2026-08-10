@@ -347,6 +347,24 @@ export const JobService = {
           select: {
             id: true,
             helper_id: true,
+            helper: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+                rating_average: true,
+                total_reviews: true,
+                completed_jobs: true,
+                verification_status: true,
+              },
+            },
+          },
+        },
+        reviews: {
+          include: {
+            customer: {
+              select: { id: true, name: true, avatar: true },
+            },
           },
         },
       },
@@ -466,6 +484,7 @@ export const JobService = {
                   helper_id: true,
                 },
               },
+              reviews: true,
             },
           },
           negotiation_offers: {
@@ -586,6 +605,7 @@ export const JobService = {
           selected_application: {
             select: { id: true, helper_id: true, status: true },
           },
+          reviews: true,
         },
         orderBy: sortBy ? { [sortBy]: sortOrder } : { created_at: "desc" },
         take: limit,

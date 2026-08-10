@@ -124,6 +124,9 @@ export const ReviewService = {
           customer: {
             select: { id: true, name: true, avatar: true },
           },
+          job: {
+            select: { id: true, title: true, created_at: true },
+          },
         },
         orderBy: { created_at: "desc" },
         take: limit,
@@ -155,6 +158,9 @@ export const ReviewService = {
         include: {
           customer: {
             select: { id: true, name: true, avatar: true },
+          },
+          job: {
+            select: { id: true, title: true, created_at: true },
           },
         },
         orderBy: { created_at: "desc" },
