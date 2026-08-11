@@ -244,71 +244,153 @@ export const UserService = {
     return null;
   },
 
-  // Request helper verification (upload a document)
+  // Request helper verification (Supports array of files, replace, upload new & delete)
   requestHelperVerification: async (payload: {
     userId: string;
-    file: Express.Multer.File;
-    documentType: string;
+    files: Express.Multer.File[];
+    body: any;
   }) => {
-    const { userId, file, documentType } = payload;
+    const { userId, files = [], body = {} } = payload;
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { verification_document: true },
+    });
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found!");
     }
 
-    if (!file) {
+    // Helper to safely delete file from AWS S3
+    const safeDeleteFromAWS = async (fileUrl: string) => {
+      if (!fileUrl) return;
+      try {
+        await FileUploadHelper.deleteSingle(fileUrl);
+      } catch (err) {
+        console.error("Failed to delete file from AWS S3:", fileUrl, err);
+      }
+    };
+
+    // 1. Parse deleteDocumentIds (Array of string document IDs)
+    let deleteIds: string[] = [];
+    if (body.deleteDocumentIds) {
+      if (Array.isArray(body.deleteDocumentIds)) {
+        deleteIds = body.deleteDocumentIds.map(String);
+      } else if (typeof body.deleteDocumentIds === "string") {
+        try {
+          const parsed = JSON.parse(body.deleteDocumentIds);
+          if (Array.isArray(parsed)) deleteIds = parsed.map(String);
+        } catch {
+          // ignore invalid json string
+        }
+      }
+    }
+
+    // Process document deletions: Remove from AWS S3 & DB
+    for (const docId of deleteIds) {
+      const docToDelete = await prisma.verificationDocument.findFirst({
+        where: { id: docId, user_id: userId },
+      });
+      if (docToDelete) {
+        await safeDeleteFromAWS(docToDelete.document_url);
+        await prisma.verificationDocument.delete({
+          where: { id: docToDelete.id },
+        });
+      }
+    }
+
+    // 2. Parse documents metadata array: [{ documentType: string, documentId?: string }]
+    let documentsMeta: Array<{ documentType: string; documentId?: string }> = [];
+
+    if (body.documents) {
+      if (Array.isArray(body.documents)) {
+        documentsMeta = body.documents;
+      } else if (typeof body.documents === "string") {
+        try {
+          const parsed = JSON.parse(body.documents);
+          if (Array.isArray(parsed)) documentsMeta = parsed;
+        } catch {
+          // ignore invalid json string
+        }
+      }
+    }
+
+    // Validation: ensure at least files uploaded or document deletions performed
+    if (files.length === 0 && deleteIds.length === 0) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "A document file is required!",
+        "No document files uploaded or delete IDs provided!",
       );
     }
 
-    if (
-      !documentType ||
-      typeof documentType !== "string" ||
-      !documentType.trim()
-    ) {
-      throw new AppError(httpStatus.BAD_REQUEST, "documentType is required!");
-    }
+    // 3. Process new file uploads & replacements
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const meta = documentsMeta[i] || {
+        documentType: `DOCUMENT_${i + 1}`,
+      };
+      const docType = meta.documentType
+        ? meta.documentType.trim()
+        : `DOCUMENT_${i + 1}`;
+      const docIdToReplace = meta.documentId;
 
-    const docTypeTrimmed = documentType.trim();
+      // Upload new file to AWS S3
+      const uploadResult = await FileUploadHelper.uploadSingle(file, "document");
 
-    const uploadResult = await FileUploadHelper.uploadSingle(file, "document");
-
-    const result = await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
-        // Delete existing document of the same type for this user
-        await tx.verificationDocument.deleteMany({
-          where: {
-            user_id: userId,
-            document_type: docTypeTrimmed,
-          },
+      if (docIdToReplace) {
+        // REPLACE BY DOCUMENT ID: Delete old S3 file & update DB record
+        const existingDoc = await prisma.verificationDocument.findFirst({
+          where: { id: docIdToReplace, user_id: userId },
         });
 
-        // Insert new document
-        await tx.verificationDocument.create({
+        if (existingDoc) {
+          await safeDeleteFromAWS(existingDoc.document_url);
+          await prisma.verificationDocument.update({
+            where: { id: existingDoc.id },
+            data: {
+              document_type: docType,
+              document_url: uploadResult.url,
+            },
+          });
+        } else {
+          // Specified ID not found, create new record
+          await prisma.verificationDocument.create({
+            data: {
+              user_id: userId,
+              document_type: docType,
+              document_url: uploadResult.url,
+            },
+          });
+        }
+      } else {
+        // Create brand new document record
+        await prisma.verificationDocument.create({
           data: {
             user_id: userId,
-            document_type: docTypeTrimmed,
+            document_type: docType,
             document_url: uploadResult.url,
           },
         });
+      }
+    }
 
-        // Update user verification status to IN_REVIEW
-        return await tx.user.update({
-          where: { id: userId },
-          data: {
-            verification_status: "IN_REVIEW",
-            rejection_reason: null,
-          },
-          select: userPublicSelect,
-        });
+    // 4. Update user verification status based on remaining documents
+    const remainingDocsCount = await prisma.verificationDocument.count({
+      where: { user_id: userId },
+    });
+
+    const newStatus = remainingDocsCount > 0 ? "IN_REVIEW" : "NOT_SUBMITTED";
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        verification_status: newStatus,
+        rejection_reason: null,
       },
-    );
+      select: userPublicSelect,
+    });
 
-    return result;
+    return updatedUser;
   },
 
   // Update helper verification status (Admin)

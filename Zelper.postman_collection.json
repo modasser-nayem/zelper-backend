@@ -29,8 +29,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/forgot-password",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "forgot-password"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "forgot-password"
+                  ]
                 }
               },
               "response": [
@@ -57,8 +62,13 @@
                     },
                     "url": {
                       "raw": "{{BASE_URL}}/auth/forgot-password",
-                      "host": ["{{BASE_URL}}"],
-                      "path": ["auth", "forgot-password"]
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "forgot-password"
+                      ]
                     }
                   },
                   "status": "OK",
@@ -131,8 +141,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/verify-otp",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "verify-otp"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "verify-otp"
+                  ]
                 }
               },
               "response": [
@@ -152,8 +167,13 @@
                     },
                     "url": {
                       "raw": "{{BASE_URL}}/auth/verify-otp",
-                      "host": ["{{BASE_URL}}"],
-                      "path": ["auth", "verify-otp"]
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "verify-otp"
+                      ]
                     }
                   },
                   "status": "OK",
@@ -226,8 +246,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/reset-password",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "reset-password"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "reset-password"
+                  ]
                 }
               },
               "response": [
@@ -247,8 +272,13 @@
                     },
                     "url": {
                       "raw": "{{BASE_URL}}/auth/reset-password",
-                      "host": ["{{BASE_URL}}"],
-                      "path": ["auth", "reset-password"]
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "reset-password"
+                      ]
                     }
                   },
                   "status": "OK",
@@ -335,8 +365,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/signup",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "signup"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
             }
           },
           "response": [
@@ -356,8 +391,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/signup",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "signup"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "signup"
+                  ]
                 }
               },
               "status": "Created",
@@ -440,8 +480,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/login",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
           "response": [
@@ -461,8 +506,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/login",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "login"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
                 }
               },
               "status": "OK",
@@ -539,8 +589,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/social-login",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "social-login"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "social-login"
+              ]
             }
           },
           "response": [
@@ -560,8 +615,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/social-login",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "social-login"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "social-login"
+                  ]
                 }
               },
               "status": "OK",
@@ -604,8 +664,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/auth/change-password",
-              "host": ["{{BASE_URL}}"],
-              "path": ["auth", "change-password"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
             }
           },
           "response": [
@@ -625,8 +690,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/auth/change-password",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["auth", "change-password"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "change-password"
+                  ]
                 }
               },
               "status": "OK",
@@ -665,8 +735,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           },
           "response": [
@@ -678,8 +753,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/users/profile",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", "profile"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile"
+                  ]
                 }
               },
               "status": "OK",
@@ -728,8 +808,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/users/profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           },
           "response": [
@@ -755,8 +840,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/users/profile",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", "profile"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile"
+                  ]
                 }
               },
               "status": "OK",
@@ -824,8 +914,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/profile",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           },
           "response": [
@@ -837,8 +932,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/users/profile",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", "profile"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile"
+                  ]
                 }
               },
               "status": "OK",
@@ -871,51 +971,39 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/users?searchTerm=&role=&status=&page=1&limit=10&sortBy=created_at&sortOrder=desc",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users"],
+              "raw": "{{BASE_URL}}/users?page=1&limit=10&verification_status=IN_REVIEW",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users"
+              ],
               "query": [
-                {
-                  "key": "searchTerm",
-                  "value": "",
-                  "disabled": true,
-                  "description": "Search query for filtering records by name, title, or details"
-                },
-                {
-                  "key": "role",
-                  "value": "",
-                  "disabled": true,
-                  "description": "Filter by user role. Options: USER, ADMIN"
-                },
-                {
-                  "key": "status",
-                  "value": "",
-                  "disabled": true,
-                  "description": "Filter by user status. Options: ACTIVE, SUSPENDED, DELETED"
-                },
                 {
                   "key": "page",
                   "value": "1",
-                  "disabled": false,
-                  "description": "Page number for pagination (optional, default: 1)"
+                  "disabled": false
                 },
                 {
                   "key": "limit",
                   "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "role",
+                  "value": "USER",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "disabled": true
+                },
+                {
+                  "key": "verification_status",
+                  "value": "IN_REVIEW",
                   "disabled": false,
-                  "description": "Number of records per page (optional, default: 10)"
-                },
-                {
-                  "key": "sortBy",
-                  "value": "created_at",
-                  "disabled": true,
-                  "description": "Field name to sort by (optional, default: created_at)"
-                },
-                {
-                  "key": "sortOrder",
-                  "value": "desc",
-                  "disabled": true,
-                  "description": "Sort direction. Options: asc, desc (optional, default: desc)"
+                  "description": "Filter users by helper verification status: NOT_SUBMITTED | IN_REVIEW | VERIFIED | REJECTED"
                 }
               ]
             }
@@ -928,8 +1016,12 @@
                 "header": [],
                 "url": {
                   "raw": "{{BASE_URL}}/users",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users"
+                  ],
                   "query": [
                     {
                       "key": "searchTerm",
@@ -1015,8 +1107,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/:userId/status",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", ":userId", "status"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                ":userId",
+                "status"
+              ],
               "variable": [
                 {
                   "key": "userId",
@@ -1034,8 +1132,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/users/:userId/status",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", ":userId", "status"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    ":userId",
+                    "status"
+                  ],
                   "variable": [
                     {
                       "key": "userId",
@@ -1075,8 +1179,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/users/:userId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", ":userId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                ":userId"
+              ],
               "variable": [
                 {
                   "key": "userId",
@@ -1094,8 +1203,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/users/:userId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", ":userId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    ":userId"
+                  ],
                   "variable": [
                     {
                       "key": "userId",
@@ -1137,22 +1251,37 @@
               "mode": "formdata",
               "formdata": [
                 {
-                  "key": "file",
+                  "key": "files",
                   "type": "file",
-                  "src": ""
+                  "src": "",
+                  "description": "Upload document image file 1"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": "",
+                  "description": "Upload document image file 2 (optional)"
                 },
                 {
                   "key": "data",
-                  "value": "{\n    \"documentType\": \"ID Front\"\n}",
-                  "type": "text"
+                  "value": "{\n    \"documents\": [\n        {\n            \"documentType\": \"ID_CARD_FRONT\"\n        },\n        {\n            \"documentType\": \"ID_CARD_BACK\",\n            \"documentId\": \"optional-doc-uuid-to-replace\"\n        }\n    ],\n    \"deleteDocumentIds\": [\n        \"optional-doc-uuid-to-delete\"\n    ]\n}",
+                  "type": "text",
+                  "description": "JSON object containing documents array and optional deleteDocumentIds array"
                 }
               ]
             },
             "url": {
               "raw": "{{BASE_URL}}/users/profile/helper-verification",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", "profile", "helper-verification"]
-            }
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                "profile",
+                "helper-verification"
+              ]
+            },
+            "description": "Submit, replace, or delete helper verification documents. Accepts array of files and metadata array."
           },
           "response": [
             {
@@ -1177,8 +1306,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/users/profile/helper-verification",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", "profile", "helper-verification"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    "profile",
+                    "helper-verification"
+                  ]
                 }
               },
               "status": "OK",
@@ -1221,8 +1356,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/users/:userId/helper-status",
-              "host": ["{{BASE_URL}}"],
-              "path": ["users", ":userId", "helper-status"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "users",
+                ":userId",
+                "helper-status"
+              ],
               "variable": [
                 {
                   "key": "userId",
@@ -1248,8 +1389,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/users/:userId/helper-status",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["users", ":userId", "helper-status"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "users",
+                    ":userId",
+                    "helper-status"
+                  ],
                   "variable": [
                     {
                       "key": "userId",
@@ -1309,8 +1456,12 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/jobs",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs"
+              ]
             }
           },
           "response": [
@@ -1336,8 +1487,12 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/jobs",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs"
+                  ]
                 }
               },
               "status": "OK",
@@ -1371,8 +1526,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/my/posts?searchTerm=&page=1&limit=10&sortBy=created_at&sortOrder=desc",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", "my", "posts"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "my",
+                "posts"
+              ],
               "query": [
                 {
                   "key": "searchTerm",
@@ -1416,8 +1577,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/my/posts?searchTerm=&page=1&limit=10&sortBy=created_at&sortOrder=desc",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", "my", "posts"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "my",
+                    "posts"
+                  ],
                   "query": [
                     {
                       "key": "searchTerm",
@@ -1481,8 +1648,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/applications",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "applications"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "applications"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -1501,8 +1674,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/applications",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "applications"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "applications"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -1552,8 +1731,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/select-helper",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "select-helper"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "select-helper"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -1580,8 +1765,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/select-helper",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "select-helper"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "select-helper"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -1631,8 +1822,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/reject-application",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "reject-application"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "reject-application"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -1659,8 +1856,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/reject-application",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "reject-application"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "reject-application"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -1701,8 +1904,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/browse?lat=23.8103&lng=90.4125&radius=15&searchTerm=&page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", "browse"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "browse"
+              ],
               "query": [
                 {
                   "key": "lat",
@@ -1752,8 +1960,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/browse?lat=23.8103&lng=90.4125&radius=15&searchTerm=&page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", "browse"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "browse"
+                  ],
                   "query": [
                     {
                       "key": "lat",
@@ -1822,8 +2035,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/my/applications?searchTerm=&page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", "my", "applications"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "my",
+                "applications"
+              ],
               "query": [
                 {
                   "key": "searchTerm",
@@ -1855,8 +2074,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/my/applications?searchTerm=&page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", "my", "applications"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    "my",
+                    "applications"
+                  ],
                   "query": [
                     {
                       "key": "searchTerm",
@@ -1910,8 +2135,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/my/works",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", "my", "works"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                "my",
+                "works"
+              ]
             }
           },
           "response": []
@@ -1933,8 +2164,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/apply",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "apply"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "apply"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -1953,8 +2190,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/apply",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "apply"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "apply"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -1995,8 +2238,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/withdraw",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "withdraw"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "withdraw"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2015,8 +2264,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/withdraw",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "withdraw"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "withdraw"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2057,8 +2312,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2077,8 +2337,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2134,8 +2399,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2168,8 +2438,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2210,8 +2485,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2230,8 +2510,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2282,8 +2567,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/start",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "start"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "start"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2312,8 +2603,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/start",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "start"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "start"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2364,8 +2661,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/complete",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "complete"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "complete"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2394,8 +2697,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/complete",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "complete"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "complete"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2436,8 +2745,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/jobs/:jobId/approve",
-              "host": ["{{BASE_URL}}"],
-              "path": ["jobs", ":jobId", "approve"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jobs",
+                ":jobId",
+                "approve"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2457,8 +2772,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/jobs/:jobId/approve",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["jobs", ":jobId", "approve"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "jobs",
+                    ":jobId",
+                    "approve"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2504,8 +2825,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/negotiations/:negotiationId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["negotiations", ":negotiationId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "negotiations",
+                ":negotiationId"
+              ],
               "variable": [
                 {
                   "key": "negotiationId",
@@ -2524,8 +2850,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/negotiations/:negotiationId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["negotiations", ":negotiationId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "negotiations",
+                    ":negotiationId"
+                  ],
                   "variable": [
                     {
                       "key": "negotiationId",
@@ -2556,7 +2887,9 @@
             "header": [],
             "url": {
               "raw": "socket-event-only",
-              "host": ["socket-event-only"]
+              "host": [
+                "socket-event-only"
+              ]
             },
             "description": "Socket.io event\n\nEvent: join_negotiation\nPayload: { negotiationId: string }\nHandshake auth: { token: ACCESS_TOKEN }"
           },
@@ -2569,7 +2902,9 @@
                 "body": null,
                 "url": {
                   "raw": "socket-event-only",
-                  "host": ["socket-event-only"]
+                  "host": [
+                    "socket-event-only"
+                  ]
                 }
               },
               "status": "OK",
@@ -2593,7 +2928,9 @@
             "header": [],
             "url": {
               "raw": "socket-event-only",
-              "host": ["socket-event-only"]
+              "host": [
+                "socket-event-only"
+              ]
             },
             "description": "Socket.io event\n\nEvent: send_offer\nPayload: { negotiationId: string, amount: number }\n\nBroadcast: offer_received\n{ offer: { id, sender_id, sender, amount, created_at } }\n\nExample flow:\n  Job budget = $30\n  Helper sends_offer $50\n  Customer sends_offer $40\n  Helper sends_offer $45\n  Customer accept_offer -> locked at $45"
           },
@@ -2606,7 +2943,9 @@
                 "body": null,
                 "url": {
                   "raw": "socket-event-only",
-                  "host": ["socket-event-only"]
+                  "host": [
+                    "socket-event-only"
+                  ]
                 }
               },
               "status": "OK",
@@ -2630,7 +2969,9 @@
             "header": [],
             "url": {
               "raw": "socket-event-only",
-              "host": ["socket-event-only"]
+              "host": [
+                "socket-event-only"
+              ]
             },
             "description": "Socket.io event\n\nEvent: accept_offer\nPayload: { negotiationId: string }\n\nAccepts the LATEST offer. Cannot accept your own last offer.\n\nBroadcast: negotiation_accepted\n{ negotiation: { id, status, final_amount, accepted_offer_id } }"
           },
@@ -2643,7 +2984,9 @@
                 "body": null,
                 "url": {
                   "raw": "socket-event-only",
-                  "host": ["socket-event-only"]
+                  "host": [
+                    "socket-event-only"
+                  ]
                 }
               },
               "status": "OK",
@@ -2667,7 +3010,9 @@
             "header": [],
             "url": {
               "raw": "socket-event-only",
-              "host": ["socket-event-only"]
+              "host": [
+                "socket-event-only"
+              ]
             },
             "description": "Socket.io event\n\nEvent: reject_negotiation\nPayload: { negotiationId: string }\n\nCustomer ends -> status = REJECTED\nHelper ends -> status = CANCELLED\n\nBroadcast: negotiation_rejected\n{ negotiation: { id, status }, rejected_by: userId }"
           },
@@ -2680,7 +3025,9 @@
                 "body": null,
                 "url": {
                   "raw": "socket-event-only",
-                  "host": ["socket-event-only"]
+                  "host": [
+                    "socket-event-only"
+                  ]
                 }
               },
               "status": "OK",
@@ -2728,8 +3075,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/payments/create-checkout-session",
-              "host": ["{{BASE_URL}}"],
-              "path": ["payments", "create-checkout-session"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "payments",
+                "create-checkout-session"
+              ]
             },
             "description": "Creates a Stripe Checkout Session for the selected job.\n\nReturns:\n- sessionId: unique checkout session ID\n- sessionUrl: redirect customer to this URL to complete payment\n- paymentId: the local payment transaction record ID\n- amount: total budget/agreed price\n- platformFee: commission\n- helperAmount: net amount for the helper"
           },
@@ -2750,8 +3102,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/payments/create-checkout-session",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["payments", "create-checkout-session"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "create-checkout-session"
+                  ]
                 }
               },
               "status": "OK",
@@ -2785,8 +3142,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/payments/job/:jobId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["payments", "job", ":jobId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "payments",
+                "job",
+                ":jobId"
+              ],
               "variable": [
                 {
                   "key": "jobId",
@@ -2806,8 +3169,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/payments/job/:jobId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["payments", "job", ":jobId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "job",
+                    ":jobId"
+                  ],
                   "variable": [
                     {
                       "key": "jobId",
@@ -2852,8 +3221,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/payments/webhook",
-              "host": ["{{BASE_URL}}"],
-              "path": ["payments", "webhook"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "payments",
+                "webhook"
+              ]
             },
             "description": "This endpoint is called by Stripe - NOT by the frontend.\n\nHandled events:\n- payment_intent.succeeded -> Funds escrow, assigns job, rejects other apps, opens conversation, credits helper pending_balance\n- payment_intent.payment_failed -> Marks payment FAILED\n\nRequires: stripe-signature header (set by Stripe automatically)\nDo NOT call this manually - test using Stripe CLI: stripe listen --forward-to localhost:5000/api/v1/payments/webhook"
           },
@@ -2879,8 +3253,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/payments/webhook",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["payments", "webhook"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "webhook"
+                  ]
                 }
               },
               "status": "OK",
@@ -2919,8 +3298,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/wallet/me",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "me"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me"
+              ]
             },
             "description": "Returns wallet balances and Stripe Connect status:\n- available_balance: ready to withdraw\n- pending_balance: held in escrow\n- stripe_onboarding_done: true if Stripe account is connected and ready"
           },
@@ -2933,8 +3317,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/me",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "me"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me"
+                  ]
                 }
               },
               "status": "OK",
@@ -2971,8 +3360,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/wallet/me/connect",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "me", "connect"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "connect"
+              ]
             },
             "description": "Creates a Stripe Connect Express account for the helper.\n\nReturns:\n- accountId: the Stripe Connect account ID\n- onboardingUrl: redirect the helper to this URL in the browser\n\nThe helper completes their Stripe onboarding (adds debit card or bank account).\nStripe then redirects back to FRONTEND_URL/wallet/connect/success"
           },
@@ -2987,8 +3382,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/me/connect",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "me", "connect"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "connect"
+                  ]
                 }
               },
               "status": "OK",
@@ -3022,8 +3423,15 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/wallet/me/connect/confirm",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "me", "connect", "confirm"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "connect",
+                "confirm"
+              ]
             },
             "description": "Call this endpoint after the helper returns from Stripe onboarding.\nChecks with Stripe whether onboarding is complete and updates wallet.stripe_onboarding_done.\n\nReturns:\n- onboardingComplete: boolean\n- chargesEnabled: boolean\n- payoutsEnabled: boolean"
           },
@@ -3036,8 +3444,15 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/me/connect/confirm",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "me", "connect", "confirm"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "connect",
+                    "confirm"
+                  ]
                 }
               },
               "status": "OK",
@@ -3071,8 +3486,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/wallet/me/transactions?page=1&limit=10&type=",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "me", "transactions"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "transactions"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3105,8 +3526,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/me/transactions?page=1&limit=10&type=",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "me", "transactions"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "transactions"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3160,8 +3587,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/wallet/me/withdrawals?page=1&limit=10&status=",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "me", "withdrawals"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "withdrawals"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3194,8 +3627,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/me/withdrawals?page=1&limit=10&status=",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "me", "withdrawals"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "withdrawals"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3258,8 +3697,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/wallet/me/withdrawals",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "me", "withdrawals"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "me",
+                "withdrawals"
+              ]
             },
             "description": "Request a Stripe Transfer to the helper's connected account.\n\nPre-requisite: helper must have completed Stripe Connect onboarding.\n\nFlow:\n1. Validates amount <= available_balance\n2. Creates stripe.transfers.create() -> money moves to helper's Stripe account\n3. Deducts from available_balance\n4. Creates Withdrawal record (status=PENDING)\n5. Creates WITHDRAWAL wallet transaction\n\nStripe then pays out to the helper's linked debit card or bank account per their payout schedule (instant or next business day).\n\nOn REJECTED/FAILED: amount is refunded back to available_balance automatically."
           },
@@ -3280,8 +3725,14 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/me/withdrawals",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "me", "withdrawals"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "me",
+                    "withdrawals"
+                  ]
                 }
               },
               "status": "OK",
@@ -3315,8 +3766,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/wallet/admin/withdrawals?page=1&limit=10&status=PENDING",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "admin", "withdrawals"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "admin",
+                "withdrawals"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3349,8 +3806,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/admin/withdrawals?page=1&limit=10&status=PENDING",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "admin", "withdrawals"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "admin",
+                    "withdrawals"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3413,8 +3876,15 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/wallet/admin/withdrawals/:withdrawalId",
-              "host": ["{{BASE_URL}}"],
-              "path": ["wallet", "admin", "withdrawals", ":withdrawalId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "wallet",
+                "admin",
+                "withdrawals",
+                ":withdrawalId"
+              ],
               "variable": [
                 {
                   "key": "withdrawalId",
@@ -3441,8 +3911,15 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/wallet/admin/withdrawals/:withdrawalId",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["wallet", "admin", "withdrawals", ":withdrawalId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "wallet",
+                    "admin",
+                    "withdrawals",
+                    ":withdrawalId"
+                  ],
                   "variable": [
                     {
                       "key": "withdrawalId",
@@ -3496,10 +3973,14 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/reviews",
-              "host": ["{{BASE_URL}}"],
-              "path": ["reviews"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "reviews"
+              ]
             },
-            "description": "Submit a review for a completed job.\n\nOnly the customer of the job can leave a review.\nRecalculates helper average rating and total reviews, and sets Job status to CLOSED."
+            "description": "Submit a review for a completed or closed job. Job status must be COMPLETED or CLOSED."
           },
           "response": [
             {
@@ -3518,8 +3999,12 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/reviews",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["reviews"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "reviews"
+                  ]
                 }
               },
               "status": "OK",
@@ -3553,8 +4038,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/reviews/me?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["reviews", "me"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "reviews",
+                "me"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3581,8 +4071,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/reviews/me?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["reviews", "me"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "reviews",
+                    "me"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3620,8 +4115,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/reviews/helper/:helperId?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["reviews", "helper", ":helperId"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "reviews",
+                "helper",
+                ":helperId"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3655,8 +4156,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/reviews/helper/:helperId?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["reviews", "helper", ":helperId"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "reviews",
+                    "helper",
+                    ":helperId"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3716,8 +4223,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/dashboard/admin-stats",
-              "host": ["{{BASE_URL}}"],
-              "path": ["dashboard", "admin-stats"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "admin-stats"
+              ]
             },
             "description": "Returns aggregated analytics and stats for the admin panel:\n- Users breakdown (active, suspended, helpers)\n- Jobs breakdown (open, completed, disputed, etc.)\n- Financials (volume, escrow held, platform fees)\n- Recent activities (new jobs, payments, verification requests, withdrawals)"
           },
@@ -3730,8 +4242,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/dashboard/admin-stats",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["dashboard", "admin-stats"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin-stats"
+                  ]
                 }
               },
               "status": "OK",
@@ -3765,8 +4282,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/dashboard/admin-charts",
-              "host": ["{{BASE_URL}}"],
-              "path": ["dashboard", "admin-charts"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "admin-charts"
+              ]
             },
             "description": "Returns monthly statistics for the last 6 months (revenue, volume, total jobs, completed jobs) formatted for frontend data charts."
           },
@@ -3779,8 +4301,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/dashboard/admin-charts",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["dashboard", "admin-charts"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin-charts"
+                  ]
                 }
               },
               "status": "OK",
@@ -3814,8 +4341,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/dashboard/admin/payments?page=1&limit=10&status=&searchTerm=",
-              "host": ["{{BASE_URL}}"],
-              "path": ["dashboard", "admin", "payments"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "admin",
+                "payments"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3854,8 +4387,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/dashboard/admin/payments?page=1&limit=10&status=&searchTerm=",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["dashboard", "admin", "payments"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin",
+                    "payments"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3915,8 +4454,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/dashboard/admin/wallets?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["dashboard", "admin", "wallets"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "admin",
+                "wallets"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -3943,8 +4488,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/dashboard/admin/wallets?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["dashboard", "admin", "wallets"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "admin",
+                    "wallets"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -3997,8 +4548,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/chat/conversations?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["chat", "conversations"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -4025,8 +4581,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/chat/conversations?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["chat", "conversations"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -4074,8 +4635,15 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/chat/conversations/:conversationId/messages?page=1&limit=20",
-              "host": ["{{BASE_URL}}"],
-              "path": ["chat", "conversations", ":conversationId", "messages"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations",
+                ":conversationId",
+                "messages"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -4109,7 +4677,9 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/chat/conversations/:conversationId/messages?page=1&limit=20",
-                  "host": ["{{BASE_URL}}"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
                   "path": [
                     "chat",
                     "conversations",
@@ -4179,8 +4749,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/chat/messages",
-              "host": ["{{BASE_URL}}"],
-              "path": ["chat", "messages"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "messages"
+              ]
             },
             "description": "Send a regular text message through the REST API."
           },
@@ -4201,8 +4776,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/chat/messages",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["chat", "messages"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "messages"
+                  ]
                 }
               },
               "status": "OK",
@@ -4246,8 +4826,15 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/chat/conversations/:conversationId/media",
-              "host": ["{{BASE_URL}}"],
-              "path": ["chat", "conversations", ":conversationId", "media"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations",
+                ":conversationId",
+                "media"
+              ],
               "variable": [
                 {
                   "key": "conversationId",
@@ -4276,8 +4863,15 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/chat/conversations/:conversationId/media",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["chat", "conversations", ":conversationId", "media"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations",
+                    ":conversationId",
+                    "media"
+                  ],
                   "variable": [
                     {
                       "key": "conversationId",
@@ -4318,8 +4912,15 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/chat/conversations/:conversationId/seen",
-              "host": ["{{BASE_URL}}"],
-              "path": ["chat", "conversations", ":conversationId", "seen"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "chat",
+                "conversations",
+                ":conversationId",
+                "seen"
+              ],
               "variable": [
                 {
                   "key": "conversationId",
@@ -4339,8 +4940,15 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/chat/conversations/:conversationId/seen",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["chat", "conversations", ":conversationId", "seen"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "chat",
+                    "conversations",
+                    ":conversationId",
+                    "seen"
+                  ],
                   "variable": [
                     {
                       "key": "conversationId",
@@ -4386,8 +4994,12 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/notifications?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["notifications"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "notifications"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -4414,8 +5026,12 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/notifications?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["notifications"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -4463,8 +5079,14 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/notifications/:notificationId/read",
-              "host": ["{{BASE_URL}}"],
-              "path": ["notifications", ":notificationId", "read"],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "notifications",
+                ":notificationId",
+                "read"
+              ],
               "variable": [
                 {
                   "key": "notificationId",
@@ -4484,8 +5106,14 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/notifications/:notificationId/read",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["notifications", ":notificationId", "read"],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    ":notificationId",
+                    "read"
+                  ],
                   "variable": [
                     {
                       "key": "notificationId",
@@ -4526,8 +5154,13 @@
             "header": [],
             "url": {
               "raw": "{{BASE_URL}}/notifications/read-all",
-              "host": ["{{BASE_URL}}"],
-              "path": ["notifications", "read-all"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
             },
             "description": "Mark all notifications of the authenticated user as read."
           },
@@ -4540,8 +5173,13 @@
                 "body": null,
                 "url": {
                   "raw": "{{BASE_URL}}/notifications/read-all",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["notifications", "read-all"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "read-all"
+                  ]
                 }
               },
               "status": "OK",
@@ -4584,8 +5222,13 @@
             },
             "url": {
               "raw": "{{BASE_URL}}/notifications/fcm-token",
-              "host": ["{{BASE_URL}}"],
-              "path": ["notifications", "fcm-token"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "notifications",
+                "fcm-token"
+              ]
             },
             "description": "Register/Save the client FCM token for push notifications."
           },
@@ -4606,8 +5249,13 @@
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/notifications/fcm-token",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["notifications", "fcm-token"]
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "fcm-token"
+                  ]
                 }
               },
               "status": "OK",
@@ -4633,8 +5281,12 @@
         "header": [],
         "url": {
           "raw": "{{BASE_URL}}/health",
-          "host": ["{{BASE_URL}}"],
-          "path": ["health"]
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "health"
+          ]
         }
       },
       "response": [
@@ -4646,8 +5298,12 @@
             "body": null,
             "url": {
               "raw": "{{BASE_URL}}/health",
-              "host": ["{{BASE_URL}}"],
-              "path": ["health"]
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           },
           "status": "OK",
@@ -4672,7 +5328,9 @@
         "type": "text/javascript",
         "packages": {},
         "requests": {},
-        "exec": [""]
+        "exec": [
+          ""
+        ]
       }
     },
     {
@@ -4681,7 +5339,9 @@
         "type": "text/javascript",
         "packages": {},
         "requests": {},
-        "exec": [""]
+        "exec": [
+          ""
+        ]
       }
     }
   ],

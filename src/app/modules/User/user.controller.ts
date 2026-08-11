@@ -103,22 +103,26 @@ export const UserController = {
     });
   }),
 
-  // Request helper verification
+  // Request helper verification (Supports array of files, replace, upload new & delete)
   requestHelperVerification: catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const file = req.file as Express.Multer.File;
-    const { documentType } = req.body;
+
+    const files: Express.Multer.File[] = Array.isArray(req.files)
+      ? (req.files as Express.Multer.File[])
+      : req.file
+        ? [req.file as Express.Multer.File]
+        : [];
 
     const result = await UserService.requestHelperVerification({
       userId,
-      file,
-      documentType,
+      files,
+      body: req.body,
     });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Helper verification document uploaded successfully!",
+      message: "Helper verification documents processed successfully!",
       data: result,
     });
   }),

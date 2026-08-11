@@ -19,7 +19,27 @@ const updateHelperStatus = z.object({
   rejectionReason: z.string().optional(),
 });
 
+const helperVerification = z.object({
+  documents: z
+    .union([
+      z.string(),
+      z.array(
+        z.object({
+          documentType: z.string({
+            required_error: "documentType is required for each document",
+          }),
+          documentId: z.string().optional(),
+        }),
+      ),
+    ])
+    .optional(),
+  deleteDocumentIds: z
+    .union([z.string(), z.array(z.string())])
+    .optional(),
+});
+
 export const userValidationSchema = {
   updateUser,
   updateHelperStatus,
+  helperVerification,
 };

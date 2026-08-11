@@ -24,12 +24,13 @@ router.put(
 // Delete My Account
 router.delete("/profile", auth(), UserController.deleteAccount);
 
-// Request helper verification
+// Request helper verification (Supports multiple files, replace, upload new & delete)
 router.put(
   "/profile/helper-verification",
   auth(),
-  uploadFile.single("file"),
+  uploadFile.any(),
   parseFormData,
+  requestValidate(userValidationSchema.helperVerification),
   UserController.requestHelperVerification,
 );
 
