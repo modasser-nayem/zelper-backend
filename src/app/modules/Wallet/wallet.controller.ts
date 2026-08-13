@@ -43,7 +43,8 @@ export const WalletController = {
 
   // Helper: confirm onboarding after returning from Stripe
   confirmConnectOnboarding: catchAsync(async (req, res) => {
-    const result = await WalletService.confirmConnectOnboarding(req.user.id);
+    const pendingWithdrawalId = req.query.pending_withdrawal_id as string;
+    const result = await WalletService.confirmConnectOnboarding(req.user.id, pendingWithdrawalId);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -148,6 +149,18 @@ export const WalletController = {
       statusCode: httpStatus.OK,
       success: true,
       message: `Withdrawal status updated to ${status}!`,
+      data: result,
+    });
+  }),
+
+  // Helper: create Connect Login Link for Express Dashboard
+  createConnectLoginLink: catchAsync(async (req, res) => {
+    const result = await WalletService.createConnectLoginLink(req.user.id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Stripe Connect login link generated successfully!",
       data: result,
     });
   }),

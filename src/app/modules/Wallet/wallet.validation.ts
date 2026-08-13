@@ -6,6 +6,7 @@ export const WalletValidation = {
       .number({ required_error: "Withdrawal amount is required" })
       .positive("Amount must be greater than 0"),
     note: z.string().optional(),
+    bank_details: z.record(z.any()).optional(),
   }),
 
   updateWithdrawalStatus: z.object({

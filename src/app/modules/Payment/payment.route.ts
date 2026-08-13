@@ -20,6 +20,9 @@ router.post(
   PaymentController.createCheckoutSession,
 );
 
+// Customer: get payment history
+router.get("/history", auth(), PaymentController.getMyPayments);
+
 // Customer or Helper: get payment details for a job
 router.get("/job/:jobId", auth(), PaymentController.getJobPayment);
 

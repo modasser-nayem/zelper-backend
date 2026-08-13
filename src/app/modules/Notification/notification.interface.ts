@@ -22,6 +22,9 @@ export enum NotificationType {
   // Wallet / Withdrawal transactions
   WITHDRAWAL_SUCCESSFUL = "WITHDRAWAL_SUCCESSFUL",
   WITHDRAWAL_FAILED = "WITHDRAWAL_FAILED",
+
+  // Review notifications
+  NEW_REVIEW = "NEW_REVIEW",
 }
 
 export type TNewJobApplicationPayload = {

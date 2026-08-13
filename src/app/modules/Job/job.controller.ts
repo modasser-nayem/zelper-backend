@@ -120,6 +120,28 @@ export const JobController = {
     });
   }),
 
+  // Customer: get order history
+  getOrderHistory: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const query = pickOptions(req.query, ["page", "limit", "filter"]) as {
+      page?: string;
+      limit?: string;
+      filter?: string;
+    };
+    const result = await JobService.getOrderHistory({ userId, query });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Order history retrieved successfully!",
+      data: {
+        stats: result.stats,
+        orders: result.orders,
+      },
+      meta: result.meta,
+    });
+  }),
+
   // Helper: get my job applications
   getMyApplications: catchAsync(async (req, res) => {
     const userId = req.user.id;

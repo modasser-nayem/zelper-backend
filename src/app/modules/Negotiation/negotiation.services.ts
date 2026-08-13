@@ -246,19 +246,29 @@ export const NegotiationService = {
       );
     }
 
-    const updatedApplication = await prisma.jobApplication.update({
-      where: { id: negotiationId },
-      data: {
-        negotiation_status: "ACCEPTED",
-        negotiation_final_amount: latestOffer.amount,
-        accepted_offer_id: latestOffer.id,
-      },
-      select: {
-        id: true,
-        negotiation_status: true,
-        negotiation_final_amount: true,
-        accepted_offer_id: true,
-      },
+    const updatedApplication = await prisma.$transaction(async (tx) => {
+      const app = await tx.jobApplication.update({
+        where: { id: negotiationId },
+        data: {
+          negotiation_status: "ACCEPTED",
+          negotiation_final_amount: latestOffer.amount,
+          accepted_offer_id: latestOffer.id,
+        },
+        select: {
+          id: true,
+          negotiation_status: true,
+          negotiation_final_amount: true,
+          accepted_offer_id: true,
+        },
+      });
+
+      // Update the JobPost's budget to the final negotiated price
+      await tx.jobPost.update({
+        where: { id: application.job_id },
+        data: { budget: latestOffer.amount },
+      });
+
+      return app;
     });
 
     // Determine the companion/counterparty

@@ -22,6 +22,13 @@ router.get(
   WalletController.confirmConnectOnboarding,
 );
 
+// Create Connect Login Link for Express Dashboard
+router.post(
+  "/me/connect/login-link",
+  auth(),
+  WalletController.createConnectLoginLink,
+);
+
 // Get transaction history
 router.get("/me/transactions", auth(), WalletController.getMyTransactions);
 

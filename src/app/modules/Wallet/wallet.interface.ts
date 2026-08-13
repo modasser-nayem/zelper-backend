@@ -8,6 +8,7 @@ export type TConnectOnboardingResult = {
 export type TCreateWithdrawal = {
   amount: number;
   note?: string;
+  bank_details?: Record<string, any>;
 };
 
 // Admin updating withdrawal status

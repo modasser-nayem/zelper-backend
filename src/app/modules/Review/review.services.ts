@@ -103,6 +103,21 @@ export const ReviewService = {
       return newReview;
     });
 
+    try {
+      const { NotificationService } = await import("../Notification/notification.service");
+      const { NotificationType } = await import("../Notification/notification.interface");
+
+      await NotificationService.createNotification({
+        receiverId: helperId,
+        type: NotificationType.NEW_REVIEW,
+        title: "New Review Received",
+        content: `Customer reviewed your work on '${job.title}' with ${rating} stars.`,
+        data: { jobId },
+      });
+    } catch (notificationErr) {
+      console.error("Failed to create review notification:", notificationErr);
+    }
+
     return review;
   },
 

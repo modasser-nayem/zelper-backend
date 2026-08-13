@@ -13,6 +13,9 @@ const router = express.Router();
 // Customer: get my own job posts
 router.get("/my/posts", auth(), JobController.getMyPosts);
 
+// Customer: get order history
+router.get("/my/order-history", auth(), JobController.getOrderHistory);
+
 // Helper: browse nearby open jobs
 router.get("/browse", auth(), JobController.browseJobs);
 

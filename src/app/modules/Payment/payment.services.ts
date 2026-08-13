@@ -7,6 +7,8 @@ import config from "../../../config";
 import { TPaymentBreakdown } from "./payment.interface";
 import { NotificationService } from "../Notification/notification.service";
 import { NotificationType } from "../Notification/notification.interface";
+import { PaginationHelper } from "../../../helpers/pagination";
+import { PaymentStatus } from "@prisma/client";
 
 const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 
@@ -463,5 +465,83 @@ export const PaymentService = {
     }
 
     return payment;
+  },
+
+  // get my payments (paginated payment history)
+  getMyPayments: async (payload: {
+    userId: string;
+    query: { page?: string; limit?: string; filter?: string };
+  }) => {
+    const { userId, query } = payload;
+    const { page, limit, skip } = PaginationHelper.calculatePagination({
+      page: Number(query.page),
+      limit: Number(query.limit),
+    });
+
+    const dateFilter: Record<string, any> = {};
+    if (query.filter === "week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      dateFilter.created_at = { gte: oneWeekAgo };
+    } else if (query.filter === "month") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      dateFilter.created_at = { gte: oneMonthAgo };
+    } else if (query.filter === "year") {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      dateFilter.created_at = { gte: oneYearAgo };
+    }
+
+    const whereConditions = {
+      customer_id: userId,
+      status: { in: [PaymentStatus.FUNDED, PaymentStatus.RELEASED] }, // Only count completed/successful payments
+      ...dateFilter,
+    };
+
+    const [payments, total] = await Promise.all([
+      prisma.payment.findMany({
+        where: whereConditions,
+        include: {
+          job: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              scheduled_at: true,
+              created_at: true,
+              job_images: {
+                select: { image_url: true },
+                take: 1,
+              },
+            },
+          },
+          helper: {
+            select: { id: true, name: true, avatar: true },
+          },
+        },
+        orderBy: { created_at: "desc" },
+        take: limit,
+        skip,
+      }),
+      prisma.payment.count({ where: whereConditions }),
+    ]);
+
+    // Calculate total spent for the user
+    const spentAggregate = await prisma.payment.aggregate({
+      where: {
+        customer_id: userId,
+        status: { in: [PaymentStatus.FUNDED, PaymentStatus.RELEASED] },
+      },
+      _sum: { amount: true },
+    });
+
+    const totalSpent = spentAggregate._sum.amount ?? 0;
+
+    return {
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      totalSpent,
+      data: payments,
+    };
   },
 };

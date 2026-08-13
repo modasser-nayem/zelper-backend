@@ -2,8 +2,32 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { PaymentService } from "./payment.services";
+import pickOptions from "../../../shared/pick";
 
 export const PaymentController = {
+  // Get my payments (payment history for customer)
+  getMyPayments: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const query = pickOptions(req.query, ["page", "limit", "filter"]) as {
+      page?: string;
+      limit?: string;
+      filter?: string;
+    };
+
+    const result = await PaymentService.getMyPayments({ userId, query });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Payment history retrieved successfully!",
+      data: {
+        payments: result.data,
+        totalSpent: result.totalSpent,
+      },
+      meta: result.meta,
+    });
+  }),
+
   // Customer creates a Stripe Checkout Session → redirects to Stripe Checkout page
   createCheckoutSession: catchAsync(async (req, res) => {
     const customerId = req.user.id;

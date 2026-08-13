@@ -347,6 +347,9 @@ export const JobService = {
           select: {
             id: true,
             helper_id: true,
+            status: true,
+            negotiation_status: true,
+            negotiation_final_amount: true,
             helper: {
               select: {
                 id: true,
@@ -1356,5 +1359,112 @@ export const JobService = {
     }
 
     return updatedJob;
+  },
+
+  // Customer: get order history with stats and paginated orders list
+  getOrderHistory: async (payload: {
+    userId: string;
+    query: { page?: string; limit?: string; filter?: string };
+  }) => {
+    const { userId, query } = payload;
+    const { page, limit, skip } = PaginationHelper.calculatePagination({
+      page: Number(query.page),
+      limit: Number(query.limit),
+    });
+
+    const dateFilter: Record<string, any> = {};
+    if (query.filter === "week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      dateFilter.created_at = { gte: oneWeekAgo };
+    } else if (query.filter === "month") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      dateFilter.created_at = { gte: oneMonthAgo };
+    } else if (query.filter === "year") {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      dateFilter.created_at = { gte: oneYearAgo };
+    }
+
+    const whereConditions = {
+      customer_id: userId,
+      ...dateFilter,
+    };
+
+    // Fetch stats
+    const [totalCompleted, totalActive, spentAggregate] = await Promise.all([
+      // Completed jobs count (COMPLETED and CLOSED status)
+      prisma.jobPost.count({
+        where: {
+          customer_id: userId,
+          status: { in: ["COMPLETED", "CLOSED"] },
+        },
+      }),
+      // Active jobs count (ASSIGNED and IN_PROGRESS and WAITING_FOR_APPROVAL status)
+      prisma.jobPost.count({
+        where: {
+          customer_id: userId,
+          status: { in: ["ASSIGNED", "IN_PROGRESS", "WAITING_FOR_APPROVAL"] },
+        },
+      }),
+      // Total spent money (funded or released payments made by this customer)
+      prisma.payment.aggregate({
+        where: {
+          customer_id: userId,
+          status: { in: ["FUNDED", "RELEASED"] },
+        },
+        _sum: { amount: true },
+      }),
+    ]);
+
+    // Fetch paginated jobs/orders
+    const [jobs, total] = await Promise.all([
+      prisma.jobPost.findMany({
+        where: whereConditions,
+        include: {
+          job_images: {
+            select: { image_url: true },
+            take: 1, // only need one thumbnail
+          },
+          reviews: {
+            select: { id: true },
+          },
+          payments: {
+            select: { status: true, amount: true },
+            take: 1,
+          },
+        },
+        orderBy: { created_at: "desc" },
+        take: limit,
+        skip,
+      }),
+      prisma.jobPost.count({ where: whereConditions }),
+    ]);
+
+    const formattedOrders = jobs.map((job) => {
+      const paymentInfo = job.payments?.[0] || null;
+      return {
+        id: job.id,
+        title: job.title,
+        status: job.status,
+        budget: job.budget,
+        scheduled_at: job.scheduled_at,
+        created_at: job.created_at,
+        image: job.job_images?.[0]?.image_url || null,
+        isReviewed: job.reviews.length > 0,
+        paymentStatus: paymentInfo?.status || "UNPAID",
+      };
+    });
+
+    return {
+      stats: {
+        totalCompleted,
+        totalActive,
+        totalSpent: spentAggregate._sum.amount ?? 0,
+      },
+      orders: formattedOrders,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   },
 };
