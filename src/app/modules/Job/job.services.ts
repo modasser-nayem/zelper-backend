@@ -154,6 +154,31 @@ export const JobService = {
       // ignore socket errors
     }
 
+    // Save database notifications for all other users/helpers so they appear in feed
+    try {
+      const otherUsers = await prisma.user.findMany({
+        where: {
+          id: { not: customerId },
+          status: "ACTIVE",
+        },
+        select: { id: true },
+      });
+
+      if (otherUsers.length > 0) {
+        await prisma.notification.createMany({
+          data: otherUsers.map((u) => ({
+            receiver_id: u.id,
+            type: NotificationType.NEW_JOB_POSTED,
+            title: "New Job Posted",
+            content: `A new job request '${result.title}' has been posted in your area.`,
+            data: { jobId: result.id },
+          })),
+        });
+      }
+    } catch (dbErr) {
+      console.error("Failed to create database notifications for new job:", dbErr);
+    }
+
     return result;
   },
 
@@ -282,6 +307,8 @@ export const JobService = {
               id: true,
               helper_id: true,
               status: true,
+              negotiation_status: true,
+              negotiation_final_amount: true,
             },
           },
         },
@@ -433,7 +460,13 @@ export const JobService = {
           job_images: true,
           _count: { select: { job_applications: true } },
           selected_application: {
-            select: { id: true, helper_id: true, status: true },
+            select: {
+              id: true,
+              helper_id: true,
+              status: true,
+              negotiation_status: true,
+              negotiation_final_amount: true,
+            },
           },
           reviews: true,
         },
@@ -485,6 +518,9 @@ export const JobService = {
                 select: {
                   id: true,
                   helper_id: true,
+                  status: true,
+                  negotiation_status: true,
+                  negotiation_final_amount: true,
                 },
               },
               reviews: true,
@@ -606,7 +642,13 @@ export const JobService = {
         include: {
           job_images: true,
           selected_application: {
-            select: { id: true, helper_id: true, status: true },
+            select: {
+              id: true,
+              helper_id: true,
+              status: true,
+              negotiation_status: true,
+              negotiation_final_amount: true,
+            },
           },
           reviews: true,
         },
@@ -1063,6 +1105,8 @@ export const JobService = {
               id: true,
               helper_id: true,
               status: true,
+              negotiation_status: true,
+              negotiation_final_amount: true,
             },
           },
         },
@@ -1434,6 +1478,15 @@ export const JobService = {
             select: { status: true, amount: true },
             take: 1,
           },
+          selected_application: {
+            select: {
+              id: true,
+              helper_id: true,
+              status: true,
+              negotiation_status: true,
+              negotiation_final_amount: true,
+            },
+          },
         },
         orderBy: { created_at: "desc" },
         take: limit,
@@ -1448,7 +1501,7 @@ export const JobService = {
         id: job.id,
         title: job.title,
         status: job.status,
-        budget: job.budget,
+        budget: job.selected_application?.negotiation_final_amount || job.budget,
         scheduled_at: job.scheduled_at,
         created_at: job.created_at,
         image: job.job_images?.[0]?.image_url || null,
