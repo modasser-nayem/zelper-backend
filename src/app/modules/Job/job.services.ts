@@ -1071,13 +1071,16 @@ export const JobService = {
         });
       }
 
-      // Update the newly chosen application status to SELECTED and initialize negotiation if negotiable
+      // Update the newly chosen application status to SELECTED and confirm negotiation status
+      const finalNegStatus = application.negotiation_status === "ACCEPTED" ? "ACCEPTED" : (job.is_negotiable ? "ACCEPTED" : null);
+      const finalNegAmount = application.negotiation_final_amount ?? job.budget;
+
       await tx.jobApplication.update({
         where: { id: applicationId },
         data: {
           status: "SELECTED",
-          negotiation_status: job.is_negotiable ? "PENDING" : null,
-          negotiation_final_amount: job.is_negotiable ? job.budget : null,
+          negotiation_status: finalNegStatus,
+          negotiation_final_amount: finalNegAmount,
         },
       });
 
@@ -1257,6 +1260,13 @@ export const JobService = {
       beforeImages = [...beforeImages, ...newUrls];
     }
 
+    if (beforeImages.length === 0) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "At least one before image is required to start the job. Please upload a photo before proceeding.",
+      );
+    }
+
     const result = await prisma.jobPost.update({
       where: { id: jobId },
       data: {
@@ -1317,6 +1327,13 @@ export const JobService = {
       const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
       const newUrls = uploadResults.map((r) => r.url);
       afterImages = [...afterImages, ...newUrls];
+    }
+
+    if (afterImages.length === 0) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "At least one after image is required to complete the job. Please upload a photo before proceeding.",
+      );
     }
 
     const result = await prisma.jobPost.update({

@@ -22,7 +22,7 @@ router.get(
   WalletController.confirmConnectOnboarding,
 );
 
-// Create Connect Login Link for Express Dashboard
+// Create Connect Login Link for Express Dashboard (to update card/bank info)
 router.post(
   "/me/connect/login-link",
   auth(),
@@ -50,14 +50,6 @@ router.get(
   "/admin/withdrawals",
   auth(UserRole.ADMIN),
   WalletController.getAllWithdrawals,
-);
-
-// Update withdrawal status (PROCESSING / COMPLETED / FAILED / REJECTED)
-router.patch(
-  "/admin/withdrawals/:id",
-  auth(UserRole.ADMIN),
-  requestValidate(WalletValidation.updateWithdrawalStatus),
-  WalletController.updateWithdrawalStatus,
 );
 
 export const WalletRoutes = router;

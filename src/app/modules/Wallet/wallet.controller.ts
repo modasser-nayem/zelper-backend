@@ -43,8 +43,7 @@ export const WalletController = {
 
   // Helper: confirm onboarding after returning from Stripe
   confirmConnectOnboarding: catchAsync(async (req, res) => {
-    const pendingWithdrawalId = req.query.pending_withdrawal_id as string;
-    const result = await WalletService.confirmConnectOnboarding(req.user.id, pendingWithdrawalId);
+    const result = await WalletService.confirmConnectOnboarding(req.user.id);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -133,23 +132,6 @@ export const WalletController = {
       message: "All withdrawals retrieved successfully!",
       data: result.data,
       meta: result.meta,
-    });
-  }),
-
-  updateWithdrawalStatus: catchAsync(async (req, res) => {
-    const withdrawalId = req.params.id;
-    const { status, note } = req.body;
-
-    const result = await WalletService.updateWithdrawalStatus({
-      withdrawalId,
-      data: { status, note },
-    });
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: `Withdrawal status updated to ${status}!`,
-      data: result,
     });
   }),
 

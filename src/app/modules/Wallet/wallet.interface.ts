@@ -10,9 +10,3 @@ export type TCreateWithdrawal = {
   note?: string;
   bank_details?: Record<string, any>;
 };
-
-// Admin updating withdrawal status
-export type TUpdateWithdrawalStatus = {
-  status: "PROCESSING" | "COMPLETED" | "FAILED" | "REJECTED";
-  note?: string;
-};

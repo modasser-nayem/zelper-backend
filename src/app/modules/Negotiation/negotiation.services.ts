@@ -250,22 +250,27 @@ export const NegotiationService = {
       const app = await tx.jobApplication.update({
         where: { id: negotiationId },
         data: {
+          status: "SELECTED",
           negotiation_status: "ACCEPTED",
           negotiation_final_amount: latestOffer.amount,
           accepted_offer_id: latestOffer.id,
         },
         select: {
           id: true,
+          status: true,
           negotiation_status: true,
           negotiation_final_amount: true,
           accepted_offer_id: true,
         },
       });
 
-      // Update the JobPost's budget to the final negotiated price
+      // Update the JobPost's budget and set selected_application_id to this accepted helper
       await tx.jobPost.update({
         where: { id: application.job_id },
-        data: { budget: latestOffer.amount },
+        data: {
+          budget: latestOffer.amount,
+          selected_application_id: application.id,
+        },
       });
 
       return app;

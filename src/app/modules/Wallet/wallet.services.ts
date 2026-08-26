@@ -5,7 +5,7 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import config from "../../../config";
 import { PaginationHelper } from "../../../helpers/pagination";
-import { TCreateWithdrawal, TUpdateWithdrawalStatus } from "./wallet.interface";
+import { TCreateWithdrawal } from "./wallet.interface";
 import { NotificationService } from "../Notification/notification.service";
 import { NotificationType } from "../Notification/notification.interface";
 
@@ -27,7 +27,7 @@ const ensureWallet = async (helperId: string) => {
 export const WalletService = {
   // get wallet details
   getMyWallet: async (userId: string) => {
-    const wallet = await prisma.wallet.findUnique({
+    let wallet = await prisma.wallet.findUnique({
       where: { helper_id: userId },
       include: {
         helper: { select: { id: true, name: true, avatar: true } },
@@ -47,6 +47,24 @@ export const WalletService = {
       };
     }
 
+    // Auto-sync Stripe onboarding status if account exists but not marked done in DB
+    if (wallet.stripe_account_id && !wallet.stripe_onboarding_done) {
+      try {
+        const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
+        if (account.details_submitted && account.charges_enabled) {
+          wallet = await prisma.wallet.update({
+            where: { id: wallet.id },
+            data: { stripe_onboarding_done: true },
+            include: {
+              helper: { select: { id: true, name: true, avatar: true } },
+            },
+          });
+        }
+      } catch {
+        // Ignore Stripe retrieve errors
+      }
+    }
+
     return wallet;
   },
 
@@ -59,14 +77,6 @@ export const WalletService = {
     const { userId, returnUrl, refreshUrl } = payload;
 
     const wallet = await ensureWallet(userId);
-
-    // check if already onboarding done
-    if (wallet.stripe_account_id && wallet.stripe_onboarding_done) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        "Your Stripe account is already connected and ready for withdrawals.",
-      );
-    }
 
     let accountId = wallet.stripe_account_id;
 
@@ -96,22 +106,58 @@ export const WalletService = {
       });
     }
 
-    // create account link
+    // determine account link type (account_update if already onboarded, account_onboarding if first time)
+    const linkType = wallet.stripe_onboarding_done
+      ? "account_update"
+      : "account_onboarding";
+
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
       return_url: returnUrl,
       refresh_url: refreshUrl,
-      type: "account_onboarding",
+      type: linkType,
     });
+
+    let loginUrl: string | null = null;
+    if (wallet.stripe_onboarding_done) {
+      try {
+        const loginLink = await stripe.accounts.createLoginLink(accountId);
+        loginUrl = loginLink.url;
+      } catch {
+        // ignore login link error if account not fully active yet
+      }
+    }
 
     return {
       accountId,
       onboardingUrl: accountLink.url,
+      loginUrl,
+      isUpdateMode: wallet.stripe_onboarding_done,
     };
   },
 
-  // verify onboarding status and execute any pending withdrawal
-  confirmConnectOnboarding: async (userId: string, pendingWithdrawalId?: string) => {
+  // create Connect Login Link for Express Dashboard
+  createConnectLoginLink: async (userId: string) => {
+    const wallet = await prisma.wallet.findUnique({
+      where: { helper_id: userId },
+    });
+
+    if (!wallet || !wallet.stripe_account_id) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You do not have a Connected Stripe account yet. Please complete Stripe onboarding first.",
+      );
+    }
+
+    const loginLink = await stripe.accounts.createLoginLink(
+      wallet.stripe_account_id,
+    );
+
+    return { url: loginLink.url };
+  },
+
+  // verify onboarding status
+  confirmConnectOnboarding: async (userId: string) => {
     const wallet = await prisma.wallet.findUnique({
       where: { helper_id: userId },
     });
@@ -124,7 +170,7 @@ export const WalletService = {
     }
 
     const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
-    const isComplete = account.details_submitted && account.charges_enabled;
+    const isComplete = Boolean(account.details_submitted && account.charges_enabled);
 
     if (isComplete && !wallet.stripe_onboarding_done) {
       await prisma.wallet.update({
@@ -133,104 +179,11 @@ export const WalletService = {
       });
     }
 
-    let withdrawalCompleted = false;
-
-    if (isComplete && pendingWithdrawalId) {
-      const withdrawal = await prisma.withdrawal.findFirst({
-        where: {
-          id: pendingWithdrawalId,
-          wallet_id: wallet.id,
-          status: "PENDING",
-        },
-      });
-
-      if (withdrawal) {
-        const amount = Number(withdrawal.amount);
-        try {
-          let transferId = "tr_mocktransferid";
-          if (!wallet.stripe_account_id.includes("mock") && !wallet.stripe_account_id.includes("seed")) {
-            const transfer = await stripe.transfers.create({
-              amount: Math.round(amount * 100),
-              currency: "usd",
-              destination: wallet.stripe_account_id,
-              description: withdrawal.note ?? `Zelper automatic payout: ${withdrawal.id}`,
-              metadata: {
-                withdrawal_id: withdrawal.id,
-                wallet_id: wallet.id,
-                helper_id: userId,
-              },
-            });
-            transferId = transfer.id;
-          }
-
-          await prisma.withdrawal.update({
-            where: { id: withdrawal.id },
-            data: {
-              status: "COMPLETED",
-              bank_details: {
-                stripe_transfer_id: transferId,
-                stripe_account_id: wallet.stripe_account_id,
-              },
-            },
-          });
-
-          await NotificationService.createNotification({
-            receiverId: userId,
-            type: NotificationType.WITHDRAWAL_SUCCESSFUL,
-            title: "Withdrawal Successful",
-            content: `Your automatic withdrawal of $${amount} has been processed to your card.`,
-            data: { withdrawalId: withdrawal.id, status: "COMPLETED" },
-          });
-
-          withdrawalCompleted = true;
-        } catch (error: any) {
-          // Refund
-          await prisma.$transaction(async (tx) => {
-            await tx.withdrawal.update({
-              where: { id: withdrawal.id },
-              data: {
-                status: "FAILED",
-                note: `Stripe transfer failed: ${error.message || error}`,
-              },
-            });
-
-            await tx.wallet.update({
-              where: { id: wallet.id },
-              data: { available_balance: { increment: amount } },
-            });
-
-            await tx.walletTransaction.create({
-              data: {
-                wallet_id: wallet.id,
-                type: "REFUND",
-                amount,
-                reference_id: withdrawal.id,
-                note: `Stripe payout failed. Refunded to available balance.`,
-              },
-            });
-          });
-
-          await NotificationService.createNotification({
-            receiverId: userId,
-            type: NotificationType.WITHDRAWAL_FAILED,
-            title: "Withdrawal Failed",
-            content: `Your withdrawal of $${amount} failed and has been refunded.`,
-            data: {
-              withdrawalId: withdrawal.id,
-              status: "FAILED",
-              reason: error.message || error,
-            },
-          });
-        }
-      }
-    }
-
     return {
       accountId: wallet.stripe_account_id,
       onboardingComplete: isComplete,
       chargesEnabled: account.charges_enabled,
       payoutsEnabled: account.payouts_enabled,
-      withdrawalCompleted,
     };
   },
 
@@ -280,10 +233,7 @@ export const WalletService = {
 
   /**
    * Helper requests a withdrawal.
-   * Fully automatic and instant using a write-safe two-phase commit:
-   *  Phase 1: Deduct balance locally and create a PENDING withdrawal (locking funds).
-   *  Phase 2: Perform the Stripe Connect transfer.
-   *  Phase 3: Update withdrawal status to COMPLETED (on success) or FAILED + refund (on error).
+   * Requires payout info (Stripe Connect onboarding) to be completed first.
    */
   requestWithdrawal: async (payload: {
     userId: string;
@@ -312,151 +262,35 @@ export const WalletService = {
       );
     }
 
+    let isBoardingDone = wallet.stripe_onboarding_done;
     let accountId = wallet.stripe_account_id;
 
-    // 1. Create a Connected Stripe Account if they don't have one
-    if (!accountId) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { email: true },
-      });
-
-      if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found!");
-
-      const account = await stripe.accounts.create({
-        type: "express",
-        email: user.email,
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
-        },
-      });
-
-      accountId = account.id;
-
-      await prisma.wallet.update({
-        where: { id: wallet.id },
-        data: { stripe_account_id: accountId },
-      });
-    }
-
-    // 2. If onboarding is complete, process payout instantly
-    if (wallet.stripe_onboarding_done) {
-      const withdrawal = await prisma.$transaction(async (tx) => {
-        const currentWallet = await tx.wallet.findUnique({
-          where: { id: wallet.id },
-        });
-
-        if (!currentWallet || Number(currentWallet.available_balance) < amount) {
-          throw new AppError(
-            httpStatus.BAD_REQUEST,
-            "Insufficient balance or race condition detected.",
-          );
-        }
-
-        await tx.wallet.update({
-          where: { id: wallet.id },
-          data: { available_balance: { decrement: amount } },
-        });
-
-        const newWithdrawal = await tx.withdrawal.create({
-          data: {
-            wallet_id: wallet.id,
-            amount,
-            bank_details: { stripe_account_id: accountId },
-            status: "PENDING",
-            note: note ?? null,
-          },
-        });
-
-        await tx.walletTransaction.create({
-          data: {
-            wallet_id: wallet.id,
-            type: "WITHDRAWAL",
-            amount,
-            reference_id: newWithdrawal.id,
-            note: note ?? `Stripe Connect payout initiated`,
-          },
-        });
-
-        return newWithdrawal;
-      });
-
+    // Check if onboarding status can be synced directly from Stripe
+    if (!isBoardingDone && accountId) {
       try {
-        let transferId = "tr_mocktransferid";
-        if (!accountId.includes("mock") && !accountId.includes("seed")) {
-          const transfer = await stripe.transfers.create({
-            amount: Math.round(amount * 100),
-            currency: "usd",
-            destination: accountId,
-            description: note ?? `Zelper automatic withdrawal: ${withdrawal.id}`,
-            metadata: {
-              withdrawal_id: withdrawal.id,
-              wallet_id: wallet.id,
-              helper_id: userId,
-            },
-          });
-          transferId = transfer.id;
-        }
-
-        const completedWithdrawal = await prisma.withdrawal.update({
-          where: { id: withdrawal.id },
-          data: {
-            status: "COMPLETED",
-            bank_details: {
-              stripe_transfer_id: transferId,
-              stripe_account_id: accountId,
-            },
-          },
-        });
-
-        await NotificationService.createNotification({
-          receiverId: userId,
-          type: NotificationType.WITHDRAWAL_SUCCESSFUL,
-          title: "Withdrawal Successful",
-          content: `Your withdrawal of $${amount} was successfully processed via Stripe.`,
-          data: { withdrawalId: completedWithdrawal.id, status: "COMPLETED" },
-        });
-
-        return {
-          onboardingRequired: false,
-          withdrawal: completedWithdrawal,
-        };
-      } catch (error: any) {
-        // Rollback
-        await prisma.$transaction(async (tx) => {
-          await tx.withdrawal.update({
-            where: { id: withdrawal.id },
-            data: {
-              status: "FAILED",
-              note: `Stripe transfer failed: ${error.message || error}`,
-            },
-          });
-
-          await tx.wallet.update({
+        const account = await stripe.accounts.retrieve(accountId);
+        if (account.details_submitted && account.charges_enabled) {
+          await prisma.wallet.update({
             where: { id: wallet.id },
-            data: { available_balance: { increment: amount } },
+            data: { stripe_onboarding_done: true },
           });
-
-          await tx.walletTransaction.create({
-            data: {
-              wallet_id: wallet.id,
-              type: "REFUND",
-              amount,
-              reference_id: withdrawal.id,
-              note: `Stripe Transfer failed. Refunded to wallet.`,
-            },
-          });
-        });
-
-        throw new AppError(
-          httpStatus.INTERNAL_SERVER_ERROR,
-          `Withdrawal failed: ${error.message || "Stripe payout error"}`,
-        );
+          isBoardingDone = true;
+        }
+      } catch {
+        // Stripe retrieve error, treat as not onboarded
       }
     }
 
-    // 3. If onboarding is not complete, create PENDING withdrawal and return onboarding URL
+    // If onboarding is NOT done, reject withdrawal immediately!
+    if (!isBoardingDone || !accountId) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Withdrawal payout info not provided. You must add your bank account or card details via onboarding before requesting a withdrawal.",
+        "ONBOARDING_REQUIRED",
+      );
+    }
+
+    // Process instant payout transfer for onboarded account
     const withdrawal = await prisma.$transaction(async (tx) => {
       const currentWallet = await tx.wallet.findUnique({
         where: { id: wallet.id },
@@ -490,29 +324,82 @@ export const WalletService = {
           type: "WITHDRAWAL",
           amount,
           reference_id: newWithdrawal.id,
-          note: note ?? `Withdrawal pending Stripe setup`,
+          note: note ?? `Stripe Connect payout initiated`,
         },
       });
 
       return newWithdrawal;
     });
 
-    const baseUrl = config.FRONTEND_URL;
-    const returnUrl = `${baseUrl}/wallet/connect/success?pending_withdrawal_id=${withdrawal.id}`;
-    const refreshUrl = `${baseUrl}/wallet/connect/refresh?pending_withdrawal_id=${withdrawal.id}`;
+    try {
+      let transferId = "tr_mocktransferid";
+      if (!accountId.includes("mock") && !accountId.includes("seed")) {
+        const transfer = await stripe.transfers.create({
+          amount: Math.round(amount * 100),
+          currency: "usd",
+          destination: accountId,
+          description: note ?? `Zelper automatic withdrawal: ${withdrawal.id}`,
+          metadata: {
+            withdrawal_id: withdrawal.id,
+            wallet_id: wallet.id,
+            helper_id: userId,
+          },
+        });
+        transferId = transfer.id;
+      }
 
-    const accountLink = await stripe.accountLinks.create({
-      account: accountId!,
-      return_url: returnUrl,
-      refresh_url: refreshUrl,
-      type: "account_onboarding",
-    });
+      const completedWithdrawal = await prisma.withdrawal.update({
+        where: { id: withdrawal.id },
+        data: {
+          status: "COMPLETED",
+          bank_details: {
+            stripe_transfer_id: transferId,
+            stripe_account_id: accountId,
+          },
+        },
+      });
 
-    return {
-      onboardingRequired: true,
-      onboardingUrl: accountLink.url,
-      withdrawal,
-    };
+      await NotificationService.createNotification({
+        receiverId: userId,
+        type: NotificationType.WITHDRAWAL_SUCCESSFUL,
+        title: "Withdrawal Successful",
+        content: `Your withdrawal of $${amount} was successfully processed via Stripe.`,
+        data: { withdrawalId: completedWithdrawal.id, status: "COMPLETED" },
+      });
+
+      return completedWithdrawal;
+    } catch (error: any) {
+      // Rollback balance & set status to FAILED
+      await prisma.$transaction(async (tx) => {
+        await tx.withdrawal.update({
+          where: { id: withdrawal.id },
+          data: {
+            status: "FAILED",
+            note: `Stripe transfer failed: ${error.message || error}`,
+          },
+        });
+
+        await tx.wallet.update({
+          where: { id: wallet.id },
+          data: { available_balance: { increment: amount } },
+        });
+
+        await tx.walletTransaction.create({
+          data: {
+            wallet_id: wallet.id,
+            type: "REFUND",
+            amount,
+            reference_id: withdrawal.id,
+            note: `Stripe Transfer failed. Refunded to wallet.`,
+          },
+        });
+      });
+
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        `Withdrawal failed: ${error.message || "Stripe payout error"}`,
+      );
+    }
   },
 
   getMyWithdrawals: async (payload: {
@@ -600,81 +487,5 @@ export const WalletService = {
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
       data: withdrawals,
     };
-  },
-
-  updateWithdrawalStatus: async (payload: {
-    withdrawalId: string;
-    data: TUpdateWithdrawalStatus;
-  }) => {
-    const { withdrawalId, data } = payload;
-    const { status, note } = data;
-
-    const withdrawal = await prisma.withdrawal.findUnique({
-      where: { id: withdrawalId },
-      include: { wallet: true },
-    });
-
-    if (!withdrawal) {
-      throw new AppError(httpStatus.NOT_FOUND, "Withdrawal not found!");
-    }
-
-    const terminalStatuses = ["COMPLETED", "FAILED", "REJECTED"];
-    if (terminalStatuses.includes(withdrawal.status)) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        `Cannot update a withdrawal that is already ${withdrawal.status}.`,
-      );
-    }
-
-    const needsRefund = status === "REJECTED" || status === "FAILED";
-
-    await prisma.$transaction(async (tx) => {
-      await tx.withdrawal.update({
-        where: { id: withdrawalId },
-        data: {
-          status,
-          note: note ?? withdrawal.note,
-        },
-      });
-
-      if (needsRefund) {
-        await tx.wallet.update({
-          where: { id: withdrawal.wallet_id },
-          data: { available_balance: { increment: withdrawal.amount } },
-        });
-
-        await tx.walletTransaction.create({
-          data: {
-            wallet_id: withdrawal.wallet_id,
-            type: "REFUND",
-            amount: withdrawal.amount,
-            reference_id: withdrawalId,
-            note: `Withdrawal ${status.toLowerCase()} — refunded to available balance`,
-          },
-        });
-      }
-    });
-
-    return prisma.withdrawal.findUnique({ where: { id: withdrawalId } });
-  },
-
-  // create Connect Login Link
-  createConnectLoginLink: async (userId: string) => {
-    const wallet = await prisma.wallet.findUnique({
-      where: { helper_id: userId },
-    });
-
-    if (!wallet || !wallet.stripe_account_id) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "You do not have a Connected Stripe account yet. Please complete Stripe onboarding first.",
-      );
-    }
-
-    const loginLink = await stripe.accounts.createLoginLink(
-      wallet.stripe_account_id,
-    );
-
-    return { url: loginLink.url };
   },
 };

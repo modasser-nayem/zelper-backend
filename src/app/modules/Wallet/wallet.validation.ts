@@ -8,11 +8,4 @@ export const WalletValidation = {
     note: z.string().optional(),
     bank_details: z.record(z.any()).optional(),
   }),
-
-  updateWithdrawalStatus: z.object({
-    status: z.enum(["PROCESSING", "COMPLETED", "FAILED", "REJECTED"], {
-      required_error: "Status is required",
-    }),
-    note: z.string().optional(),
-  }),
 };

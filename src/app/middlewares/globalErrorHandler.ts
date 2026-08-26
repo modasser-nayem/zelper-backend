@@ -17,8 +17,11 @@ export const globalErrorHandler: ErrorRequestHandler = (
 ) => {
   let message = err.message || "Something went wrong!";
   let statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-  let errors = [];
+  let errors: any[] = [];
   let stack = err.stack || null;
+  let code: string | undefined = undefined;
+  let data: any = undefined;
+  let onboardingRequired: boolean | undefined = undefined;
 
   if (err instanceof ZodError) {
     const result = zodErrorHandler(err);
@@ -28,7 +31,18 @@ export const globalErrorHandler: ErrorRequestHandler = (
   } else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
-    errors = [{ type: "ApiError", message: err.message }];
+    code = err.code;
+    data = err.data;
+    if (err.code === "ONBOARDING_REQUIRED") {
+      onboardingRequired = true;
+    }
+    errors = [
+      {
+        type: err.code || "ApiError",
+        message: err.message,
+        ...(err.data ? { data: err.data } : {}),
+      },
+    ];
   } else if (err instanceof JsonWebTokenError) {
     statusCode = httpStatus.UNAUTHORIZED;
     message = "Unauthorized Access";
@@ -109,6 +123,9 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res.status(statusCode).json({
     success: false,
     message: message,
+    ...(code ? { code } : {}),
+    ...(onboardingRequired !== undefined ? { onboardingRequired } : {}),
+    ...(data !== undefined ? { data } : {}),
     errors: errors,
     stack: config.NODE_ENV === "development" ? stack : null,
   });
