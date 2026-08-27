@@ -288,6 +288,7 @@ export const PaymentService = {
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
       metadata: {
+        payment_id: paymentId,
         job_id: jobId,
         customer_id: customerId,
         helper_id: helperId,
@@ -340,9 +341,15 @@ export const PaymentService = {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
 
-      const payment = await prisma.payment.findFirst({
+      let payment = await prisma.payment.findFirst({
         where: { stripe_payment_intent: session.id },
       });
+
+      if (!payment && session.metadata?.payment_id) {
+        payment = await prisma.payment.findUnique({
+          where: { id: session.metadata.payment_id },
+        });
+      }
 
       if (payment) {
         const paymentIntentId =
@@ -367,7 +374,7 @@ export const PaymentService = {
 
     if (event.type === "account.updated") {
       const account = event.data.object as Stripe.Account;
-      const isComplete = account.details_submitted && account.charges_enabled;
+      const isComplete = account.details_submitted || account.payouts_enabled || account.charges_enabled;
 
       if (isComplete) {
         await prisma.wallet.updateMany({
