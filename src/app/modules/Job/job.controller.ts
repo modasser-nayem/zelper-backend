@@ -263,6 +263,26 @@ export const JobController = {
     });
   }),
 
+  // Customer accepts a helper's application for negotiation
+  acceptApplication: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+    const { applicationId } = req.body;
+
+    const result = await JobService.acceptApplication({
+      userId,
+      jobId,
+      applicationId,
+    });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Job application accepted for negotiation successfully!",
+      data: result,
+    });
+  }),
+
   // Customer rejects a helper's application
   rejectApplication: catchAsync(async (req, res) => {
     const userId = req.user.id;

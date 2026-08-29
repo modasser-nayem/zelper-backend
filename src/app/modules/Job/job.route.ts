@@ -61,6 +61,13 @@ router.get("/:id/applications", auth(), JobController.getJobApplications);
 // Customer selects a helper for a job
 router.patch("/:id/select-helper", auth(), JobController.selectHelper);
 
+// Customer accepts a helper's application for negotiation
+router.patch(
+  "/:id/accept-application",
+  auth(),
+  JobController.acceptApplication,
+);
+
 // Customer rejects a helper's application
 router.patch(
   "/:id/reject-application",

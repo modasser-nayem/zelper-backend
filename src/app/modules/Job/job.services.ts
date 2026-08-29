@@ -1127,6 +1127,75 @@ export const JobService = {
     return result;
   },
 
+  // Customer accepts a helper's application for negotiation (unlocks negotiation, sends notification & socket event)
+  acceptApplication: async (payload: {
+    userId: string;
+    jobId: string;
+    applicationId: string;
+  }) => {
+    const { userId, jobId, applicationId } = payload;
+
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId },
+    });
+
+    if (!job) {
+      throw new AppError(httpStatus.NOT_FOUND, "Job post not found!");
+    }
+
+    if (job.customer_id !== userId) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to accept applications for this job!",
+      );
+    }
+
+    const application = await prisma.jobApplication.findUnique({
+      where: { id: applicationId },
+    });
+
+    if (!application || application.job_id !== jobId) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Job application not found for this job post!",
+      );
+    }
+
+    // Update application negotiation status to PENDING so negotiation is unlocked
+    const result = await prisma.jobApplication.update({
+      where: { id: applicationId },
+      data: {
+        negotiation_status: "PENDING",
+      },
+    });
+
+    // Send DB + Socket notification to helper
+    await NotificationService.createNotification({
+      receiverId: application.helper_id,
+      type: NotificationType.APPLICATION_ACCEPTED,
+      title: "Job Application Accepted",
+      content: `Your application for '${job.title}' was accepted! Negotiation is now open.`,
+      data: { jobId: job.id, applicationId: application.id },
+    });
+
+    // Realtime Socket broadcast to helper's user room for auto reload
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${application.helper_id}`).emit("application_accepted", {
+          jobId: job.id,
+          applicationId: application.id,
+          title: "Job Application Accepted",
+          message: `Your application for '${job.title}' was accepted! Negotiation is now open.`,
+        });
+      }
+    } catch (socketErr) {
+      // Ignore socket emit errors
+    }
+
+    return result;
+  },
+
   // Customer rejects a helper's application
   rejectApplication: async (payload: {
     userId: string;
