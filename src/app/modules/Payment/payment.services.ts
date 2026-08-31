@@ -222,10 +222,18 @@ export const PaymentService = {
     });
 
     if (existingPayment) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        "A payment is already in progress for this job. Check your payment status.",
-      );
+      if (existingPayment.status === "FUNDED") {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          "This job has already been paid and funded!",
+        );
+      }
+
+      // If existing payment is in PENDING state, customer left or cancelled checkout before completing it.
+      // Remove stale PENDING record so a fresh Stripe Checkout session can be generated cleanly.
+      await prisma.payment.delete({
+        where: { id: existingPayment.id },
+      });
     }
 
     const applicationId = job.selected_application.id;

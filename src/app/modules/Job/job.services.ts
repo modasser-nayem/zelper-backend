@@ -677,157 +677,177 @@ export const JobService = {
     let userLng = query.lng !== undefined && query.lng !== null && query.lng !== "" ? Number(query.lng) : null;
     const radius = query.radius !== undefined && query.radius !== null && query.radius !== "" ? Number(query.radius) : null;
 
-    // If radius is requested but no lat/lng supplied, default center coordinates to NYC default
-    if ((userLat === null || userLng === null) && radius !== null) {
-      userLat = 40.7128;
-      userLng = -74.0060;
-    }
+    if (userLat !== null && (isNaN(userLat) || !isFinite(userLat))) userLat = null;
+    if (userLng !== null && (isNaN(userLng) || !isFinite(userLng))) userLng = null;
 
     if (userLat !== null && userLng !== null) {
-      // Spatial query using Spherical Law of Cosines
-      const rawJobs = await prisma.$queryRaw<TRawJobRow[]>`
-        SELECT 
-          id, customer_id, title, description, budget, is_negotiable, is_urgent,
-          scheduled_at, latitude, longitude, address, status, created_at,
-          CASE 
-            WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN
-              (6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude))))))
-            ELSE NULL
-          END AS distance
-        FROM job_posts
-        WHERE status = 'OPEN'
-          AND customer_id != ${userId}
-          ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
-          ${radius !== null ? Prisma.sql`AND (
-            (latitude IS NOT NULL AND longitude IS NOT NULL AND (6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))))) <= ${radius})
-            OR (latitude IS NULL OR longitude IS NULL)
-          )` : Prisma.empty}
-        ORDER BY distance ASC NULLS LAST, created_at DESC
-        LIMIT ${limit} OFFSET ${skip}
-      `;
+      try {
+        const rawJobs = await prisma.$queryRaw<TRawJobRow[]>`
+          SELECT 
+            id, customer_id, title, description, budget, is_negotiable, is_urgent,
+            scheduled_at, latitude, longitude, address, status, created_at,
+            CASE 
+              WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN
+                (6371 * acos(LEAST(1.0::double precision, GREATEST(-1.0::double precision, cos(radians(${userLat}::double precision)) * cos(radians(latitude::double precision)) * cos(radians(longitude::double precision) - radians(${userLng}::double precision)) + sin(radians(${userLat}::double precision)) * sin(radians(latitude::double precision))))))
+              ELSE NULL
+            END AS distance
+          FROM job_posts
+          WHERE status = 'OPEN'
+            AND customer_id != ${userId}
+            ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
+            ${radius !== null ? Prisma.sql`AND (
+              (latitude IS NOT NULL AND longitude IS NOT NULL AND (6371 * acos(LEAST(1.0::double precision, GREATEST(-1.0::double precision, cos(radians(${userLat}::double precision)) * cos(radians(latitude::double precision)) * cos(radians(longitude::double precision) - radians(${userLng}::double precision)) + sin(radians(${userLat}::double precision)) * sin(radians(latitude::double precision)))))) <= ${radius})
+              OR (latitude IS NULL OR longitude IS NULL)
+            )` : Prisma.empty}
+          ORDER BY distance ASC NULLS LAST, created_at DESC
+          LIMIT ${limit} OFFSET ${skip}
+        `;
 
-      const jobIds = rawJobs.map((j) => j.id);
-      const [fullJobs, applications] = await Promise.all([
-        prisma.jobPost.findMany({
-          where: { id: { in: jobIds } },
-          include: {
-            job_images: true,
-          },
-        }),
-        prisma.jobApplication.findMany({
-          where: {
-            helper_id: userId,
-            job_id: { in: jobIds },
-            status: { not: "WITHDRAWN" },
-          },
-          select: { job_id: true },
-        }),
-      ]);
+        const jobIds = rawJobs.map((j) => j.id);
+        const [fullJobs, applications] = await Promise.all([
+          prisma.jobPost.findMany({
+            where: { id: { in: jobIds } },
+            include: {
+              job_images: true,
+            },
+          }),
+          prisma.jobApplication.findMany({
+            where: {
+              helper_id: userId,
+              job_id: { in: jobIds },
+              status: { not: "WITHDRAWN" },
+            },
+            select: { job_id: true },
+          }),
+        ]);
 
-      const appliedJobIds = new Set(applications.map((app) => app.job_id));
+        const appliedJobIds = new Set(applications.map((app) => app.job_id));
+        const distanceMap = new Map(rawJobs.map((j) => [j.id, j.distance]));
+        const sortedJobs = fullJobs
+          .map((job) => ({
+            ...maskJobDetails(job, userId),
+            already_applied: appliedJobIds.has(job.id),
+            distance_km: distanceMap.get(job.id) !== null && distanceMap.get(job.id) !== undefined
+              ? Number(Number(distanceMap.get(job.id)).toFixed(2))
+              : null,
+          }))
+          .sort((a, b) => {
+            if (a.distance_km === null) return 1;
+            if (b.distance_km === null) return -1;
+            return a.distance_km - b.distance_km;
+          });
 
-      const distanceMap = new Map(rawJobs.map((j) => [j.id, j.distance]));
-      const sortedJobs = fullJobs
-        .map((job) => ({
-          ...maskJobDetails(job, userId),
-          already_applied: appliedJobIds.has(job.id),
-          distance_km: distanceMap.get(job.id) !== null && distanceMap.get(job.id) !== undefined
-            ? Number(Number(distanceMap.get(job.id)).toFixed(2))
-            : null,
-        }))
-        .sort((a, b) => {
-          if (a.distance_km === null) return 1;
-          if (b.distance_km === null) return -1;
-          return a.distance_km - b.distance_km;
-        });
+        const countRes = await prisma.$queryRaw<TRawCountRow[]>`
+          SELECT COUNT(*)::int as count
+          FROM job_posts
+          WHERE status = 'OPEN'
+            AND customer_id != ${userId}
+            ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
+            ${radius !== null ? Prisma.sql`AND (
+              (latitude IS NOT NULL AND longitude IS NOT NULL AND (6371 * acos(LEAST(1.0::double precision, GREATEST(-1.0::double precision, cos(radians(${userLat}::double precision)) * cos(radians(latitude::double precision)) * cos(radians(longitude::double precision) - radians(${userLng}::double precision)) + sin(radians(${userLat}::double precision)) * sin(radians(latitude::double precision)))))) <= ${radius})
+              OR (latitude IS NULL OR longitude IS NULL)
+            )` : Prisma.empty}
+        `;
+        const total = countRes[0]?.count || 0;
 
-      const countRes = await prisma.$queryRaw<TRawCountRow[]>`
-        SELECT COUNT(*)::int as count
-        FROM job_posts
-        WHERE status = 'OPEN'
-          AND customer_id != ${userId}
-          ${query.searchTerm ? Prisma.sql`AND (title ILIKE ${`%${query.searchTerm}%`} OR description ILIKE ${`%${query.searchTerm}%`})` : Prisma.empty}
-          ${radius !== null ? Prisma.sql`AND (
-            (latitude IS NOT NULL AND longitude IS NOT NULL AND (6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(${userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${userLng})) + sin(radians(${userLat})) * sin(radians(latitude)))))) <= ${radius})
-            OR (latitude IS NULL OR longitude IS NULL)
-          )` : Prisma.empty}
-      `;
-      const total = countRes[0]?.count || 0;
+        return {
+          meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+          data: sortedJobs,
+        };
+      } catch (rawErr) {
+        console.error("Spatial raw query failed, falling back to standard query:", rawErr);
+      }
+    }
 
-      return {
-        meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-        data: sortedJobs,
-      };
-    } else {
-      // No location query: return recent open jobs without distance (ordered by created_at desc)
-      const searchCondition = query.searchTerm
-        ? {
-            OR: [
-              {
-                title: {
-                  contains: query.searchTerm,
-                  mode: Prisma.QueryMode.insensitive,
-                },
-              },
-              {
-                description: {
-                  contains: query.searchTerm,
-                  mode: Prisma.QueryMode.insensitive,
-                },
-              },
-            ],
-          }
-        : {};
-
-      const whereConditions = {
-        status: "OPEN" as JobPostStatus,
-        NOT: { customer_id: userId },
-        ...searchCondition,
-      };
-
-      const [jobs, total] = await Promise.all([
-        prisma.jobPost.findMany({
-          where: whereConditions,
-          include: {
-            job_images: true,
-            customer: {
-              select: {
-                id: true,
-                name: true,
-                avatar: true,
-                rating_average: true,
-                total_reviews: true,
-                completed_jobs: true,
-                verification_status: true,
+    // Fallback query (executes if userLat/lng is null or raw query throws exception)
+    const searchCondition = query.searchTerm
+      ? {
+          OR: [
+            {
+              title: {
+                contains: query.searchTerm,
+                mode: Prisma.QueryMode.insensitive,
               },
             },
-          },
-          orderBy: { created_at: "desc" },
-          take: limit,
-          skip,
-        }),
-        prisma.jobPost.count({ where: whereConditions }),
-      ]);
+            {
+              description: {
+                contains: query.searchTerm,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+          ],
+        }
+      : {};
 
-      const jobIds = jobs.map((j) => j.id);
-      const applications = await prisma.jobApplication.findMany({
+    const whereConditions = {
+      status: "OPEN" as JobPostStatus,
+      NOT: { customer_id: userId },
+      ...searchCondition,
+    };
+
+    const [jobs, total, userApplications] = await Promise.all([
+      prisma.jobPost.findMany({
+        where: whereConditions,
+        include: {
+          job_images: true,
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+              rating_average: true,
+              total_reviews: true,
+              completed_jobs: true,
+              verification_status: true,
+            },
+          },
+        },
+        orderBy: { created_at: "desc" },
+        take: limit,
+        skip,
+      }),
+      prisma.jobPost.count({ where: whereConditions }),
+      prisma.jobApplication.findMany({
         where: {
           helper_id: userId,
-          job_id: { in: jobIds },
           status: { not: "WITHDRAWN" },
         },
         select: { job_id: true },
-      });
-      const appliedJobIds = new Set(applications.map((app) => app.job_id));
+      }),
+    ]);
+
+    const appliedJobIds = new Set(userApplications.map((app) => app.job_id));
+    const processedJobs = jobs.map((job) => {
+      let distanceKm: number | null = null;
+      if (
+        userLat !== null &&
+        userLng !== null &&
+        job.latitude !== null &&
+        job.longitude !== null
+      ) {
+        const dLat = ((job.latitude - userLat) * Math.PI) / 180;
+        const dLon = ((job.longitude - userLng) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((userLat * Math.PI) / 180) *
+            Math.cos((job.latitude * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        distanceKm = Number((6371 * c).toFixed(2));
+      }
 
       return {
-        meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-        data: jobs.map((job) => ({
-          ...maskJobDetails(job, userId),
-          already_applied: appliedJobIds.has(job.id),
-        })),
+        ...maskJobDetails(job, userId),
+        already_applied: appliedJobIds.has(job.id),
+        distance_km: distanceKm,
       };
-    }
+    });
+
+    return {
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      data: processedJobs,
+    };
   },
 
   // Helper applies to a job post
@@ -897,6 +917,20 @@ export const JobService = {
       content: `A helper has applied to your job: '${job.title}'.`,
       data: { jobId: job.id },
     });
+
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${job.customer_id}`).emit("new_job_application", {
+          jobId: job.id,
+          applicationId: result.id,
+          title: "New Job Application",
+          content: `A helper has applied to your job: '${job.title}'.`,
+        });
+      }
+    } catch (socketErr) {
+      // Ignore socket emit errors
+    }
 
     return result;
   },
