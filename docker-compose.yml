@@ -5,30 +5,36 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: someone-help-api
-    image: someone-help-api:latest
+    container_name: zelper-api
+    image: zelper-api:latest
     ports:
       - "5014:5014"
     env_file:
       - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=5014
     volumes:
       - ./logs:/usr/src/app/logs
     restart: unless-stopped
-    depends_on:
-      - db
 
   db:
     image: postgres:16-alpine
-    container_name: someone-help-db
+    container_name: zelper-db
     restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: someone-help
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: zelper
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zelper"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

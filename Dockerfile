@@ -42,11 +42,13 @@ RUN npx prisma generate
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/public ./public
 
-# Create logs directory to prevent volume mounting errors
-RUN mkdir -p logs
+# Copy entrypoint script
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
 # Expose the API port
 EXPOSE 5014
 
-# Start the application
+# Set entrypoint and default command
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["npm", "start"]

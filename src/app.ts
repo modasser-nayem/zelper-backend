@@ -26,10 +26,7 @@ class App {
         origin: [
           config.FRONTEND_URL,
           "http://localhost:3032",
-          "http://localhost:3000",
-          "http://localhost:3001",
-          "http://206.162.244.134:3032",
-          "https://sum-1-help-web-app-nu.vercel.app",
+          "https://zelper.app",
         ],
         credentials: true,
         methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
