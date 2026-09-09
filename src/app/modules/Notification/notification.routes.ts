@@ -7,6 +7,9 @@ const router = Router();
 // save FCM token
 router.post("/fcm-token", auth(), NotificationController.addFcmToken);
 
+// remove FCM token
+router.delete("/fcm-token", auth(), NotificationController.removeFcmToken);
+
 // get notifications (paginated)
 router.get("/", auth(), NotificationController.getMyNotifications);
 

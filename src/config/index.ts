@@ -30,14 +30,6 @@ export default {
     ADMIN_DEFAULT_PASSWORD: envRequireString("ADMIN_DEFAULT_PASSWORD"),
   },
 
-  // Auth Provider
-  oauth: {
-    google: {
-      GOOGLE_CLIENT_ID: envRequireString("GOOGLE_CLIENT_ID"),
-      GOOGLE_CLIENT_SECRET: envRequireString("GOOGLE_CLIENT_SECRET"),
-    },
-  },
-
   // AWS S3 Configuration
   aws: {
     AWS_ACCESS_KEY: envRequireString("AWS_ACCESS_KEY"),
@@ -61,5 +53,12 @@ export default {
     STRIPE_SECRET_KEY: envRequireString("STRIPE_SECRET_KEY"),
     STRIPE_WEBHOOK_SECRET: envRequireString("STRIPE_WEBHOOK_SECRET"),
     PLATFORM_FEE_PERCENT: envRequireNumber("PLATFORM_FEE_PERCENT"),
+  },
+
+  // Firebase
+  firebase: {
+    FIREBASE_PROJECT_ID: envRequireString("FIREBASE_PROJECT_ID"),
+    FIREBASE_CLIENT_EMAIL: envRequireString("FIREBASE_CLIENT_EMAIL"),
+    FIREBASE_PRIVATE_KEY: envRequireString("FIREBASE_PRIVATE_KEY"),
   },
 };

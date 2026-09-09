@@ -91,6 +91,7 @@ model User {
   reviews_received          Review[]               @relation("HelperReviews")
   verification_document     VerificationDocument[]
   negotiation_offers        NegotiationOffer[]
+  device_tokens             UserDeviceToken[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -424,3 +425,17 @@ model Notification {
   @@index([receiver_id])
   @@map("notifications")
 }
+
+// ==================== USER DEVICE TOKENS (FCM) ====================
+model UserDeviceToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  fcm_token  String   @unique
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([user_id])
+  @@map("user_device_tokens")
+}
+

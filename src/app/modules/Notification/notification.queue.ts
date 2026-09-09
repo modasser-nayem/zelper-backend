@@ -4,6 +4,7 @@ import { getIo } from "../../../socket/socketHandler";
 import { Prisma } from "@prisma/client";
 import { NotificationType } from "./notification.interface";
 import { SOCKET_EVENTS } from "../../../socket/socket.constant";
+import { sendFcmPushNotification } from "../../../helpers/fcmPush";
 
 type TNotificationJob = {
   receiverId: string;
@@ -72,6 +73,24 @@ class NotificationQueue {
     } catch (err) {
       logger.warn(
         `Failed to emit real-time socket notification to user:${job.receiverId}: Socket server not initialized.`,
+      );
+    }
+
+    // 3. Send FCM Web Push Notification (for users offline / outside website)
+    try {
+      await sendFcmPushNotification({
+        receiverId: job.receiverId,
+        title: job.title,
+        body: job.content,
+        data: {
+          type: job.type,
+          ...(job.data || {}),
+        },
+      });
+    } catch (pushErr) {
+      logger.warn(
+        `Failed to send FCM push notification to user:${job.receiverId}:`,
+        pushErr,
       );
     }
   }

@@ -1,6 +1,7 @@
 import { emailVerification } from "./../../../mail/template/emailVerification";
 import status from "http-status";
-import { OAuth2Client } from "google-auth-library";
+import axios from "axios";
+import admin from "../../../helpers/firebaseAdmin";
 import { sendEmail } from "../../../mail/sendEmail";
 import AppError from "../../../errors/AppError";
 import { resetPasswordHtml } from "../../../mail/template/resetPassword";
@@ -125,26 +126,22 @@ export class AuthService {
     return this.getLoginTokens(user);
   };
 
-  // Social Login
+  // Social Login (Firebase Auth)
   static socialLogin = async (payload: {
-    provider: "GOOGLE";
+    provider: string;
     token: string;
     fcmToken?: string;
   }) => {
-    const { provider, token, fcmToken } = payload;
+    const { token, fcmToken } = payload;
 
-    if (provider !== "GOOGLE") {
-      throw new AppError(status.BAD_REQUEST, "Only Google login is supported");
-    }
-
-    const userInfo = await this.verifyGoogleToken(token);
+    const userInfo = await this.verifyFirebaseToken(token);
 
     if (!userInfo?.email) {
-      throw new AppError(status.BAD_REQUEST, "Email not found from Google");
+      throw new AppError(status.BAD_REQUEST, "Email not found from Firebase");
     }
 
-    const email = userInfo.email;
-    const name = userInfo.name || "";
+    const email = userInfo.email.toLowerCase().trim();
+    const name = userInfo.name || email.split("@")[0];
     const avatar = userInfo.picture || "";
 
     // Check existing user first
@@ -153,20 +150,12 @@ export class AuthService {
     });
 
     if (user) {
-      // Prevent provider conflict
-      if (user.auth_provider && user.auth_provider !== "GOOGLE") {
-        throw new AppError(
-          status.BAD_REQUEST,
-          "This email is already registered with another method",
-        );
-      }
-
       // Update user info
       user = await prisma.user.update({
         where: { email },
         data: {
-          name,
-          avatar,
+          name: user.name || name,
+          avatar: user.avatar || avatar,
           auth_provider: "GOOGLE",
         },
       });
@@ -480,39 +469,41 @@ export class AuthService {
     }
   }
 
-  // verify google token
-  private static verifyGoogleToken = async (idToken: string) => {
-    const client = new OAuth2Client(config.oauth.google.GOOGLE_CLIENT_ID);
+  // verify firebase id token
+  private static verifyFirebaseToken = async (idToken: string) => {
     try {
-      const ticket = await client.verifyIdToken({
-        idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-      const response = ticket.getPayload();
-
-      if (!response) {
-        throw new AppError(status.NOT_FOUND, "Empty Google token payload");
+      if (!decodedToken || !decodedToken.email) {
+        throw new AppError(status.BAD_REQUEST, "Email not found in Firebase token");
       }
 
-      console.log("Google verify: ", response);
+      console.log("🔥 Firebase Auth verifyIdToken success for:", decodedToken.email);
 
-      return response;
+      return {
+        email: decodedToken.email,
+        name: decodedToken.name || decodedToken.email.split("@")[0],
+        picture: decodedToken.picture || null,
+      };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Google OAuth error:", error?.message);
+      console.error("Firebase Auth verification error:", error?.message);
 
-      if (error?.message?.includes("Wrong number of segments")) {
-        throw new AppError(status.BAD_REQUEST, "Malformed Google token");
+      if (error?.code === "auth/id-token-expired") {
+        throw new AppError(status.UNAUTHORIZED, "Firebase token expired");
       }
 
-      if (error?.message?.includes("Token used too late")) {
-        throw new AppError(status.BAD_REQUEST, "Google token expired");
+      if (
+        error?.code === "auth/argument-error" ||
+        error?.message?.includes("Decoding Firebase ID token failed") ||
+        error?.message?.includes("Wrong number of segments")
+      ) {
+        throw new AppError(status.BAD_REQUEST, "Malformed or invalid Firebase token");
       }
 
       throw new AppError(
-        status.INTERNAL_SERVER_ERROR,
-        "Google authentication failed",
+        status.UNAUTHORIZED,
+        error?.message || "Firebase authentication failed",
       );
     }
   };

@@ -8,10 +8,41 @@ import { notificationQueue } from "./notification.queue";
 export const NotificationService = {
   // save fcm token
   addFcmToken: async (payload: { userId: string; token: string }) => {
-    logger.info(
-      `FCM Token received for user ${payload.userId}: ${payload.token}`,
-    );
-    return { success: true };
+    const { userId, token } = payload;
+    if (!token) {
+      return { success: false, message: "FCM Token is required" };
+    }
+
+    logger.info(`FCM Token received for user ${userId}: ${token}`);
+
+    await prisma.userDeviceToken.upsert({
+      where: { fcm_token: token },
+      create: {
+        user_id: userId,
+        fcm_token: token,
+      },
+      update: {
+        user_id: userId,
+        updated_at: new Date(),
+      },
+    });
+
+    return { success: true, message: "FCM Token registered successfully!" };
+  },
+
+  // remove fcm token
+  removeFcmToken: async (payload: { userId: string; token: string }) => {
+    const { userId, token } = payload;
+    if (!token) return { success: false };
+
+    await prisma.userDeviceToken.deleteMany({
+      where: {
+        user_id: userId,
+        fcm_token: token,
+      },
+    });
+
+    return { success: true, message: "FCM Token removed successfully!" };
   },
 
   // create and send notification (DB + real-time Socket via Background Queue)

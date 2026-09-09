@@ -20,6 +20,21 @@ export const NotificationController = {
     });
   }),
 
+  // remove fcm token
+  removeFcmToken: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const { token } = req.body;
+
+    const result = await NotificationService.removeFcmToken({ userId, token });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "FCM token removed successfully!",
+      data: result,
+    });
+  }),
+
   // get my notifications
   getMyNotifications: catchAsync(async (req, res) => {
     const userId = req.user.id;
