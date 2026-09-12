@@ -9,6 +9,73 @@ interface SendFcmPushOptions {
   data?: Record<string, unknown> | null;
 }
 
+export function getNotificationLink(type: string, data?: Record<string, unknown> | null): string {
+  const dAny = (data || {}) as any;
+  const targetJobId = String(dAny.jobId || dAny.job_id || dAny.job?.id || dAny.id || "");
+  const targetAppId = String(dAny.applicationId || dAny.application_id || "");
+  const normalizedType = (type || "").toUpperCase();
+
+  switch (normalizedType) {
+    case "NEW_JOB_APPLICATION":
+    case "JOB_APPLICATION":
+    case "JOB_APPLIED":
+    case "NEW_OFFER":
+    case "OFFER_RECEIVED":
+    case "APPLICATION_RECEIVED":
+    case "APPLICATION_WITHDRAWN":
+    case "NEGOTIATION_CONFIRMED":
+      return targetJobId ? `/customer/request-offer/responding?id=${targetJobId}` : "/customer/request-offer";
+
+    case "APPLICATION_SELECTED":
+    case "APPLICATION_ACCEPTED":
+    case "OFFER_ACCEPTED":
+    case "NEGOTIATION_ACCEPTED":
+    case "HELPER_ACCEPTED":
+      if (targetJobId && targetAppId) {
+        return `/provider/my-application?jobId=${targetJobId}&appId=${targetAppId}`;
+      }
+      return targetJobId ? `/provider/my-application?jobId=${targetJobId}` : "/provider/my-application";
+
+    case "JOB_ACCEPTED":
+    case "JOB_ASSIGNED":
+    case "JOB_APPROVED":
+    case "NEW_REVIEW":
+      return targetJobId ? `/provider/my-works/myJob-details?id=${targetJobId}` : "/provider/my-works";
+
+    case "APPLICATION_REJECTED":
+      return "/provider/my-application";
+
+    case "APPLICATION_DECLINED":
+    case "OFFER_DECLINED":
+    case "OFFER_REJECTED":
+    case "NEGOTIATION_REJECTED":
+    case "JOB_DECLINED":
+    case "JOB_REJECTED":
+      return "/provider/my-works";
+
+    case "NEW_JOB_POSTED":
+    case "NEW_JOB":
+    case "JOB_CREATED":
+    case "JOB_POSTED":
+      return targetJobId ? `/provider?jobId=${targetJobId}` : "/provider";
+
+    case "JOB_STARTED":
+    case "JOB_WORK_COMPLETED":
+      return targetJobId ? `/customer/request-offer/active-details?id=${targetJobId}` : "/customer/request-offer";
+
+    case "ACCOUNT_VERIFIED":
+    case "VERIFICATION_REJECTED":
+      return "/provider/profile";
+
+    case "WITHDRAWAL_SUCCESSFUL":
+    case "WITHDRAWAL_FAILED":
+      return "/provider/earnings";
+
+    default:
+      return "/customer/notification";
+  }
+}
+
 export async function sendFcmPushNotification({
   receiverId,
   title,
@@ -39,6 +106,11 @@ export async function sendFcmPushNotification({
       });
     }
 
+    // Determine target redirection link based on notification type and job data
+    const notifType = String(data?.type || "").toUpperCase();
+    const calculatedLink = getNotificationLink(notifType, data);
+    stringDataPayload.link = stringDataPayload.link || calculatedLink;
+
     // 3. Build Multicast Message payload
     const multicastMessage: admin.messaging.MulticastMessage = {
       tokens,
@@ -54,7 +126,7 @@ export async function sendFcmPushNotification({
           icon: "/favicon.ico",
         },
         fcmOptions: {
-          link: stringDataPayload.link || stringDataPayload.url || "/",
+          link: stringDataPayload.link,
         },
       },
     };
@@ -62,7 +134,7 @@ export async function sendFcmPushNotification({
     // 4. Send FCM Push Notification
     const response = await admin.messaging().sendEachForMulticast(multicastMessage);
     logger.info(
-      `📲 Sent FCM Web Push for user ${receiverId}: ${response.successCount} succeeded, ${response.failureCount} failed.`,
+      `📲 Sent FCM Web Push for user ${receiverId} (Link: ${stringDataPayload.link}): ${response.successCount} succeeded, ${response.failureCount} failed.`,
     );
 
     // 5. Clean up expired / invalid tokens
