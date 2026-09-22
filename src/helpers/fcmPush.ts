@@ -9,11 +9,19 @@ interface SendFcmPushOptions {
   data?: Record<string, unknown> | null;
 }
 
-export function getNotificationLink(type: string, data?: Record<string, unknown> | null): string {
+export function getNotificationLink(
+  type: string,
+  data?: Record<string, unknown> | null,
+  receiverRole?: string,
+): string {
   const dAny = (data || {}) as any;
   const targetJobId = String(dAny.jobId || dAny.job_id || dAny.job?.id || dAny.id || "");
   const targetAppId = String(dAny.applicationId || dAny.application_id || "");
   const normalizedType = (type || "").toUpperCase();
+  const isHelper =
+    String(dAny.role || receiverRole || "").toUpperCase() === "HELPER" ||
+    String(dAny.receiverRole || "").toUpperCase() === "HELPER" ||
+    String(dAny.userRole || "").toUpperCase() === "PROVIDER";
 
   switch (normalizedType) {
     case "NEW_JOB_APPLICATION":
@@ -23,7 +31,16 @@ export function getNotificationLink(type: string, data?: Record<string, unknown>
     case "OFFER_RECEIVED":
     case "APPLICATION_RECEIVED":
     case "APPLICATION_WITHDRAWN":
+      return targetJobId ? `/customer/request-offer/responding?id=${targetJobId}` : "/customer/request-offer";
+
     case "NEGOTIATION_CONFIRMED":
+      if (isHelper) {
+        return targetJobId && targetAppId
+          ? `/provider/my-application?jobId=${targetJobId}&appId=${targetAppId}`
+          : targetJobId
+          ? `/provider/my-works/myJob-details?id=${targetJobId}`
+          : "/provider/my-works";
+      }
       return targetJobId ? `/customer/request-offer/responding?id=${targetJobId}` : "/customer/request-offer";
 
     case "APPLICATION_SELECTED":
@@ -43,9 +60,9 @@ export function getNotificationLink(type: string, data?: Record<string, unknown>
       return targetJobId ? `/provider/my-works/myJob-details?id=${targetJobId}` : "/provider/my-works";
 
     case "APPLICATION_REJECTED":
+    case "APPLICATION_DECLINED":
       return "/provider/my-application";
 
-    case "APPLICATION_DECLINED":
     case "OFFER_DECLINED":
     case "OFFER_REJECTED":
     case "NEGOTIATION_REJECTED":
@@ -61,6 +78,9 @@ export function getNotificationLink(type: string, data?: Record<string, unknown>
 
     case "JOB_STARTED":
     case "JOB_WORK_COMPLETED":
+      if (isHelper) {
+        return targetJobId ? `/provider/my-works/myJob-details?id=${targetJobId}` : "/provider/my-works";
+      }
       return targetJobId ? `/customer/request-offer/active-details?id=${targetJobId}` : "/customer/request-offer";
 
     case "ACCOUNT_VERIFIED":
@@ -73,10 +93,10 @@ export function getNotificationLink(type: string, data?: Record<string, unknown>
 
     case "NEW_MESSAGE":
     case "MESSAGE_RECEIVED":
-      return "/customer/messages";
+      return isHelper ? "/provider/messages" : "/customer/messages";
 
     default:
-      return "/customer/notification";
+      return isHelper ? "/provider/history" : "/customer/notification";
   }
 }
 
@@ -87,11 +107,17 @@ export async function sendFcmPushNotification({
   data,
 }: SendFcmPushOptions): Promise<void> {
   try {
-    // 1. Fetch active FCM tokens for the receiver
-    const deviceTokens = await prisma.userDeviceToken.findMany({
-      where: { user_id: receiverId },
-      select: { fcm_token: true },
-    });
+    // 1. Fetch active FCM tokens and receiver profile for role detection
+    const [deviceTokens, receiverUser] = await Promise.all([
+      prisma.userDeviceToken.findMany({
+        where: { user_id: receiverId },
+        select: { fcm_token: true },
+      }),
+      prisma.user.findUnique({
+        where: { id: receiverId },
+        select: { id: true, verification_status: true, role: true },
+      }),
+    ]);
 
     if (!deviceTokens || deviceTokens.length === 0) {
       logger.info(`ℹ️ No FCM tokens found for user ${receiverId}. Skipping Web Push.`);
@@ -99,6 +125,12 @@ export async function sendFcmPushNotification({
     }
 
     const tokens = deviceTokens.map((dt) => dt.fcm_token);
+
+    // Determine receiver role (HELPER vs CUSTOMER)
+    const receiverRole =
+      receiverUser?.verification_status === "VERIFIED" || receiverUser?.verification_status === "IN_REVIEW"
+        ? "HELPER"
+        : "CUSTOMER";
 
     // 2. Format string-only data payload for Firebase Cloud Messaging
     const stringDataPayload: Record<string, string> = {};
@@ -110,10 +142,15 @@ export async function sendFcmPushNotification({
       });
     }
 
-    // Determine target redirection link based on notification type and job data
+    // Determine target redirection link based on notification type, job data, and receiver role
     const notifType = String(data?.type || "").toUpperCase();
-    const calculatedLink = getNotificationLink(notifType, data);
+    const calculatedLink = getNotificationLink(notifType, data, receiverRole);
     stringDataPayload.link = stringDataPayload.link || calculatedLink;
+
+    // Unique deterministic tag to prevent double popups across browser service workers
+    const notifTag =
+      String(data?.jobId || data?.id || data?.conversationId || notifType || "zelper-notification");
+    stringDataPayload.tag = notifTag;
 
     // 3. Build Multicast Message payload
     const multicastMessage: admin.messaging.MulticastMessage = {
@@ -128,6 +165,7 @@ export async function sendFcmPushNotification({
           title,
           body,
           icon: "/favicon.ico",
+          tag: notifTag,
         },
         fcmOptions: {
           link: stringDataPayload.link,
