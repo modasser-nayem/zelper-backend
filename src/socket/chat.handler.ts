@@ -3,6 +3,7 @@ import prisma from "../db/prisma";
 import { ChatService } from "../app/modules/Chat/chat.services";
 import { SOCKET_EVENTS } from "./socket.constant";
 import logger from "../utils/logger";
+import { sendFcmPushNotification } from "../helpers/fcmPush";
 
 const chatRoom = (conversationId: string) => `chat:${conversationId}`;
 const userRoom = (userId: string) => `user:${userId}`;
@@ -129,6 +130,30 @@ export const handleChatEvents = (
         logger.info(
           `Message sent — Conv: ${conversationId}, Sender: ${userId}, Online: ${isCompanionOnline}`,
         );
+
+        // If companion is offline, send FCM Web Push Notification
+        if (!isCompanionOnline) {
+          const senderName = (message as any)?.sender?.name || "New Message";
+          const pushBody =
+            content ||
+            (images && images.length > 0 ? "📷 Sent an image" : "Sent a message");
+
+          sendFcmPushNotification({
+            receiverId: companionId,
+            title: senderName,
+            body: pushBody,
+            data: {
+              type: "NEW_MESSAGE",
+              conversationId,
+              senderId: userId,
+            },
+          }).catch((pushErr) => {
+            logger.warn(
+              `Failed to send chat FCM push notification to offline user ${companionId}:`,
+              pushErr,
+            );
+          });
+        }
       } catch (err: unknown) {
         emitError(
           err instanceof Error ? err.message : "Failed to send message.",

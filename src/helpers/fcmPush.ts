@@ -71,6 +71,10 @@ export function getNotificationLink(type: string, data?: Record<string, unknown>
     case "WITHDRAWAL_FAILED":
       return "/provider/earnings";
 
+    case "NEW_MESSAGE":
+    case "MESSAGE_RECEIVED":
+      return "/customer/messages";
+
     default:
       return "/customer/notification";
   }
