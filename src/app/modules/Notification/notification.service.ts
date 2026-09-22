@@ -30,10 +30,13 @@ export const NotificationService = {
     return { success: true, message: "FCM Token registered successfully!" };
   },
 
-  // remove fcm token
-  removeFcmToken: async (payload: { userId: string; token: string }) => {
+  // remove fcm token for this specific device
+  removeFcmToken: async (payload: { userId: string; token?: string }) => {
     const { userId, token } = payload;
-    if (!token) return { success: false };
+
+    if (!token) {
+      return { success: false, message: "Device FCM token is required to remove" };
+    }
 
     await prisma.userDeviceToken.deleteMany({
       where: {
@@ -42,7 +45,7 @@ export const NotificationService = {
       },
     });
 
-    return { success: true, message: "FCM Token removed successfully!" };
+    return { success: true, message: "Device FCM Token removed successfully!" };
   },
 
   // create and send notification (DB + real-time Socket via Background Queue)
