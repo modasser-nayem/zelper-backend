@@ -12,6 +12,8 @@ import logger from "../utils/logger";
 const negotiationRoom = (negotiationId: string) =>
   `negotiation:${negotiationId}`;
 
+const userRoom = (userId: string) => `user:${userId}`;
+
 export const handleNegotiationEvents = (
   io: Server,
   socket: Socket,
@@ -148,11 +150,12 @@ export const handleNegotiationEvents = (
       try {
         const { negotiationId } = payload;
 
-        await NegotiationService.verifyParticipant({
-          userId,
-          negotiationId,
-          requirePending: true,
-        });
+        const { customerId, helperId } =
+          await NegotiationService.verifyParticipant({
+            userId,
+            negotiationId,
+            requirePending: true,
+          });
 
         const updatedNegotiation = await NegotiationService.acceptLatestOffer({
           userId,
@@ -165,6 +168,14 @@ export const handleNegotiationEvents = (
             negotiation: updatedNegotiation,
           },
         );
+
+        const companionId = userId === customerId ? helperId : customerId;
+        io.to(userRoom(companionId)).emit(SOCKET_EVENTS.NEGOTIATION_ACCEPTED, {
+          negotiation: updatedNegotiation,
+        });
+        io.to(userRoom(userId)).emit(SOCKET_EVENTS.NEGOTIATION_ACCEPTED, {
+          negotiation: updatedNegotiation,
+        });
 
         logger.info(
           `Negotiation ACCEPTED — ID: ${negotiationId}, By: ${userId}, Final: ${updatedNegotiation.final_amount}`,
@@ -184,7 +195,7 @@ export const handleNegotiationEvents = (
       try {
         const { negotiationId } = payload;
 
-        const { customerId } = await NegotiationService.verifyParticipant({
+        const { customerId, helperId } = await NegotiationService.verifyParticipant({
           userId,
           negotiationId,
           requirePending: true,
@@ -203,6 +214,16 @@ export const handleNegotiationEvents = (
             rejected_by: userId,
           },
         );
+
+        const companionId = userId === customerId ? helperId : customerId;
+        io.to(userRoom(companionId)).emit(SOCKET_EVENTS.NEGOTIATION_REJECTED, {
+          negotiation: updatedNegotiation,
+          rejected_by: userId,
+        });
+        io.to(userRoom(userId)).emit(SOCKET_EVENTS.NEGOTIATION_REJECTED, {
+          negotiation: updatedNegotiation,
+          rejected_by: userId,
+        });
 
         logger.info(
           `Negotiation ENDED (${updatedNegotiation.status}) — ID: ${negotiationId}, By: ${userId}`,

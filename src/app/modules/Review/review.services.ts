@@ -118,6 +118,29 @@ export const ReviewService = {
       console.error("Failed to create review notification:", notificationErr);
     }
 
+    try {
+      const { getIo } = await import("../../../socket/socketHandler");
+      const io = getIo();
+      if (io) {
+        io.to(`user:${helperId}`).emit("new_review", {
+          jobId,
+          rating,
+          comment,
+          title: "New Review Received",
+        });
+        io.to(`user:${helperId}`).emit("job_status_changed", {
+          jobId,
+          status: "CLOSED",
+        });
+        io.to(`user:${userId}`).emit("job_status_changed", {
+          jobId,
+          status: "CLOSED",
+        });
+      }
+    } catch {
+      // Ignore socket emit errors
+    }
+
     return review;
   },
 

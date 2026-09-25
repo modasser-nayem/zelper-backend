@@ -3,6 +3,7 @@ import prisma from "../../../db/prisma";
 import AppError from "../../../errors/AppError";
 import { NotificationService } from "../Notification/notification.service";
 import { NotificationType } from "../Notification/notification.interface";
+import { getIo } from "../../../socket/socketHandler";
 
 export const NegotiationService = {
   /**
@@ -294,6 +295,30 @@ export const NegotiationService = {
         finalAmount: latestOffer.amount,
       },
     });
+
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${companionId}`).emit("negotiation_accepted", {
+          jobId: application.job_id,
+          applicationId: application.id,
+          finalAmount: latestOffer.amount,
+          negotiation: updatedApplication,
+        });
+        io.to(`user:${companionId}`).emit("job_status_changed", {
+          jobId: application.job_id,
+          applicationId: application.id,
+          negotiationStatus: "ACCEPTED",
+        });
+        io.to(`user:${userId}`).emit("job_status_changed", {
+          jobId: application.job_id,
+          applicationId: application.id,
+          negotiationStatus: "ACCEPTED",
+        });
+      }
+    } catch {
+      // Ignore socket emit errors
+    }
 
     return {
       id: updatedApplication.id,

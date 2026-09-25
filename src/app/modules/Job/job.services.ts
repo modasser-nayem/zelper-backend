@@ -1158,6 +1158,32 @@ export const JobService = {
       data: { jobId: job.id, applicationId: application.id },
     });
 
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${application.helper_id}`).emit("application_selected", {
+          jobId: job.id,
+          applicationId: application.id,
+          title: "Application Selected",
+          message: `Your application for '${job.title}' has been selected.`,
+        });
+        io.to(`user:${application.helper_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          applicationId: application.id,
+          status: "OPEN",
+          applicationStatus: "SELECTED",
+        });
+        io.to(`user:${job.customer_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          applicationId: application.id,
+          status: "OPEN",
+          selectedApplicationId: applicationId,
+        });
+      }
+    } catch {
+      // Ignore socket emit errors
+    }
+
     return result;
   },
 
@@ -1212,7 +1238,7 @@ export const JobService = {
       data: { jobId: job.id, applicationId: application.id },
     });
 
-    // Realtime Socket broadcast to helper's user room for auto reload
+    // Realtime Socket broadcast to helper and customer rooms for auto reload
     try {
       const io = getIo();
       if (io) {
@@ -1221,6 +1247,16 @@ export const JobService = {
           applicationId: application.id,
           title: "Job Application Accepted",
           message: `Your application for '${job.title}' was accepted! Negotiation is now open.`,
+        });
+        io.to(`user:${application.helper_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          applicationId: application.id,
+          negotiationStatus: "PENDING",
+        });
+        io.to(`user:${job.customer_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          applicationId: application.id,
+          negotiationStatus: "PENDING",
         });
       }
     } catch (socketErr) {
@@ -1321,6 +1357,29 @@ export const JobService = {
       data: { jobId: job.id, applicationId: application.id },
     });
 
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${application.helper_id}`).emit("application_rejected", {
+          jobId: job.id,
+          applicationId: application.id,
+          title: "Application Rejected",
+        });
+        io.to(`user:${application.helper_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          applicationId: application.id,
+          applicationStatus: "REJECTED",
+        });
+        io.to(`user:${job.customer_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          applicationId: application.id,
+          applicationStatus: "REJECTED",
+        });
+      }
+    } catch {
+      // Ignore socket emit errors
+    }
+
     return result;
   },
 
@@ -1389,6 +1448,27 @@ export const JobService = {
       content: `The helper has started working on your job: '${job.title}'.`,
       data: { jobId: job.id },
     });
+
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${job.customer_id}`).emit("job_started", {
+          jobId: job.id,
+          status: "IN_PROGRESS",
+          title: "Job Started",
+        });
+        io.to(`user:${job.customer_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          status: "IN_PROGRESS",
+        });
+        io.to(`user:${userId}`).emit("job_status_changed", {
+          jobId: job.id,
+          status: "IN_PROGRESS",
+        });
+      }
+    } catch {
+      // Ignore socket emit errors
+    }
 
     return result;
   },
@@ -1459,6 +1539,27 @@ export const JobService = {
       data: { jobId: job.id },
     });
 
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${job.customer_id}`).emit("job_work_completed", {
+          jobId: job.id,
+          status: "WAITING_FOR_APPROVAL",
+          title: "Job Work Completed",
+        });
+        io.to(`user:${job.customer_id}`).emit("job_status_changed", {
+          jobId: job.id,
+          status: "WAITING_FOR_APPROVAL",
+        });
+        io.to(`user:${userId}`).emit("job_status_changed", {
+          jobId: job.id,
+          status: "WAITING_FOR_APPROVAL",
+        });
+      }
+    } catch {
+      // Ignore socket emit errors
+    }
+
     return result;
   },
 
@@ -1520,6 +1621,27 @@ export const JobService = {
         content: `Customer approved the completion of '${job.title}'. Escrow earnings released to your wallet.`,
         data: { jobId: job.id },
       });
+
+      try {
+        const io = getIo();
+        if (io) {
+          io.to(`user:${job.selected_application.helper_id}`).emit("job_approved", {
+            jobId: job.id,
+            status: "COMPLETED",
+            title: "Job Approved",
+          });
+          io.to(`user:${job.selected_application.helper_id}`).emit("job_status_changed", {
+            jobId: job.id,
+            status: "COMPLETED",
+          });
+          io.to(`user:${userId}`).emit("job_status_changed", {
+            jobId: job.id,
+            status: "COMPLETED",
+          });
+        }
+      } catch {
+        // Ignore socket emit errors
+      }
     }
 
     return updatedJob;

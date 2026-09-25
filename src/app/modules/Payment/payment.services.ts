@@ -9,6 +9,7 @@ import { NotificationService } from "../Notification/notification.service";
 import { NotificationType } from "../Notification/notification.interface";
 import { PaginationHelper } from "../../../helpers/pagination";
 import { PaymentStatus } from "@prisma/client";
+import { getIo } from "../../../socket/socketHandler";
 
 const stripe = new Stripe(config.stripe.STRIPE_SECRET_KEY);
 
@@ -164,6 +165,31 @@ const fulfillPayment = async (
     content: `A customer paid and assigned you to the job: '${jobTitle}'.`,
     data: { jobId: payment.job_id, paymentId: payment.id },
   });
+
+  try {
+    const io = getIo();
+    if (io) {
+      io.to(`user:${payment.helper_id}`).emit("job_assigned", {
+        jobId: payment.job_id,
+        status: "ASSIGNED",
+        title: "Job Assigned",
+      });
+      io.to(`user:${payment.helper_id}`).emit("job_status_changed", {
+        jobId: payment.job_id,
+        status: "ASSIGNED",
+      });
+      io.to(`user:${payment.customer_id}`).emit("job_assigned", {
+        jobId: payment.job_id,
+        status: "ASSIGNED",
+      });
+      io.to(`user:${payment.customer_id}`).emit("job_status_changed", {
+        jobId: payment.job_id,
+        status: "ASSIGNED",
+      });
+    }
+  } catch {
+    // Ignore socket emit errors
+  }
 };
 
 export const PaymentService = {
