@@ -145,6 +145,7 @@ export const JobService = {
           id: result.id,
           title: result.title,
           budget: result.budget,
+          customerId: result.customer_id,
           latitude: result.latitude,
           longitude: result.longitude,
           address: result.address,
@@ -404,7 +405,28 @@ export const JobService = {
       throw new AppError(httpStatus.NOT_FOUND, "Job post not found!");
     }
 
-    return maskJobDetails(job, userId);
+    let myApplication = null;
+    if (userId) {
+      myApplication = await prisma.jobApplication.findFirst({
+        where: {
+          job_id: jobId,
+          helper_id: userId,
+          status: { not: "WITHDRAWN" },
+        },
+        select: {
+          id: true,
+          status: true,
+          negotiation_status: true,
+          negotiation_final_amount: true,
+        },
+      });
+    }
+
+    return {
+      ...maskJobDetails(job, userId),
+      already_applied: Boolean(myApplication),
+      my_application: myApplication,
+    };
   },
 
   // Customer: get my own job posts
@@ -717,20 +739,38 @@ export const JobService = {
               job_id: { in: jobIds },
               status: { not: "WITHDRAWN" },
             },
-            select: { job_id: true },
+            select: {
+              id: true,
+              job_id: true,
+              status: true,
+              negotiation_status: true,
+              negotiation_final_amount: true,
+            },
           }),
         ]);
 
-        const appliedJobIds = new Set(applications.map((app) => app.job_id));
+        const applicationMap = new Map(applications.map((app) => [app.job_id, app]));
         const distanceMap = new Map(rawJobs.map((j) => [j.id, j.distance]));
         const sortedJobs = fullJobs
-          .map((job) => ({
-            ...maskJobDetails(job, userId),
-            already_applied: appliedJobIds.has(job.id),
-            distance_km: distanceMap.get(job.id) !== null && distanceMap.get(job.id) !== undefined
-              ? Number(Number(distanceMap.get(job.id)).toFixed(2))
-              : null,
-          }))
+          .map((job) => {
+            const myApp = applicationMap.get(job.id);
+            return {
+              ...maskJobDetails(job, userId),
+              already_applied: Boolean(myApp),
+              my_application: myApp
+                ? {
+                    id: myApp.id,
+                    status: myApp.status,
+                    negotiation_status: myApp.negotiation_status,
+                    negotiation_final_amount: myApp.negotiation_final_amount,
+                  }
+                : null,
+              distance_km:
+                distanceMap.get(job.id) !== null && distanceMap.get(job.id) !== undefined
+                  ? Number(Number(distanceMap.get(job.id)).toFixed(2))
+                  : null,
+            };
+          })
           .sort((a, b) => {
             if (a.distance_km === null) return 1;
             if (b.distance_km === null) return -1;
@@ -812,11 +852,17 @@ export const JobService = {
           helper_id: userId,
           status: { not: "WITHDRAWN" },
         },
-        select: { job_id: true },
+        select: {
+          id: true,
+          job_id: true,
+          status: true,
+          negotiation_status: true,
+          negotiation_final_amount: true,
+        },
       }),
     ]);
 
-    const appliedJobIds = new Set(userApplications.map((app) => app.job_id));
+    const applicationMap = new Map(userApplications.map((app) => [app.job_id, app]));
     const processedJobs = jobs.map((job) => {
       let distanceKm: number | null = null;
       if (
@@ -837,9 +883,19 @@ export const JobService = {
         distanceKm = Number((6371 * c).toFixed(2));
       }
 
+      const myApp = applicationMap.get(job.id);
+
       return {
         ...maskJobDetails(job, userId),
-        already_applied: appliedJobIds.has(job.id),
+        already_applied: Boolean(myApp),
+        my_application: myApp
+          ? {
+              id: myApp.id,
+              status: myApp.status,
+              negotiation_status: myApp.negotiation_status,
+              negotiation_final_amount: myApp.negotiation_final_amount,
+            }
+          : null,
         distance_km: distanceKm,
       };
     });
