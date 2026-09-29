@@ -135,9 +135,18 @@ export const WalletController = {
     });
   }),
 
-  // Helper: create Connect Login Link for Express Dashboard
+  // Helper: create Connect Login / Update Link for Express Dashboard
   createConnectLoginLink: catchAsync(async (req, res) => {
-    const result = await WalletService.createConnectLoginLink(req.user.id);
+    const userId = req.user.id;
+    const baseUrl = config.FRONTEND_URL;
+    const returnUrl = `${baseUrl}/provider/earnings`;
+    const refreshUrl = `${baseUrl}/wallet/connect/refresh`;
+
+    const result = await WalletService.createConnectLoginLink({
+      userId,
+      returnUrl,
+      refreshUrl,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

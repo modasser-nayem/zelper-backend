@@ -47,11 +47,19 @@ export const WalletService = {
       };
     }
 
-    // Auto-sync Stripe onboarding status if account exists but not marked done in DB
-    if (wallet.stripe_account_id && !wallet.stripe_onboarding_done) {
+    let payoutMethod = null;
+
+    // Auto-sync Stripe onboarding status & retrieve linked external account (Bank / Card)
+    if (wallet.stripe_account_id) {
       try {
         const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
-        if (account.details_submitted && account.charges_enabled) {
+        const isReady = Boolean(
+          account.details_submitted ||
+          account.payouts_enabled ||
+          account.capabilities?.transfers === "active"
+        );
+
+        if (isReady && !wallet.stripe_onboarding_done) {
           wallet = await prisma.wallet.update({
             where: { id: wallet.id },
             data: { stripe_onboarding_done: true },
@@ -60,12 +68,39 @@ export const WalletService = {
             },
           });
         }
+
+        const external = account.external_accounts?.data?.[0];
+        if (external) {
+          if (external.object === "bank_account") {
+            const b = external as Stripe.BankAccount;
+            payoutMethod = {
+              type: "bank_account",
+              bank_name: b.bank_name || "Bank Account",
+              last4: b.last4,
+              currency: b.currency,
+              routing_number: b.routing_number,
+              status: b.status,
+            };
+          } else if (external.object === "card") {
+            const c = external as Stripe.Card;
+            payoutMethod = {
+              type: "card",
+              brand: c.brand,
+              last4: c.last4,
+              exp_month: c.exp_month,
+              exp_year: c.exp_year,
+            };
+          }
+        }
       } catch {
         // Ignore Stripe retrieve errors
       }
     }
 
-    return wallet;
+    return {
+      ...wallet,
+      payout_method: payoutMethod,
+    };
   },
 
   // create connect account and return onboarding url
@@ -93,7 +128,6 @@ export const WalletService = {
         type: "express",
         email: user.email,
         capabilities: {
-          card_payments: { requested: true },
           transfers: { requested: true },
         },
       });
@@ -136,8 +170,13 @@ export const WalletService = {
     };
   },
 
-  // create Connect Login Link for Express Dashboard
-  createConnectLoginLink: async (userId: string) => {
+  // create Connect Login Link for Express Dashboard or update link fallback
+  createConnectLoginLink: async (payload: {
+    userId: string;
+    returnUrl?: string;
+    refreshUrl?: string;
+  }) => {
+    const { userId, returnUrl, refreshUrl } = payload;
     const wallet = await prisma.wallet.findUnique({
       where: { helper_id: userId },
     });
@@ -149,11 +188,23 @@ export const WalletService = {
       );
     }
 
-    const loginLink = await stripe.accounts.createLoginLink(
-      wallet.stripe_account_id,
-    );
-
-    return { url: loginLink.url };
+    try {
+      const loginLink = await stripe.accounts.createLoginLink(
+        wallet.stripe_account_id,
+      );
+      return { url: loginLink.url };
+    } catch (err: any) {
+      // Fallback: If login link fails (e.g. initial onboarding incomplete or test mode restriction),
+      // generate an account_update account link so user can still edit their bank/card payout details!
+      const baseUrl = config.FRONTEND_URL;
+      const accountLink = await stripe.accountLinks.create({
+        account: wallet.stripe_account_id,
+        return_url: returnUrl || `${baseUrl}/wallet/connect/success`,
+        refresh_url: refreshUrl || `${baseUrl}/wallet/connect/refresh`,
+        type: "account_update",
+      });
+      return { url: accountLink.url };
+    }
   },
 
   // verify onboarding status
@@ -170,7 +221,11 @@ export const WalletService = {
     }
 
     const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
-    const isComplete = Boolean(account.details_submitted && account.charges_enabled);
+    const isComplete = Boolean(
+      account.details_submitted ||
+      account.payouts_enabled ||
+      account.capabilities?.transfers === "active"
+    );
 
     if (isComplete && !wallet.stripe_onboarding_done) {
       await prisma.wallet.update({
@@ -184,6 +239,7 @@ export const WalletService = {
       onboardingComplete: isComplete,
       chargesEnabled: account.charges_enabled,
       payoutsEnabled: account.payouts_enabled,
+      detailsSubmitted: account.details_submitted,
     };
   },
 
@@ -269,7 +325,11 @@ export const WalletService = {
     if (!isBoardingDone && accountId) {
       try {
         const account = await stripe.accounts.retrieve(accountId);
-        if (account.details_submitted && account.charges_enabled) {
+        if (
+          account.details_submitted ||
+          account.payouts_enabled ||
+          account.capabilities?.transfers === "active"
+        ) {
           await prisma.wallet.update({
             where: { id: wallet.id },
             data: { stripe_onboarding_done: true },
