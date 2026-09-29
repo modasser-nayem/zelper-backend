@@ -408,16 +408,42 @@ export const PaymentService = {
 
     if (event.type === "account.updated") {
       const account = event.data.object as Stripe.Account;
-      const isComplete = account.details_submitted || account.payouts_enabled || account.charges_enabled;
-
-      if (isComplete) {
+      if ((account as any).deleted) {
         await prisma.wallet.updateMany({
-          where: {
-            stripe_account_id: account.id,
+          where: { stripe_account_id: account.id },
+          data: {
+            stripe_account_id: null,
             stripe_onboarding_done: false,
           },
+        });
+      } else {
+        const isComplete =
+          account.details_submitted ||
+          account.payouts_enabled ||
+          account.charges_enabled;
+
+        if (isComplete) {
+          await prisma.wallet.updateMany({
+            where: {
+              stripe_account_id: account.id,
+              stripe_onboarding_done: false,
+            },
+            data: {
+              stripe_onboarding_done: true,
+            },
+          });
+        }
+      }
+    }
+
+    if (event.type === "account.application.deauthorized") {
+      const account = event.data.object as any;
+      if (account?.id) {
+        await prisma.wallet.updateMany({
+          where: { stripe_account_id: account.id },
           data: {
-            stripe_onboarding_done: true,
+            stripe_account_id: null,
+            stripe_onboarding_done: false,
           },
         });
       }

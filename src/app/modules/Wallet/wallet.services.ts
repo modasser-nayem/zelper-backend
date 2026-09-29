@@ -53,47 +53,82 @@ export const WalletService = {
     if (wallet.stripe_account_id) {
       try {
         const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
-        const isReady = Boolean(
-          account.details_submitted ||
-          account.payouts_enabled ||
-          account.capabilities?.transfers === "active"
-        );
 
-        if (isReady && !wallet.stripe_onboarding_done) {
+        if ((account as any).deleted) {
+          // Account was deleted in Stripe Dashboard! Reset DB
           wallet = await prisma.wallet.update({
             where: { id: wallet.id },
-            data: { stripe_onboarding_done: true },
+            data: {
+              stripe_account_id: null,
+              stripe_onboarding_done: false,
+            },
             include: {
               helper: { select: { id: true, name: true, avatar: true } },
             },
           });
-        }
+          payoutMethod = null;
+        } else {
+          const isReady = Boolean(
+            account.details_submitted ||
+            account.payouts_enabled ||
+            account.capabilities?.transfers === "active"
+          );
 
-        const external = account.external_accounts?.data?.[0];
-        if (external) {
-          if (external.object === "bank_account") {
-            const b = external as Stripe.BankAccount;
-            payoutMethod = {
-              type: "bank_account",
-              bank_name: b.bank_name || "Bank Account",
-              last4: b.last4,
-              currency: b.currency,
-              routing_number: b.routing_number,
-              status: b.status,
-            };
-          } else if (external.object === "card") {
-            const c = external as Stripe.Card;
-            payoutMethod = {
-              type: "card",
-              brand: c.brand,
-              last4: c.last4,
-              exp_month: c.exp_month,
-              exp_year: c.exp_year,
-            };
+          if (isReady !== wallet.stripe_onboarding_done) {
+            wallet = await prisma.wallet.update({
+              where: { id: wallet.id },
+              data: { stripe_onboarding_done: isReady },
+              include: {
+                helper: { select: { id: true, name: true, avatar: true } },
+              },
+            });
+          }
+
+          const external = account.external_accounts?.data?.[0];
+          if (external) {
+            if (external.object === "bank_account") {
+              const b = external as Stripe.BankAccount;
+              payoutMethod = {
+                type: "bank_account",
+                bank_name: b.bank_name || "Bank Account",
+                last4: b.last4,
+                currency: b.currency,
+                routing_number: b.routing_number,
+                status: b.status,
+              };
+            } else if (external.object === "card") {
+              const c = external as Stripe.Card;
+              payoutMethod = {
+                type: "card",
+                brand: c.brand,
+                last4: c.last4,
+                exp_month: c.exp_month,
+                exp_year: c.exp_year,
+              };
+            }
           }
         }
-      } catch {
-        // Ignore Stripe retrieve errors
+      } catch (err: any) {
+        // If the account was deleted in Stripe Dashboard, clear it from DB
+        const isAccountMissing =
+          err?.statusCode === 404 ||
+          err?.code === "resource_missing" ||
+          err?.raw?.code === "resource_missing" ||
+          err?.message?.includes("No such account");
+
+        if (isAccountMissing) {
+          wallet = await prisma.wallet.update({
+            where: { id: wallet.id },
+            data: {
+              stripe_account_id: null,
+              stripe_onboarding_done: false,
+            },
+            include: {
+              helper: { select: { id: true, name: true, avatar: true } },
+            },
+          });
+          payoutMethod = null;
+        }
       }
     }
 
@@ -115,7 +150,25 @@ export const WalletService = {
 
     let accountId = wallet.stripe_account_id;
 
-    // create new express account if not exist
+    // Verify existing account in Stripe if present
+    if (accountId) {
+      try {
+        const existing = await stripe.accounts.retrieve(accountId);
+        if ((existing as any).deleted) {
+          accountId = null;
+        }
+      } catch (err: any) {
+        if (
+          err?.statusCode === 404 ||
+          err?.code === "resource_missing" ||
+          err?.message?.includes("No such account")
+        ) {
+          accountId = null;
+        }
+      }
+    }
+
+    // create new express account if not exist or was deleted in Stripe
     if (!accountId) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -136,12 +189,17 @@ export const WalletService = {
 
       await prisma.wallet.update({
         where: { id: wallet.id },
-        data: { stripe_account_id: accountId },
+        data: {
+          stripe_account_id: accountId,
+          stripe_onboarding_done: false,
+        },
       });
     }
 
-    // determine account link type (account_update if already onboarded, account_onboarding if first time)
-    const linkType = wallet.stripe_onboarding_done
+    // determine account link type (account_update if already onboarded, account_onboarding if first time or recreated)
+    const isAlreadyOnboarded =
+      wallet.stripe_onboarding_done && accountId === wallet.stripe_account_id;
+    const linkType = isAlreadyOnboarded
       ? "account_update"
       : "account_onboarding";
 
@@ -153,7 +211,7 @@ export const WalletService = {
     });
 
     let loginUrl: string | null = null;
-    if (wallet.stripe_onboarding_done) {
+    if (isAlreadyOnboarded) {
       try {
         const loginLink = await stripe.accounts.createLoginLink(accountId);
         loginUrl = loginLink.url;
@@ -166,7 +224,7 @@ export const WalletService = {
       accountId,
       onboardingUrl: accountLink.url,
       loginUrl,
-      isUpdateMode: wallet.stripe_onboarding_done,
+      isUpdateMode: isAlreadyOnboarded,
     };
   },
 
@@ -188,14 +246,38 @@ export const WalletService = {
       );
     }
 
+    // Verify account still exists in Stripe
+    try {
+      const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
+      if ((account as any).deleted) {
+        throw new Error("Account was deleted in Stripe");
+      }
+    } catch (err: any) {
+      // Account deleted or missing in Stripe! Reset DB and create a fresh onboarding link seamlessly
+      await prisma.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          stripe_account_id: null,
+          stripe_onboarding_done: false,
+        },
+      });
+
+      const newConnect = await WalletService.createConnectAccount({
+        userId,
+        returnUrl: returnUrl || `${config.FRONTEND_URL}/wallet/connect/success`,
+        refreshUrl: refreshUrl || `${config.FRONTEND_URL}/wallet/connect/refresh`,
+      });
+
+      return { url: newConnect.onboardingUrl };
+    }
+
     try {
       const loginLink = await stripe.accounts.createLoginLink(
         wallet.stripe_account_id,
       );
       return { url: loginLink.url };
     } catch (err: any) {
-      // Fallback: If login link fails (e.g. initial onboarding incomplete or test mode restriction),
-      // generate an account_update account link so user can still edit their bank/card payout details!
+      // Fallback: If login link fails, generate an account_update account link
       const baseUrl = config.FRONTEND_URL;
       const accountLink = await stripe.accountLinks.create({
         account: wallet.stripe_account_id,
@@ -220,27 +302,56 @@ export const WalletService = {
       );
     }
 
-    const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
-    const isComplete = Boolean(
-      account.details_submitted ||
-      account.payouts_enabled ||
-      account.capabilities?.transfers === "active"
-    );
+    try {
+      const account = await stripe.accounts.retrieve(wallet.stripe_account_id);
+      if ((account as any).deleted) {
+        await prisma.wallet.update({
+          where: { id: wallet.id },
+          data: { stripe_account_id: null, stripe_onboarding_done: false },
+        });
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "Connected account was deleted in Stripe. Please set up a new payout account.",
+        );
+      }
 
-    if (isComplete && !wallet.stripe_onboarding_done) {
-      await prisma.wallet.update({
-        where: { id: wallet.id },
-        data: { stripe_onboarding_done: true },
-      });
+      const isComplete = Boolean(
+        account.details_submitted ||
+        account.payouts_enabled ||
+        account.capabilities?.transfers === "active"
+      );
+
+      if (isComplete && !wallet.stripe_onboarding_done) {
+        await prisma.wallet.update({
+          where: { id: wallet.id },
+          data: { stripe_onboarding_done: true },
+        });
+      }
+
+      return {
+        accountId: wallet.stripe_account_id,
+        onboardingComplete: isComplete,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        detailsSubmitted: account.details_submitted,
+      };
+    } catch (err: any) {
+      if (
+        err?.statusCode === 404 ||
+        err?.code === "resource_missing" ||
+        err?.message?.includes("No such account")
+      ) {
+        await prisma.wallet.update({
+          where: { id: wallet.id },
+          data: { stripe_account_id: null, stripe_onboarding_done: false },
+        });
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "Connected account does not exist in Stripe. Please set up a new payout account.",
+        );
+      }
+      throw err;
     }
-
-    return {
-      accountId: wallet.stripe_account_id,
-      onboardingComplete: isComplete,
-      chargesEnabled: account.charges_enabled,
-      payoutsEnabled: account.payouts_enabled,
-      detailsSubmitted: account.details_submitted,
-    };
   },
 
   // get transactions
@@ -322,22 +433,42 @@ export const WalletService = {
     let accountId = wallet.stripe_account_id;
 
     // Check if onboarding status can be synced directly from Stripe
-    if (!isBoardingDone && accountId) {
+    if (accountId) {
       try {
         const account = await stripe.accounts.retrieve(accountId);
-        if (
+        if ((account as any).deleted) {
+          await prisma.wallet.update({
+            where: { id: wallet.id },
+            data: { stripe_account_id: null, stripe_onboarding_done: false },
+          });
+          isBoardingDone = false;
+          accountId = null;
+        } else if (
           account.details_submitted ||
           account.payouts_enabled ||
           account.capabilities?.transfers === "active"
         ) {
+          if (!isBoardingDone) {
+            await prisma.wallet.update({
+              where: { id: wallet.id },
+              data: { stripe_onboarding_done: true },
+            });
+            isBoardingDone = true;
+          }
+        }
+      } catch (err: any) {
+        if (
+          err?.statusCode === 404 ||
+          err?.code === "resource_missing" ||
+          err?.message?.includes("No such account")
+        ) {
           await prisma.wallet.update({
             where: { id: wallet.id },
-            data: { stripe_onboarding_done: true },
+            data: { stripe_account_id: null, stripe_onboarding_done: false },
           });
-          isBoardingDone = true;
+          isBoardingDone = false;
+          accountId = null;
         }
-      } catch {
-        // Stripe retrieve error, treat as not onboarded
       }
     }
 
