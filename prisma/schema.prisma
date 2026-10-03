@@ -92,6 +92,7 @@ model User {
   verification_document     VerificationDocument[]
   negotiation_offers        NegotiationOffer[]
   device_tokens             UserDeviceToken[]
+  job_submissions           JobSubmission[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -122,6 +123,7 @@ enum JobPostStatus {
   ASSIGNED
   IN_PROGRESS
   WAITING_FOR_APPROVAL
+  REVISION_REQUESTED
   COMPLETED
   CLOSED
   DISPUTED
@@ -142,7 +144,6 @@ model JobPost {
   status                  JobPostStatus @default(OPEN)
   selected_application_id String?       @unique
   before_images           String[]      @default([])
-  after_images            String[]      @default([])
 
   // relations
   job_images       JobImage[]
@@ -150,6 +151,7 @@ model JobPost {
   conversations    Conversation[]   @relation("JobConversations")
   payments         Payment[]        @relation("JobPayments")
   reviews          Review[]         @relation("JobReviews")
+  submissions      JobSubmission[]
 
   // relations
   customer             User            @relation("CustomerJobs", fields: [customer_id], references: [id], onDelete: Cascade)
@@ -160,6 +162,30 @@ model JobPost {
 
   @@index([customer_id])
   @@map("job_posts")
+}
+
+// ==================== Job Submissions / Revision History ====================
+model JobSubmission {
+  id                    String    @id @default(uuid())
+  job_id                String
+  submission_number     Int       @default(1)
+  helper_id             String
+  after_images          String[]  @default([])
+  note                  String?
+  status                String    @default("PENDING") // PENDING | REVISION_REQUESTED | APPROVED
+  revision_reason       String?
+  revision_images       String[]  @default([])
+  revision_requested_at DateTime?
+  reviewed_at           DateTime?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  job    JobPost @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  helper User    @relation(fields: [helper_id], references: [id], onDelete: Cascade)
+
+  @@index([job_id])
+  @@index([helper_id])
+  @@map("job_submissions")
 }
 
 // ==================== Job Images ====================

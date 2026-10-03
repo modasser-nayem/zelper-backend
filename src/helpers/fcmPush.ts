@@ -83,6 +83,12 @@ export function getNotificationLink(
       }
       return targetJobId ? `/customer/request-offer/active-details?id=${targetJobId}` : "/customer/request-offer";
 
+    case "JOB_REVISION_REQUESTED":
+      return targetJobId ? `/provider/my-works/myJob-details?id=${targetJobId}` : "/provider/my-works";
+
+    case "JOB_RESUBMITTED":
+      return targetJobId ? `/customer/request-offer/active-details?id=${targetJobId}` : "/customer/request-offer";
+
     case "ACCOUNT_VERIFIED":
     case "VERIFICATION_REJECTED":
       return "/provider/profile";

@@ -106,6 +106,24 @@ router.patch(
   JobController.completeJob,
 );
 
+// Customer: request revision / mark work incomplete (WAITING_FOR_APPROVAL → REVISION_REQUESTED)
+router.patch(
+  "/:id/request-revision",
+  auth(),
+  uploadFile.array("files"),
+  parseFormData,
+  JobController.requestRevision,
+);
+
+// Helper: resubmit revised work (REVISION_REQUESTED → WAITING_FOR_APPROVAL)
+router.patch(
+  "/:id/resubmit",
+  auth(),
+  uploadFile.array("files"),
+  parseFormData,
+  JobController.resubmitJob,
+);
+
 // Customer: approve job completion → COMPLETED + escrow released
 router.patch("/:id/approve", auth(), JobController.approveJob);
 

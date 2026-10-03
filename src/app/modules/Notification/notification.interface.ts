@@ -14,6 +14,8 @@ export enum NotificationType {
   JOB_ASSIGNED = "JOB_ASSIGNED",
   JOB_STARTED = "JOB_STARTED",
   JOB_WORK_COMPLETED = "JOB_WORK_COMPLETED",
+  JOB_REVISION_REQUESTED = "JOB_REVISION_REQUESTED",
+  JOB_RESUBMITTED = "JOB_RESUBMITTED",
   JOB_APPROVED = "JOB_APPROVED",
 
   // Identity / Admin verification
@@ -92,6 +94,15 @@ export type TWithdrawalFailedPayload = {
   reason: string;
 };
 
+export type TJobRevisionRequestedPayload = {
+  jobId: string;
+  reason: string;
+};
+
+export type TJobResubmittedPayload = {
+  jobId: string;
+};
+
 export type TNotificationDataPayloads = {
   [NotificationType.NEW_JOB_APPLICATION]: TNewJobApplicationPayload;
   [NotificationType.APPLICATION_SELECTED]: TApplicationSelectedPayload;
@@ -101,6 +112,8 @@ export type TNotificationDataPayloads = {
   [NotificationType.JOB_ASSIGNED]: TJobAssignedPayload;
   [NotificationType.JOB_STARTED]: TJobStartedPayload;
   [NotificationType.JOB_WORK_COMPLETED]: TJobWorkCompletedPayload;
+  [NotificationType.JOB_REVISION_REQUESTED]: TJobRevisionRequestedPayload;
+  [NotificationType.JOB_RESUBMITTED]: TJobResubmittedPayload;
   [NotificationType.JOB_APPROVED]: TJobApprovedPayload;
   [NotificationType.ACCOUNT_VERIFIED]: TAccountVerifiedPayload;
   [NotificationType.VERIFICATION_REJECTED]: TVerificationRejectedPayload;

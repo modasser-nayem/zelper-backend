@@ -398,6 +398,9 @@ export const JobService = {
             },
           },
         },
+        submissions: {
+          orderBy: { submission_number: "asc" },
+        },
       },
     });
 
@@ -422,8 +425,13 @@ export const JobService = {
       });
     }
 
+    const latestSubmission = job.submissions && job.submissions.length > 0
+      ? job.submissions[job.submissions.length - 1]
+      : null;
+
     return {
       ...maskJobDetails(job, userId),
+      after_images: latestSubmission?.after_images || [],
       already_applied: Boolean(myApplication),
       my_application: myApplication,
     };
@@ -641,6 +649,7 @@ export const JobService = {
       JobPostStatus.ASSIGNED,
       JobPostStatus.IN_PROGRESS,
       JobPostStatus.WAITING_FOR_APPROVAL,
+      JobPostStatus.REVISION_REQUESTED,
       JobPostStatus.COMPLETED,
       JobPostStatus.CLOSED,
       JobPostStatus.DISPUTED,
@@ -1534,8 +1543,9 @@ export const JobService = {
     userId: string;
     jobId: string;
     files?: Express.Multer.File[];
+    note?: string;
   }) => {
-    const { userId, jobId, files } = payload;
+    const { userId, jobId, files, note } = payload;
 
     const job = await prisma.jobPost.findUnique({
       where: { id: jobId },
@@ -1553,55 +1563,85 @@ export const JobService = {
       );
     }
 
-    if (job.status !== "IN_PROGRESS") {
+    if (job.status !== "IN_PROGRESS" && job.status !== "REVISION_REQUESTED") {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `Cannot complete a job with status '${job.status}'. Job must be IN_PROGRESS.`,
+        `Cannot submit work for a job with status '${job.status}'. Job must be IN_PROGRESS or REVISION_REQUESTED.`,
       );
     }
 
-    // Upload after images if any are uploaded, preserving existing after_images
-    let afterImages: string[] = job.after_images || [];
+    const isResubmission = job.status === "REVISION_REQUESTED";
+
+    // Upload after images for this submission iteration
+    let newUrls: string[] = [];
     if (files && files.length > 0) {
       const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
-      const newUrls = uploadResults.map((r) => r.url);
-      afterImages = [...afterImages, ...newUrls];
+      newUrls = uploadResults.map((r) => r.url);
     }
 
-    if (afterImages.length === 0) {
+    if (newUrls.length === 0) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "At least one after image is required to complete the job. Please upload a photo before proceeding.",
+        "At least one proof photo is required to submit completed work.",
       );
     }
 
+    // 1. Create a historical submission record
+    const prevSubmissionsCount = await prisma.jobSubmission.count({
+      where: { job_id: jobId },
+    });
+
+    await prisma.jobSubmission.create({
+      data: {
+        job_id: jobId,
+        helper_id: userId,
+        submission_number: prevSubmissionsCount + 1,
+        after_images: newUrls,
+        note: note || (isResubmission ? "Revised work submitted" : "Completed work submitted"),
+        status: "PENDING",
+      },
+    });
+
+    // 2. Update job post status to WAITING_FOR_APPROVAL
     const result = await prisma.jobPost.update({
       where: { id: jobId },
       data: {
         status: "WAITING_FOR_APPROVAL",
-        after_images: afterImages,
       },
       include: {
         job_images: true,
         selected_application: true,
+        submissions: { orderBy: { submission_number: "asc" } },
       },
     });
 
+    const notifType = isResubmission
+      ? NotificationType.JOB_RESUBMITTED
+      : NotificationType.JOB_WORK_COMPLETED;
+
+    const notifTitle = isResubmission
+      ? "Revised Work Submitted"
+      : "Job Work Completed";
+
+    const notifContent = isResubmission
+      ? `Helper resubmitted revised work for '${job.title}'. Please review and approve.`
+      : `Helper marked the job '${job.title}' as completed. Please review and approve.`;
+
     await NotificationService.createNotification({
       receiverId: job.customer_id,
-      type: NotificationType.JOB_WORK_COMPLETED,
-      title: "Job Work Completed",
-      content: `Helper marked the job '${job.title}' as completed. Please review and approve.`,
+      type: notifType,
+      title: notifTitle,
+      content: notifContent,
       data: { jobId: job.id },
     });
 
     try {
       const io = getIo();
       if (io) {
-        io.to(`user:${job.customer_id}`).emit("job_work_completed", {
+        io.to(`user:${job.customer_id}`).emit(isResubmission ? "job_resubmitted" : "job_work_completed", {
           jobId: job.id,
           status: "WAITING_FOR_APPROVAL",
-          title: "Job Work Completed",
+          title: notifTitle,
         });
         io.to(`user:${job.customer_id}`).emit("job_status_changed", {
           jobId: job.id,
@@ -1616,7 +1656,177 @@ export const JobService = {
       // Ignore socket emit errors
     }
 
+    try {
+      const conversation = await prisma.conversation.findFirst({
+        where: { job_id: jobId },
+      });
+      if (conversation) {
+        const msg = await prisma.message.create({
+          data: {
+            conversation_id: conversation.id,
+            sender_id: userId,
+            content: isResubmission
+              ? `🔄 [Work Resubmitted]: Helper submitted revised work for client review.${note ? ` Note: "${note}"` : ""}`
+              : `✅ [Work Completed]: Helper submitted completed work for client review.${note ? ` Note: "${note}"` : ""}`,
+            is_read: false,
+          },
+        });
+        const io = getIo();
+        if (io) {
+          io.to(`conversation:${conversation.id}`).emit("new_message", msg);
+        }
+      }
+    } catch {
+      // Ignore chat notice errors
+    }
+
     return result;
+  },
+
+  // Customer requests revision (WAITING_FOR_APPROVAL → REVISION_REQUESTED)
+  requestRevision: async (payload: {
+    userId: string;
+    jobId: string;
+    reason: string;
+    files?: Express.Multer.File[];
+  }) => {
+    const { userId, jobId, reason, files } = payload;
+
+    if (!reason || !reason.trim()) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Revision reason / feedback is required!");
+    }
+
+    const job = await prisma.jobPost.findUnique({
+      where: { id: jobId },
+      include: {
+        selected_application: true,
+      },
+    });
+
+    if (!job) throw new AppError(httpStatus.NOT_FOUND, "Job not found!");
+
+    if (job.customer_id !== userId) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Only the customer can request revisions!",
+      );
+    }
+
+    if (job.status !== "WAITING_FOR_APPROVAL") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Cannot request revision for a job with status '${job.status}'. Job must be WAITING_FOR_APPROVAL.`,
+      );
+    }
+
+    const helperId = job.selected_application?.helper_id;
+    if (!helperId) {
+      throw new AppError(httpStatus.BAD_REQUEST, "No assigned helper found for this job.");
+    }
+
+    // Upload customer revision proof photos if any
+    let revisionImages: string[] = [];
+    if (files && files.length > 0) {
+      const uploadResults = await FileUploadHelper.uploadMultiple(files, "job");
+      revisionImages = uploadResults.map((r) => r.url);
+    }
+
+    // Mark latest pending submission as REVISION_REQUESTED
+    const latestSubmission = await prisma.jobSubmission.findFirst({
+      where: { job_id: jobId },
+      orderBy: { submission_number: "desc" },
+    });
+
+    if (latestSubmission) {
+      await prisma.jobSubmission.update({
+        where: { id: latestSubmission.id },
+        data: {
+          status: "REVISION_REQUESTED",
+          revision_reason: reason.trim(),
+          revision_images: revisionImages,
+          revision_requested_at: new Date(),
+        },
+      });
+    } else {
+      await prisma.jobSubmission.create({
+        data: {
+          job_id: jobId,
+          helper_id: helperId,
+          submission_number: 1,
+          after_images: [],
+          revision_images: revisionImages,
+          status: "REVISION_REQUESTED",
+          revision_reason: reason.trim(),
+          revision_requested_at: new Date(),
+        },
+      });
+    }
+
+    const updatedJob = await prisma.jobPost.update({
+      where: { id: jobId },
+      data: {
+        status: "REVISION_REQUESTED",
+      },
+      include: {
+        job_images: true,
+        selected_application: true,
+        submissions: { orderBy: { submission_number: "asc" } },
+      },
+    });
+
+    await NotificationService.createNotification({
+      receiverId: helperId,
+      type: NotificationType.JOB_REVISION_REQUESTED,
+      title: "Work Revision Requested",
+      content: `Customer requested changes on '${job.title}': "${reason.trim()}". Please review notes and resubmit work.`,
+      data: { jobId: job.id, reason: reason.trim() },
+    });
+
+    try {
+      const io = getIo();
+      if (io) {
+        io.to(`user:${helperId}`).emit("job_revision_requested", {
+          jobId: job.id,
+          reason: reason.trim(),
+          status: "REVISION_REQUESTED",
+          title: "Work Revision Requested",
+        });
+        io.to(`user:${helperId}`).emit("job_status_changed", {
+          jobId: job.id,
+          status: "REVISION_REQUESTED",
+        });
+        io.to(`user:${userId}`).emit("job_status_changed", {
+          jobId: job.id,
+          status: "REVISION_REQUESTED",
+        });
+      }
+    } catch {
+      // Ignore socket errors
+    }
+
+    try {
+      const conversation = await prisma.conversation.findFirst({
+        where: { job_id: jobId },
+      });
+      if (conversation) {
+        const msg = await prisma.message.create({
+          data: {
+            conversation_id: conversation.id,
+            sender_id: userId,
+            content: `⚠️ [Revision Requested]: "${reason.trim()}"\nPlease fix the issues mentioned and resubmit your completed work.`,
+            is_read: false,
+          },
+        });
+        const io = getIo();
+        if (io) {
+          io.to(`conversation:${conversation.id}`).emit("new_message", msg);
+        }
+      }
+    } catch {
+      // Ignore chat notice errors
+    }
+
+    return updatedJob;
   },
 
   // approve job completion
@@ -1651,6 +1861,12 @@ export const JobService = {
       where: { id: jobId },
       data: { status: "COMPLETED" },
       select: { id: true, status: true, title: true },
+    });
+
+    // Mark pending submissions as approved
+    await prisma.jobSubmission.updateMany({
+      where: { job_id: jobId, status: "PENDING" },
+      data: { status: "APPROVED", reviewed_at: new Date() },
     });
 
     // release escrow
@@ -1743,11 +1959,11 @@ export const JobService = {
           status: { in: ["COMPLETED", "CLOSED"] },
         },
       }),
-      // Active jobs count (ASSIGNED and IN_PROGRESS and WAITING_FOR_APPROVAL status)
+      // Active jobs count (ASSIGNED, IN_PROGRESS, WAITING_FOR_APPROVAL, REVISION_REQUESTED status)
       prisma.jobPost.count({
         where: {
           customer_id: userId,
-          status: { in: ["ASSIGNED", "IN_PROGRESS", "WAITING_FOR_APPROVAL"] },
+          status: { in: ["ASSIGNED", "IN_PROGRESS", "WAITING_FOR_APPROVAL", "REVISION_REQUESTED"] },
         },
       }),
       // Total spent money (funded or released payments made by this customer)

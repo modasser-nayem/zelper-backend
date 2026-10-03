@@ -324,13 +324,53 @@ export const JobController = {
     const userId = req.user.id;
     const jobId = req.params.id;
     const files = req.files as Express.Multer.File[];
+    const note = req.body?.note || req.body?.description;
 
-    const result = await JobService.completeJob({ userId, jobId, files });
+    const result = await JobService.completeJob({ userId, jobId, files, note });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Job marked as complete. Awaiting customer approval.",
+      data: result,
+    });
+  }),
+
+  // Customer: request revision (WAITING_FOR_APPROVAL → REVISION_REQUESTED)
+  requestRevision: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+    const { reason } = req.body;
+    const files = req.files as Express.Multer.File[];
+
+    const result = await JobService.requestRevision({
+      userId,
+      jobId,
+      reason,
+      files,
+    });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Revision requested successfully. Helper has been notified.",
+      data: result,
+    });
+  }),
+
+  // Helper: resubmit revised job (REVISION_REQUESTED → WAITING_FOR_APPROVAL)
+  resubmitJob: catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const jobId = req.params.id;
+    const files = req.files as Express.Multer.File[];
+    const note = req.body?.note || req.body?.description;
+
+    const result = await JobService.completeJob({ userId, jobId, files, note });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Revised work submitted successfully. Awaiting customer approval.",
       data: result,
     });
   }),

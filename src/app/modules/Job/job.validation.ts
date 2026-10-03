@@ -32,7 +32,16 @@ const createJob = z.object({
 
 const updateJob = createJob.partial();
 
+const requestRevision = z.object({
+  body: z.object({
+    reason: z
+      .string({ required_error: "Revision reason is required" })
+      .min(3, "Reason must be at least 3 characters"),
+  }),
+});
+
 export const JobValidation = {
   createJob,
   updateJob,
+  requestRevision,
 };
